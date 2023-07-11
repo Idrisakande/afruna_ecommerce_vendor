@@ -1,0 +1,126 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+@layer utilities {
+ 
+  .cardbg-red {
+    background:#fcf6f6b2 url(../assets/imgs/cdBg2.png);
+    background-blend-mode: lighten;
+    background-origin: content-box;
+    backdrop-filter: blur(20px);
+  }
+  .cardbg-blue {
+    background: #fcfdffcc url(../assets/imgs/cdBg2.png);
+    background-blend-mode: lighten;
+  }
+  .cardbg-left {
+    background:#fffaf7b2 url(../assets/imgs/cdBg2.png) no-repeat;
+    background-blend-mode: soft-light;
+    background-origin: border-box;
+   background-position-x: center;
+  }
+  .cardbg-right {
+    background:#FEFBFFCC url(../assets/imgs/cdBg1.png);
+    background-blend-mode: lighten;
+    background-origin: border-box;
+    backdrop-filter: blur(20px);
+    background-size: cover;
+  }
+}
+
+
+
+@font-face {
+  font-family: "Lato";
+  src: url('../assets/fonts/Lato-Regular.ttf');
+}
+@font-face {
+  font-family: "Quicksand-Regular";
+  src: url('../assets/fonts/static/Quicksand-Regular.ttf');
+}
+
+* {
+  letter-spacing: 0.05rem;
+  outline: 0;
+  box-sizing: border-box;
+}
+
+
+:root {
+  --background: #F4F7F9;
+  --background-start: #FFFFFF; 
+  --background-end: #F4F5FF;
+  --border-col: #D5D5E6;
+}
+
+/* @media (prefers-color-scheme: dark) {
+  :root {
+   
+  }
+} */
+
+body {
+  background: var(--background);
+  overflow: hidden;
+}
+
+/* CSS Normalize */
+html, body, div, span, h1, h2, h3, h4, h5, h6, p, pre,
+a, code, em, img, small, strong, sub, sup,
+b, i, dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td {
+    margin: 0;
+    padding: 0;
+	box-sizing: border-box;
+    /* border: none; */
+}
+
+
+::-webkit-scrollbar {
+	width: 7px;
+}
+::-webkit-scrollbar-thumb {
+	width: 5px;
+	background: var(--border-col);
+	border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+	background: #3b3b3b;
+}
+::-webkit-scrollbar-track{
+	border:none;
+	background-color: var(--background-end);
+}
+::-webkit-scrollbar-track-piece {
+	width: 4px;
+}
+
+*, *::before, *::after {
+    box-sizing: inherit;
+}
+
+
+
+ol, ul {
+    list-style: none;
+}
+
+blockquote, q {
+    quotes: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content: '';
+    content: none;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+@import url("./vendor-auth.style.css");
