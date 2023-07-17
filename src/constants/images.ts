@@ -28,6 +28,10 @@ import cardBg2 from "../assets/imgs/cardBg2.png";
 import vendorhomeart from "../assets/imgs/Group 1040.png";
 import clipart_1 from "../assets/imgs/clipart-01.png";
 import clipart_2 from "../assets/imgs/clipart-02.png";
+import clipart_3 from "../assets/imgs/clipart-03.png";
+import clipart_4 from "../assets/imgs/clipart-04.png";
+import clipart_5 from "../assets/imgs/clipart-05.png";
+import clipart_6 from "../assets/imgs/clipart-06.png";
 import google_icon from "../assets/imgs/google.png";
 import authwall from "../assets/imgs/africa_map.png";
 
@@ -52,6 +56,10 @@ export const images = {
 	authwall,
 	clipart_1,
 	clipart_2,
+	clipart_3,
+	clipart_4,
+	clipart_5,
+	clipart_6,
 	logo,
 	profileImg,
 	userImg1,

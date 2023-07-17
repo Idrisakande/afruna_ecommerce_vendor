@@ -9,7 +9,6 @@ import {
 	useReactTable,
 } from "@tanstack/react-table";
 import Image from "next/image";
-import { FaEye } from "react-icons/fa";
 import { MdDeleteOutline, MdRemoveRedEye } from "react-icons/md";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 
@@ -17,9 +16,9 @@ import { IRecentOrders } from "@/interfaces/tables.interface";
 import { recent_order } from "@/constants/data";
 import Link from "next/link";
 
-interface RecentOrderType {}
+interface ProductListingProps {}
 
-const REcentOrderTable: FC<RecentOrderType> = () => {
+const REcentOrderTable: FC<ProductListingProps> = () => {
 	const [data, setData] = useState(() => [...recent_order]);
 
 	const [sorting, setSorting] = useState<SortingState>([]);
@@ -31,7 +30,7 @@ const REcentOrderTable: FC<RecentOrderType> = () => {
 					const id = `#${info.getValue()}`;
 					return <div className="ml-2">{id}</div>;
 				},
-				header: () => <span className="">ID</span>,
+				header: () => <span className="">Product ID</span>,
 			},
 			{
 				accessorKey: "image",
@@ -55,9 +54,13 @@ const REcentOrderTable: FC<RecentOrderType> = () => {
 				header: () => <span className="">Item Name</span>,
 			},
 			{
-				accessorKey: "qty",
-				cell: (info) => info.getValue(),
-				header: () => <span className="">Quantity</span>,
+				accessorKey: "category",
+				cell: () => {
+					let items = ["Fashion", "COD", "Electronics", "Agros"];
+					let idx = Math.floor(Math.random() * items.length);
+					return items[idx];
+				},
+				header: () => <span className="">Category</span>,
 			},
 			{
 				accessorKey: "order_date",

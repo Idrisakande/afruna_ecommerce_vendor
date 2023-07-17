@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import { forwardRef, useState } from "react";
+import { FC, FunctionComponent, Ref, forwardRef, useState } from "react";
 import * as Select from "@radix-ui/react-select";
 import classnames from "classnames";
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
@@ -8,24 +8,38 @@ const useSelect = (
 	data: string[] | number[],
 	placeholder: string,
 	headerTitle?: string | undefined
-): { selected: string; ItemPicker: () => JSX.Element } => {
+): { selected: string; ItemPicker: FunctionComponent } => {
 	const [selected, setSelected] = useState("");
-	const ItemPicker = () => {
+	const [isOpen, setIsOpen] = useState(false);
+	const ItemPicker: FC<{}> = ({}) => {
 		return (
-			<div>
+			<div className="text-xs">
 				{headerTitle ? <h2 className="my-2">{headerTitle}</h2> : null}
 
-				<Select.Root onValueChange={(val) => setSelected(val)}>
-					<Select.Trigger className="w-full p-[18px] bg-white focus:bg-white text-sm text-slate-900 border border-slate-300 flex justify-between items-center rounded-lg">
+				<Select.Root
+					onOpenChange={setIsOpen}
+					onValueChange={(val) => setSelected(val)}
+				>
+					<Select.Trigger
+						className={classnames(
+							"w-full p-2 bg-white focus:bg-white text-sm text-afruna-blue border border-afruna-gray/20 flex justify-between items-center rounded-lg"
+						)}
+					>
 						<Select.Value
 							placeholder={selected ? selected : placeholder}
 						/>
-						<Select.Icon className="">
+						<Select.Icon
+							className={`${
+								isOpen && "rotate-180"
+							} transition ease-in-out delay-200 duration-500 `}
+						>
 							<ChevronDownIcon className="w-5 h-5 text-black font-extrabold" />
 						</Select.Icon>
 					</Select.Trigger>
-					<Select.Portal>
-						<Select.Content className="SelectContent">
+					<Select.Portal
+						className={classnames("bg-white rounded-md")}
+					>
+						<Select.Content>
 							<Select.ScrollUpButton className="">
 								<ChevronUpIcon />
 							</Select.ScrollUpButton>
@@ -67,7 +81,7 @@ const SelectItem = forwardRef(
 			className: string;
 			value: string | number;
 		},
-		forwarded
+		forwarded: Ref<HTMLDivElement>
 	) => {
 		return (
 			<Select.Item

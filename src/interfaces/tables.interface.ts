@@ -39,16 +39,17 @@ export interface IBuyers {
 	status: string;
 }
 export interface IBuyerOrder {
-	id: number
-	img: StaticImageData
-	itemName: string
-	amount: number
-	quantity: number
-	orderDate: string
-	status: string
+	id: number;
+	img: StaticImageData;
+	itemName: string;
+	amount: number;
+	quantity: number;
+	orderDate: string;
+	status: string;
 }
 export interface IOrder {
 	id: number;
+	img: StaticImageData;
 	buyers_name: string;
 	item_name: string;
 	amount: number;
@@ -69,10 +70,10 @@ export interface IProducts {
 	productImg: StaticImageData;
 	category: string;
 	stock: number;
-	rating: string
-	price: number
-	order: number
-	dateListed: string
+	rating: string;
+	price: number;
+	order: number;
+	dateListed: string;
 }
 
 export interface IOrederDetails {

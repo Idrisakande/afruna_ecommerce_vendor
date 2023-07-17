@@ -34,9 +34,9 @@ export function InputLabelNumber({
 	}, []);
 	useMemo(() => getValue(input), [getValue, input]);
 	return (
-		<fieldset>
+		<fieldset className="text-xs">
 			<h3 className="my-2">{headerTitle}</h3>
-			<div className="flex justify-between items-center border-[1px] border-slate-300 px-3 rounded-md">
+			<div className="flex justify-between items-center border-[1px] border-slate-300 px-2 rounded-md">
 				{prefix && <span>$</span>}
 				<input
 					ref={inputRef}
@@ -44,7 +44,7 @@ export function InputLabelNumber({
 					value={inputRef.current?.value}
 					type="number"
 					placeholder={placeholder}
-					className="w-full p-3"
+					className="w-full p-1"
 				/>
 				{suffix ? (
 					<div className="flex flex-col items-center">
