@@ -10,9 +10,9 @@ export default function Breadcrumbs() {
 	const route = r === "/" ? "Dashboard" : r.split("/")[1];
 	return (
 		<section>
-			<h1 className="capitalize">
+			<h1 className="capitalize font-extrabold text-sm md:text-lg tracking-tight">
 				{route}
-				<span className="text-slate-700 font-medium">
+				<span className="text-sm md:text-lg text-slate-700 font-medium">
 					{" "}
 					{slug ? " > ".concat(slug as string) : ""}
 				</span>

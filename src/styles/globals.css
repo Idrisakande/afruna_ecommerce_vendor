@@ -4,7 +4,7 @@
 
 
 
-@layer utilities {
+/* @layer utilities {
  
   .cardbg-red {
     background:#fcf6f6b2 url(../assets/imgs/cdBg2.png);
@@ -29,7 +29,7 @@
     backdrop-filter: blur(20px);
     background-size: cover;
   }
-}
+} */
 
 
 
@@ -43,7 +43,7 @@
 }
 
 * {
-  letter-spacing: 0.05rem;
+  /* letter-spacing: 0.05rem; */
   outline: 0;
   box-sizing: border-box;
 }
