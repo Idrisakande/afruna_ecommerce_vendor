@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import { FC, memo, useContext } from "react";
+import { FC, memo, useContext, useEffect } from "react";
 import { Content } from "./Content";
 import { IProductContext } from "@/interfaces/IProductContext";
 import { Header } from "./Header";
@@ -10,10 +10,15 @@ import { ProductItem } from "./ProductItem";
 import { images } from "@/constants/images";
 import { productcontext } from "@/contexts/ProductProvider";
 
-export const ManageProducts: FC<{}> = memo(({}) => {
-	const { tab, itemsSelector } = useContext(
-		productcontext
-	) as IProductContext;
+export const ManageProducts: FC<{}> = memo(({ }) => {
+	const { tab, itemsSelector } = useContext(productcontext) as IProductContext;
+	useEffect(() => {
+		const hiddenBTN = document.querySelector(
+			"button.bg-gradient-y-deepblue",
+		) as HTMLButtonElement;
+		hiddenBTN.style.display = "flex";
+	}, []);
+
 	return (
 		<Content>
 			<Header
@@ -28,12 +33,7 @@ export const ManageProducts: FC<{}> = memo(({}) => {
 						/>
 						<SelectPicker
 							getSelected={(val) => console.log(val)}
-							items={[
-								"Approved",
-								"Pending",
-								"Cancelled",
-								"Shipped",
-							]}
+							items={["Approved", "Pending", "Cancelled", "Shipped"]}
 							placeholder="Action"
 							triggerClassName="flex p-[8px] relative top-[5px] items-center space-x-2 border border-afruna-gray/40 [-2 rounded-md"
 						/>

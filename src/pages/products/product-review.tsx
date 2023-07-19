@@ -1,37 +1,38 @@
 /* eslint-disable import/no-anonymous-default-export */
 /* eslint-disable react/display-name */
 import Image from "next/image";
-import React, { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { images } from "@/constants/images";
-import { PiArrowBendUpLeft, PiX } from "react-icons/pi";
 import { ProductProvider, productcontext } from "@/contexts/ProductProvider";
 import { IProductContext } from "@/interfaces/IProductContext";
+import { MdCancel, MdReply, MdStar } from "react-icons/md";
+import { HiX } from "react-icons/hi";
 
 const messages = [
 	{
 		user: "Mohammed Ali",
 		image: images.userImg1,
-		rating: "5stars",
+		rating: 3.6,
 		comment: "I'm happy to get my product delivered in good keep.",
 		date: "05 April 2016",
 	},
 	{
-		user: "Mohammed Ali",
+		user: "Omarion Sheneal",
 		image: images.userImg,
-		rating: "3stars",
-		comment: "",
+		rating: 4.2,
+		comment: "Wow I'm grateful for your services dear seller!",
 		date: "04 April 2006",
 	},
 	{
 		user: "Mohammed Ali",
 		image: images.userImg1,
-		rating: "4stars",
+		rating: 5,
 		comment:
 			"Nice dress i love this so much . you are the best platform for marketting you got all the good your customers are looking for. please keep up the good work",
 		date: "15 days ago",
 	},
 ];
-export default function () {
+export default function() {
 	return (
 		<ProductProvider>
 			<ReviewDetails />
@@ -42,30 +43,33 @@ export default function () {
 function ReviewDetails() {
 	const { product_review } = useContext(productcontext) as IProductContext;
 	const [reply, setReply] = useState(false);
+	useEffect(() => {
+		const hiddenBTN = document.querySelector(
+			"button.bg-gradient-y-deepblue",
+		) as HTMLButtonElement;
+		hiddenBTN.style.display = "none";
+	}, []);
+
 	return (
-		<div className="relative">
-			<section className="flex justify-around w-[80vw] p-3">
+		<div className="relative p-3 text-[12px] pb-28 md:pb-44">
+			<section className="grid grid-cols-4 md:h-48">
 				<Image
 					src={product_review?.image ?? ""}
 					alt="productImage"
-					className="w-[25vw] h-[50vh]"
+					className="md:grid-span-1"
 				/>
-				<div className="mx-1 px-3 flex flex-col justify-around h-5/6 ">
-					<p className="text-md text-orange-300">
-						# {product_review?.id}
-					</p>
+				<div className="md:grid-span-3">
+					<p className=" text-afruna-gold/70"># {product_review?.id}</p>
 					<p>{product_review?.name}</p>
-					<p className="text-xs text-slate-300">
-						{product_review?.category}
-					</p>
+					<p className="text-slate-300">{product_review?.category}</p>
 					<p>{product_review?.status}</p>
 				</div>
 			</section>
-			<div className="messages">
+			<div className="messages grid grid-cols-6">
 				{messages.map((message) => (
 					<div
 						key={message.rating}
-						className=" bg-slate-200 rounded-md p-2 m-2 h-[50vh]"
+						className="md:col-span-3 bg-slate-200/40 rounded-md p-2 m-2 h-32"
 					>
 						<section className="flex mb-3">
 							<Image
@@ -75,8 +79,15 @@ function ReviewDetails() {
 							/>
 							<div className="ml-2">
 								<p>{message.user}</p>
-								<p className="text-yellow-300">
-									{message.rating}
+								<p className={"flex space-x-[1px] items-center"}>
+									{Array(5)
+										.fill("_")
+										.map((_, __) => (
+											<MdStar
+												className={`${__ + 1 <= message.rating ? "text-afruna-gold/70" : ""
+													}`}
+											/>
+										))}
 								</p>
 								<p>{message.date}</p>
 							</div>
@@ -87,28 +98,36 @@ function ReviewDetails() {
 						<button
 							onClick={() => {
 								setReply((prev) => !prev);
-								console.log(reply, " iam hit");
 							}}
 							className="flex"
 						>
-							<PiArrowBendUpLeft /> Reply
+							<MdReply /> Reply
 						</button>
 					</div>
 				))}
 			</div>
 			<div
-				className={`absolute top-0   h-screen ${
-					reply ? "flex" : "hidden"
-				} items-center justify-center w-screen bg-black/40 `}
+				className={`${reply
+						? "flex fixed z-20 left-0 top-0  items-center justify-center w-screen bg-black/40 h-screen"
+						: "hidden"
+					}`}
 			>
-				<form className="reply_pop  p-10 rounded-lg bg-white h-[70%] w-[60%] ">
-					<PiX onClick={() => setReply((prev) => !prev)} />
-
-					<textarea
-						placeholder="Message"
-						className="w-full h-full border-[1px] border-slate-300 rounded-md"
-					/>
-					<button type="submit" className="mb-5">
+				<form className="relative flex flex-col p-10 text-afruna-blue m-auto rounded-lg bg-white h-fit w-[50vw] ">
+					<button
+						type="button"
+						className="absolute right-4"
+						onClick={() => setReply(false)}
+					>
+						<HiX />
+					</button>
+					<div>
+						<p className="">Message</p>
+						<textarea className="p-5 w-full border border-afruna-gray/40 rounded-md" />
+					</div>
+					<button
+						type="submit"
+						className="self-end mb-5 text-white bg-afruna-blue rounded-md p-2"
+					>
 						Send
 					</button>
 				</form>

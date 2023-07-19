@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import { FC, memo, useCallback, useContext, useState } from "react";
+import { FC, memo, useCallback, useContext, useEffect, useState } from "react";
 import { Header } from "./Header";
 import { Content } from "./Content";
 import { IProductContext } from "@/interfaces/IProductContext";
@@ -13,7 +13,7 @@ import { InputLabel } from "../widgets/Input/InputLabel";
 import { MdAdd, MdDelete, MdImage } from "react-icons/md";
 import { InputMetadata } from "../widgets/Input/InputMetadata";
 
-export const CreateProduct: FC<{}> = memo(({}) => {
+export const CreateProduct: FC<{}> = memo(({ }) => {
 	const { tab } = useContext(productcontext) as IProductContext;
 	const [files, setFiles] = useState<ExtFile[]>([]);
 	const updateFiles = useCallback((incommingFiles: ExtFile[]) => {
@@ -26,7 +26,7 @@ export const CreateProduct: FC<{}> = memo(({}) => {
 						alert(`The file size of ${file.name} is too large.`);
 						return;
 					}
-				})
+				}),
 			);
 		} else {
 			alert("Maximum files reached!");
@@ -36,8 +36,14 @@ export const CreateProduct: FC<{}> = memo(({}) => {
 		(id: string | number | undefined) => {
 			setFiles(files.filter((x: ExtFile) => x.id !== id));
 		},
-		[files]
+		[files],
 	);
+	useEffect(() => {
+		const hiddenBTN = document.querySelector(
+			"button.bg-gradient-y-deepblue",
+		) as HTMLButtonElement;
+		hiddenBTN.style.display = "flex";
+	}, []);
 
 	return (
 		<Content>
@@ -86,9 +92,7 @@ export const CreateProduct: FC<{}> = memo(({}) => {
 											</span>
 										</header>
 										<FileMosaic {...file} preview />
-										<span
-											onClick={() => removeFile(file.id)}
-										>
+										<span onClick={() => removeFile(file.id)}>
 											<MdDelete size={20} />
 										</span>
 									</div>
@@ -113,13 +117,7 @@ export const CreateProduct: FC<{}> = memo(({}) => {
 					/>
 					<div className="w-full grid grid-cols-2 gap-8">
 						<ColorSelector
-							colors={[
-								"red",
-								"green",
-								"yellow",
-								"gray",
-								"lightblue",
-							]}
+							colors={["red", "green", "yellow", "gray", "lightblue"]}
 							getselectedColor={(color) => console.log(color)}
 							headerTitle="Colors"
 						/>
