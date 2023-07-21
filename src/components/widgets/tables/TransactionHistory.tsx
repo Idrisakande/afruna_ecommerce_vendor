@@ -8,10 +8,7 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
-import Image from "next/image";
-import { FaEye } from "react-icons/fa";
-import { MdDeleteOutline } from "react-icons/md";
-import { BiChevronDown, BiChevronUp } from "react-icons/bi";
+import { MdDeleteOutline, MdPrint } from "react-icons/md";
 
 import { ITransactionHistory } from "@/interfaces/tables.interface";
 import { transactionHistory_data } from "@/constants/data";
@@ -76,17 +73,43 @@ const TransactionHistory: FC<TransactionHistoryType> = () => {
 			},
 			{
 				accessorKey: "amount",
-				cell: (info) => info.getValue(),
+				cell: ({ getValue }) => (
+					<>${(getValue() as number).toLocaleString()}</>
+				),
 				header: () => <span>Amount</span>,
 			},
 
 			{
 				accessorKey: "action",
-				cell: (info) => info.getValue(),
-				header: () => <span>Action</span>,
+				header: () => <>Actions</>,
+				cell: ({ cell, row }) => {
+					return (
+						<div className="flex items-center space-x-2">
+							<button
+								className={
+									"text-sm transition ease-out duration-200 hover:scale-105"
+								}
+							>
+								<MdPrint />
+							</button>
+							<button
+								onClick={() =>
+									setData(
+										data.filter((_, id) => row.index !== id)
+									)
+								}
+								className={
+									"text-sm transition ease-out duration-200 hover:scale-105"
+								}
+							>
+								<MdDeleteOutline />
+							</button>
+						</div>
+					);
+				},
 			},
 		],
-		[]
+		[data]
 	);
 	const table = useReactTable({
 		data,
@@ -101,13 +124,13 @@ const TransactionHistory: FC<TransactionHistoryType> = () => {
 
 	return (
 		<div className="overflow-auto">
-			<table className="w-screen lg:w-full border-collapse">
+			<table className="w-full relative overflow-auto  border-collapse">
 				<thead className="p-4">
 					{table.getHeaderGroups().map((headerGroup) => (
 						<tr key={headerGroup.id}>
 							{headerGroup.headers.map((header) => (
 								<th
-									className="text-left font-medium p-3 text-slate-500 text-sm"
+									className="text-left font-semibold p-1 text-afruna-gray/70 text-[12px]"
 									key={header.id}
 								>
 									{header.index > 1 &&
@@ -137,7 +160,10 @@ const TransactionHistory: FC<TransactionHistoryType> = () => {
 						>
 							{row.getVisibleCells().map((cell) => {
 								return (
-									<td className="text-left p-2" key={cell.id}>
+									<td
+										className="px-1 py-3 text-left text-[14px]"
+										key={cell.id}
+									>
 										{flexRender(
 											cell.column.columnDef.cell,
 											cell.getContext()

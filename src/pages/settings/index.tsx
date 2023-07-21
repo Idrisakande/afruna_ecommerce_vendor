@@ -1,27 +1,23 @@
 "use client";
 
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-
-import { Main } from "@/layouts/Main";
 import Image from "next/image";
-import { images } from "@/constants/images";
 import * as Accordion from "@radix-ui/react-accordion";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
-import { useForm, Controller } from "react-hook-form";
-import "react-phone-input-2/lib/style.css";
-import PhoneInput from "react-phone-input-2";
-// import "react-phone-number-input/style.css";
-// import PhoneInput from "react-phone-number-input";
+import { useForm } from "react-hook-form";
+import { PhoneInput } from "react-international-phone";
+import "react-international-phone/style.css";
 
+import { Main } from "@/layouts/Main";
+import { images } from "@/constants/images";
+import ReactFlagsSelect from "react-flags-select";
+import { useState } from "react";
 export default function Index() {
 	const {
-		control,
 		register,
-		handleSubmit,
 		setValue,
 		formState: { errors },
 	} = useForm();
+	const [country, setCountry] = useState("");
 
 	// const [open, setOpen] = useState<boolean>(false);
 
@@ -43,7 +39,7 @@ export default function Index() {
 	return (
 		<>
 			<Main>
-				<main className="px-8 py-14">
+				<main className="px-8 py-14 text-xs">
 					<div className="relative flex gap-8">
 						<Image
 							src={images.userImg}
@@ -205,14 +201,10 @@ export default function Index() {
 										>
 											Country of Residence
 										</label>
-										<input
-											id="country"
-											type="country"
-											placeholder="Ghana"
-											className="w-full placeholder:text-[#959191] px-4 py-3 border border-[#E0E0E0] rounded-md shadow-sm outline-none focus:outline-[#9B9B9B] focus:border-none focus:outline-[1px]"
-											{...register("country", {
-												required: true,
-											})}
+										<ReactFlagsSelect
+											fullWidth
+											selected=""
+											onSelect={setCountry}
 										/>
 										{errors.country && (
 											<p className="text-blue mt-1">
@@ -356,26 +348,28 @@ export default function Index() {
 											>
 												Phone Number
 											</label>
+
 											<PhoneInput
-												country={"ng"}
-												{...register("phoneNumber", {
-													required:
-														"Phone number is required",
-												})}
-												onChange={(value) =>
-													setValue(
-														"phoneNumber",
-														value
-													)
-												}
-												// name="phoneNumber"
+												// onChange={handlePhoneChange}
+												// value={phone}
+												defaultCountry="ng"
+												inputClassName="ml-2"
 												inputProps={{
-													name: "phoneNumber",
-													required: true,
-													className:
-														"w-full placeholder:text-[#959191] pl-10 pr-4 py-3 border border-[#E0E0E0] rounded-md shadow-sm outline-none focus:outline-[#9B9B9B] overflow-hidden focus:border-none focus:outline-[1px]",
+													...register("phone"),
 												}}
+												inputStyle={{
+													border: "none",
+													width: "100%",
+												}}
+												countrySelectorStyleProps={{
+													buttonStyle: {
+														border: "none",
+													},
+												}}
+												placeholder="phone number"
+												className="flex items-center p-2 border-[1px] border-slate-300 focus-within:border-slate-400 focus-within:shadow-lg rounded-md"
 											/>
+
 											{errors.lastName && (
 												<p className="text-blue mt-1">
 													{errors.lastName.type ===

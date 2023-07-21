@@ -1,11 +1,11 @@
 /* eslint-disable react/display-name */
 import { FC, Ref, forwardRef, useState } from "react";
+import classnames from "classnames";
 import * as Select from "@radix-ui/react-select";
 import { MdCheck } from "react-icons/md";
 import { RxChevronDown, RxChevronUp } from "react-icons/rx";
 
 import { ISelectPicker } from "@/interfaces/selectPicker.interface";
-import classnames from "classnames";
 
 // tailwind style to move div to the right end of the screen
 export const SelectPicker: FC<ISelectPicker> = ({
@@ -13,6 +13,7 @@ export const SelectPicker: FC<ISelectPicker> = ({
 	placeholder,
 	triggerLeftIcon,
 	getSelected,
+	contentClassName,
 	triggerClassName,
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -33,8 +34,13 @@ export const SelectPicker: FC<ISelectPicker> = ({
 					/>
 				</Select.Icon>
 			</Select.Trigger>
-			<Select.Portal className="z-10 bg-slate-50 rounded-md shadow-md text-[12px] text-afruna-blue transition-all ease-out duration-200 delay-700">
-				<Select.Content className="" position="popper">
+			<Select.Portal
+				className={classnames(
+					"z-10 bg-slate-50 rounded-md shadow-md text-[12px] text-afruna-blue transition-all ease-out duration-200 delay-700",
+					contentClassName
+				)}
+			>
+				<Select.Content position="popper">
 					<Select.ScrollUpButton className="">
 						<RxChevronUp />
 					</Select.ScrollUpButton>

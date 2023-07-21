@@ -2,12 +2,14 @@ import { SiderBar } from "@/components/SiderBar";
 import { DashboardHeader } from "@/components/headers/DashboardHeader";
 import { HeaderDropdown } from "@/components/widgets/HeaderDropdown";
 import LocaleSelector from "@/components/widgets/LocaleSelector";
+import { NotificationPopup } from "@/components/widgets/NotificationPopup";
+import { SelectPicker } from "@/components/widgets/SelectPicker";
 import { images, svgs } from "@/constants/images";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { FC, ReactElement, useCallback } from "react";
-import { MdSettings, MdShoppingCart } from "react-icons/md";
+import { MdHelp, MdSettings, MdShoppingCart } from "react-icons/md";
 
 interface MainProps {
 	children: React.ReactNode;
@@ -36,7 +38,16 @@ export const Main: FC<MainProps> = ({
 							dropdownBgColor="red"
 							dropDownIcon={<BiWorld />}
 						/> */}
+						<SelectPicker
+							items={["item one", "item two", "item three"]}
+							placeholder={"Help"}
+							triggerLeftIcon={<MdHelp />}
+							getSelected={(value) => console.log(value)}
+							contentClassName="z-20"
+							triggerClassName="flex text-xs space-x-1 items-center text-afruna-blue"
+						/>
 						<LocaleSelector />
+						<NotificationPopup />
 						<HeaderDropdown
 							title={"Jon Dov"}
 							profileSrc={images.userImg}

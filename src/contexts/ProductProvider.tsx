@@ -25,8 +25,6 @@ export const ProductProvider: FC<{ children: ReactNode }> = ({ children }) => {
 		[]
 	);
 
-	console.log(product_review);
-
 	const itemsSelector = useCallback(
 		(item: IProductItem) => {
 			let itemExist = manageItems.some(

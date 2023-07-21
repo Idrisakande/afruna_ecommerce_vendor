@@ -9,10 +9,6 @@ import {
 	MdChat,
 	MdCreditCard,
 	MdDashboard,
-	MdGroups,
-	MdLogin,
-	MdPeopleAlt,
-	MdReviews,
 	MdSettings,
 	MdShoppingBag,
 	MdShoppingCart,
@@ -49,9 +45,9 @@ export function SiderBar() {
 						opts: {},
 					},
 					{
-						title: "Reports",
+						title: "Report",
 						Icon: MdTrendingUp,
-						link: "/reports",
+						link: "/report",
 						hasOption: false,
 						opts: {},
 					},
@@ -81,18 +77,14 @@ export function SiderBar() {
 				].map((SidebarItem) => (
 					<div key={SidebarItem.title}>
 						<Link
-							className={`${
-								currentRoute === SidebarItem.link
+							className={`${currentRoute === SidebarItem.link
 									? "text-slate-950 font-extrabold bg-slate-300"
 									: ""
-							} w-full relative group py-2 pl-8 mt-3 flex justify-between items-center font-medium text-xs text-slate-500/70 hover:text-slate-950 hover:font-extrabold hover:bg-slate-300 transition duration-300`}
+								} w-full relative group py-2 pl-8 mt-3 flex justify-between items-center font-medium text-[12px] text-slate-500/70 hover:text-slate-950 hover:font-extrabold hover:bg-slate-300 transition duration-300`}
 							href={SidebarItem.link}
 						>
 							<div className="flex justify-start items-center ">
-								<SidebarItem.Icon
-									size={23}
-									className="relative right-2"
-								/>
+								<SidebarItem.Icon size={23} className="relative right-2" />
 								<span className="xs:hidden md:inline-block">
 									{SidebarItem.title}
 								</span>
@@ -105,11 +97,8 @@ export function SiderBar() {
 								</div>
 							)}
 							<div
-								className={`${
-									currentRoute === SidebarItem.link
-										? "opacity-100"
-										: ""
-								} absolute -right-5 top-1/2 transform -translate-y-1/2 w-8 h-8 rounded-full bg-orange-300 opacity-0 group-hover:opacity-100 transition-opacity duration-300`}
+								className={`${currentRoute === SidebarItem.link ? "opacity-100" : ""
+									} absolute -right-5 top-1/2 transform -translate-y-1/2 w-8 h-8 rounded-full bg-orange-300 opacity-0 group-hover:opacity-100 transition-opacity duration-300`}
 							/>
 						</Link>
 					</div>
@@ -126,7 +115,7 @@ const AccordionTrigger = React.forwardRef(
 			className,
 			...props
 		}: { children: React.ReactNode; className: string },
-		forwardedRef
+		forwardedRef,
 	) => (
 		<Accordion.Header className="">
 			<Accordion.Trigger
@@ -138,7 +127,7 @@ const AccordionTrigger = React.forwardRef(
 				<GoChevronDown className="chevrondown" />
 			</Accordion.Trigger>
 		</Accordion.Header>
-	)
+	),
 );
 
 const AccordionContent = React.forwardRef(
@@ -148,7 +137,7 @@ const AccordionContent = React.forwardRef(
 			className,
 			...props
 		}: { children: React.ReactNode; className: string },
-		forwardedRef
+		forwardedRef,
 	) => (
 		<Accordion.Content
 			className={classNames("accordion-content", className)}
@@ -157,5 +146,5 @@ const AccordionContent = React.forwardRef(
 		>
 			<div className="">{children}</div>
 		</Accordion.Content>
-	)
+	),
 );

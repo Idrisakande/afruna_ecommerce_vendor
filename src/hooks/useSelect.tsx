@@ -18,7 +18,7 @@ const useSelect = (
 
 				<Select.Root
 					onOpenChange={setIsOpen}
-					onValueChange={(val) => setSelected(val)}
+					onValueChange={setSelected}
 				>
 					<Select.Trigger
 						className={classnames(
@@ -36,10 +36,8 @@ const useSelect = (
 							<ChevronDownIcon className="w-5 h-5 text-black font-extrabold" />
 						</Select.Icon>
 					</Select.Trigger>
-					<Select.Portal
-						className={classnames("bg-white rounded-md")}
-					>
-						<Select.Content>
+					<Select.Portal className="z-10 bg-slate-50 rounded-md shadow-md text-[12px] text-afruna-blue transition-all ease-out duration-200 delay-700">
+						<Select.Content position={"popper"}>
 							<Select.ScrollUpButton className="">
 								<ChevronUpIcon />
 							</Select.ScrollUpButton>

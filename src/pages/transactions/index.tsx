@@ -1,87 +1,220 @@
 import "react-calendar/dist/Calendar.css";
 import Image from "next/image";
 import { Main } from "@/layouts/Main";
-import ItemPicker from "@/components/widgets/ItemPicker";
 import { images } from "@/constants/images";
-import { SortItem } from "@/components/SortItem";
 import TransactionHistory from "@/components/widgets/tables/TransactionHistory";
 import Breadcrumbs from "@/components/widgets/Breadcrumbs";
 import { useRouter } from "next/router";
+import { Content } from "@/components/products/Content";
+import { Header } from "@/components/products/Header";
+import { FC, ReactElement, ReactNode, useState } from "react";
+import classNames from "classnames";
+import { RxChevronRight } from "react-icons/rx";
+import { HiX } from "react-icons/hi";
 
 const Index = () => {
 	const router = useRouter();
+	const [showAFCModel, setShowAFCModel] = useState(false);
+	const [showPendingModel, setShowPendingModel] = useState(false);
 	return (
 		<Main breadcrumbs={<Breadcrumbs />}>
-			<main className="my-8 m-12 pb-20">
-				<div className="grid grid-cols-6 gap-8 my-10 snap-mandatory snap-y snap-center">
-					<div className=" col-span-3 bg-white  border-slate-300 rounded-xl border-[1px]">
-						<section className="flex items-center justify-between  py-2 px-[1cm]">
-							<div className="flex items-center">
-								<Image
-									src={images.wallet}
-									alt=""
-									className="p-2 object-fit w-1/3 "
-								/>
-								<section className="p-2">
-									<p className="">Available Balance</p>
-									<p className="p-2 text-3xl">$20,000</p>
-								</section>
-							</div>
-							<button
-								onClick={() =>
-									router.push("transactions/transfer")
-								}
-								className="text-white font-medium text-sm bg-gradient-bluebutton p-2 border-b-1 border-blue-800 shadow-sm rounded-md w-24 inset-3"
-							>
-								Transfer
+			<main className="relative my-8 m-12 pb-20">
+				<div className="grid grid-cols-7 gap-4">
+					<TransactionStat
+						className="col-span-full md:col-span-5 lg:col-span-3"
+						leftComponent={
+							<Image
+								className="w-11"
+								src={images.wallet}
+								alt="Wallet_Image"
+							/>
+						}
+						middelComponent={
+							<MiddleComponent
+								title={"Available Balance"}
+								value={170225}
+							/>
+						}
+						rightComponent={
+							<button className="md:w-24 text-center rounded-sm bg-gradient-whitishblue p-2 text-white text-[12px]">
+								Withdraw
 							</button>
-						</section>
-					</div>
-					<div className="col-span-2 bg-white w-full border-slate-300 rounded-xl border-[1px]">
-						<section className=" justify-start flex flex-col h-full px-16  py-10 ">
-							<p>Available Afruna Coin </p>
-							<p className="text-3xl py-3">143,000 AFC</p>
-						</section>
-					</div>
+						}
+					/>
+					<TransactionStat
+						className="col-span-full md:col-span-5 lg:col-span-2"
+						middelComponent={
+							<MiddleComponent
+								afc
+								title={"Afruna Coin"}
+								value={170225}
+							/>
+						}
+						rightComponent={
+							<button
+								onClick={() => setShowAFCModel(true)}
+								className="text-center rounded-sm bg-afruna-blue p-2 text-white text-[12px]"
+							>
+								Get coin
+							</button>
+						}
+					/>
+					<TransactionStat
+						className="col-span-full md:col-span-5 lg:col-span-2"
+						middelComponent={
+							<MiddleComponent
+								title={"Pending Balance"}
+								value={225}
+							/>
+						}
+						rightComponent={
+							<button
+								onClick={() => setShowPendingModel(true)}
+								className="font-extrabold text-2xl text-center rounded-sm"
+							>
+								<RxChevronRight />
+							</button>
+						}
+					/>
 				</div>
-
-				<div className="w-full bg-white border-[1px]  rounded-lg shadow-sm h-[50h]">
-					<header className="p-4 mb-4 flex w-full justify-between">
-						<h1 className=" text-xl font-extrabold">
-							Transaction History
-						</h1>
-
-						<div className="sort_dropdown space-x-8 grid grid-cols-2 mr-8">
-							<ItemPicker
-								getSelected={(val) => console.log(val)}
-								placeholder="Sorts"
-								items={[
-									"All",
-									"By date",
-									"By month",
-									"Ascending",
-									"Descending",
-								]}
-							/>
-							<ItemPicker
-								getSelected={(val) => console.log(val)}
-								placeholder="Select date"
-								items={[
-									"All",
-									"Jan-Mar",
-									"Apr-Jun",
-									"Jul-Sept",
-									"Oct-Dec",
-								]}
-							/>
-						</div>
-					</header>
-					<hr className="border-slate-300" />
+				<Content>
+					<Header
+						key={"transaction history"}
+						headerTitle={"Transaction history"}
+					/>
 					<TransactionHistory />
+				</Content>
+				<div
+					className={`${
+						!showAFCModel && "hidden"
+					} fixed top-0 left-0 transition-all ease-linear delay-75 w-screen h-screen bg-black/40 z-20`}
+				>
+					<form className="flex flex-col w-[75vw] md:w-[50vw] h-fit md:h-[80-vh] relative top-20 rounded-md bg-white p-3 m-auto transition-all translate-y-10 delay-1000 ease-linear duration-300">
+						<button
+							type="button"
+							onClick={() => setShowAFCModel(false)}
+							className="absolute top-2 right-2 rounded-full p-1 text-afruna-blue text-xs hover:rotate-180 transition duration-200 ease-out"
+						>
+							<HiX />
+						</button>
+						<header className={"text-afruna-blue space-y-2"}>
+							<h1>Get more coins</h1>
+							<div className="flex font-medium flex-col text-xs">
+								<p>Save more with bigger bundles</p>
+								<span
+									className={
+										"text-afruna-gray/70 text-[12px]"
+									}
+								>
+									Prices of Afruna coins at VAT inclusive.
+								</span>
+							</div>
+						</header>
+						<div className="flex flex-col items-center space-y-1">
+							{[{ afc: 50, discount: 5, price: 25 }].map(
+								({ afc, discount, price }, idx) => (
+									<div
+										key={idx}
+										className={
+											"text-[12px] flex w-full flex-wrap justify-around items-center"
+										}
+									>
+										<p className="space-x-2">
+											<span
+												className={
+													"text-lg2 font-extrabold"
+												}
+											>
+												{afc}
+											</span>
+											<button
+												className="rounded-full w-7 h-7 p-1 text-afruna-blue
+											bg-gradient-to-t from-slate-100/40 to-slate-500/90 inset-4"
+											>
+												AFC
+											</button>
+										</p>
+										<div className=" text-extrabold text-red-500/90 bg-green-500/20 p-2 rounded-full">
+											Sales {discount}%
+										</div>
+										<button
+											type="button"
+											className="p-2 text-width  w-14 bg-green-500 text-white rounded-sm
+										"
+										>
+											${price}
+										</button>
+									</div>
+								)
+							)}
+						</div>
+					</form>
+				</div>
+				<div
+					className={`${
+						!showPendingModel && "hidden"
+					} fixed top-0 left-0 transition-all ease-linear delay-75 w-screen h-screen bg-black/40 z-20`}
+				>
+					<div
+						className={
+							"w-[75vw] md:w-[50vw] h-fit md:h-[80-vh] relative top-20 m-auto transition-all translate-y-10 delay-1000 ease-linear duration-300"
+						}
+					>
+						<Content>
+							<Header
+								headerTitle="Pending Transactions"
+								rightComponent={
+									<button
+										className="absolute top-2 right-2 rounded-full p-1 text-afruna-blue text-xs hover:rotate-180 transition duration-200 ease-out"
+										onClick={() =>
+											setShowPendingModel(false)
+										}
+									>
+										<HiX />
+									</button>
+								}
+							/>
+							<Image src={images.noResult} alt="NOT_FOUND" />
+						</Content>
+					</div>
 				</div>
 			</main>
+			{/* popover coin */}
 		</Main>
 	);
 };
+
+const TransactionStat: FC<{
+	middelComponent: ReactNode;
+
+	className?: string;
+	leftComponent?: ReactElement;
+	rightComponent?: ReactNode;
+}> = ({ middelComponent, leftComponent, rightComponent, className }) => (
+	<div
+		className={classNames(
+			"rounded-md border text-afruna-blue border-afruna-gray/5 p-3 flex justify-around space-x-0 items-center w-full bg-white",
+			className
+		)}
+	>
+		{leftComponent && leftComponent}
+		{middelComponent}
+		{rightComponent && rightComponent}
+	</div>
+);
+const MiddleComponent: FC<{ value: number; title: string; afc?: boolean }> = ({
+	value,
+	title,
+	afc,
+}) => (
+	<div className="space-y-2">
+		<h1 className={"text-afruna-text/70 text-[14px]"}>{title}</h1>
+		<p className="text-xl font-semibold">
+			{afc
+				? `${value.toLocaleString()} AFC`
+				: `$${value.toLocaleString()}`}
+		</p>
+	</div>
+);
 
 export default Index;

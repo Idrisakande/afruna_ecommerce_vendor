@@ -9,6 +9,8 @@ import {
 	IBuyerOrder,
 } from "@/interfaces/tables.interface";
 import { images } from "@/constants/images";
+import { IReview } from "@/interfaces/IReview";
+import { IBestSellingProduct } from "@/interfaces/IBestSellingProduct";
 
 export const vendorDetails = [
 	{
@@ -1668,6 +1670,85 @@ export const conversations = [
 		message: "Lorem ipsum ever standard dummy text ever",
 		time: "8:00 PM",
 		isOwn: true,
+	},
+];
+
+export const products: IBestSellingProduct[] = [
+	{
+		id: 738,
+		image: images.product,
+		name: "Kartik Cloth",
+		price: 337,
+		status: "instock",
+		stock: 362,
+		total_sales: 101,
+	},
+	{
+		id: 838,
+		image: images.product7,
+		name: "Kartik Cloth",
+		price: 337,
+		status: "instock",
+		stock: 362,
+		total_sales: 101,
+	},
+	{
+		id: 1030,
+		image: images.product5,
+		name: "Kartik Cloth",
+		price: 337,
+		status: "out-of-stock",
+		stock: 362,
+		total_sales: 101,
+	},
+	{
+		id: 2893,
+		image: images.product2,
+		name: "Kartik Cloth",
+		price: 337,
+		status: "out-of-stock",
+		stock: 362,
+		total_sales: 101,
+	},
+	{
+		id: 2970,
+		image: images.product4,
+		name: "Kartik Cloth",
+		price: 337,
+		status: "instock",
+		stock: 362,
+		total_sales: 101,
+	},
+];
+
+export const reviews: IReview[] = [
+	{
+		comment: "The product came well packaged and I loved it.",
+		date: new Date(),
+		img: images.profileImg,
+		name: "James Toshima",
+		rated: 5,
+	},
+	{
+		comment: "The product came well packaged and I loved it.",
+		date: new Date(),
+		img: images.profileImg,
+		name: "Juan Toshima",
+		rated: 3,
+	},
+	{
+		comment: "The product came well packaged and I loved it.",
+		date: new Date(),
+		img: images.profileImg,
+		name: "Jane Toshima",
+		rated: 5,
+	},
+	{
+		comment: "The product came well packaged and I loved it.",
+		date: new Date(),
+		img: images.profileImg,
+		name: "Jolly Toshima",
+		rated: 4,
 	},
 ];
 

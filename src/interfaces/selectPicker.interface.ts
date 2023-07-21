@@ -5,5 +5,6 @@ export interface ISelectPicker {
 	items?: string[];
 	placeholder?: string;
 	triggerLeftIcon?: ReactElement;
+	contentClassName?: string;
 	triggerClassName?: string;
 }

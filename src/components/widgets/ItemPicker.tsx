@@ -1,6 +1,6 @@
 /* eslint-disable react/display-name */
 import useSelect from "@/hooks/useSelect";
-import { IItemPicker } from "@/interfaces/itemPicker";
+import { IItemPicker } from "@/interfaces/ItemPicker";
 import { memo } from "react";
 
 export default memo(function ({

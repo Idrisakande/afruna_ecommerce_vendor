@@ -84,6 +84,7 @@ function ReviewDetails() {
 										.fill("_")
 										.map((_, __) => (
 											<MdStar
+												key={__ * message.rating}
 												className={`${__ + 1 <= message.rating ? "text-afruna-gold/70" : ""
 													}`}
 											/>
@@ -108,8 +109,8 @@ function ReviewDetails() {
 			</div>
 			<div
 				className={`${reply
-						? "flex fixed z-20 left-0 top-0  items-center justify-center w-screen bg-black/40 h-screen"
-						: "hidden"
+					? "flex fixed z-20 left-0 top-0  items-center justify-center w-screen bg-black/40 h-screen"
+					: "hidden"
 					}`}
 			>
 				<form className="relative flex flex-col p-10 text-afruna-blue m-auto rounded-lg bg-white h-fit w-[50vw] ">
