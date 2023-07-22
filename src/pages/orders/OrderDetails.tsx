@@ -10,7 +10,7 @@ import * as ScrollArea from "@radix-ui/react-scroll-area";
 
 interface OrderDetailsProps {}
 
-export const OrderDetails: FC<OrderDetailsProps> = ({}) => {
+const OrderDetails: FC<OrderDetailsProps> = ({}) => {
 	return (
 		<Main breadcrumbs={<Breadcrumbs />}>
 			<main className="m-7 pb-20">
@@ -130,3 +130,4 @@ export const OrderDetails: FC<OrderDetailsProps> = ({}) => {
 		</Main>
 	);
 };
+export default OrderDetails;
