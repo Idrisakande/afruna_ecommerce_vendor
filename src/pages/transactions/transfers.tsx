@@ -89,17 +89,20 @@ export default function Transfer() {
 				</div>
 				<div className="col-span-6 flex flex-col bg-white rounded-2xl border p-4">
 					<InputLabel
+						type="text"
 						getValue={(val) => console.log(val)}
 						headerTitle="Seller's Name"
 						placeholder="Hammer Head"
 					/>
 					<InputLabel
+						type="text"
 						getValue={(val) => console.log(val)}
 						headerTitle="Seller's ID"
 						placeholder="#dzkd33c"
 					/>
 					<div className="grid grid-cols-2 gap-8">
 						<InputLabel
+							type="text"
 							getValue={(val) => console.log(val)}
 							headerTitle="Bank Name"
 							placeholder="POS"
