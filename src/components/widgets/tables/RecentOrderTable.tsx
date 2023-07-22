@@ -9,7 +9,6 @@ import {
 	useReactTable,
 } from "@tanstack/react-table";
 import Image from "next/image";
-import { FaEye } from "react-icons/fa";
 import { MdDeleteOutline, MdRemoveRedEye } from "react-icons/md";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 
