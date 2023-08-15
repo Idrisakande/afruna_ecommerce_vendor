@@ -32,7 +32,7 @@ export default Index;
 
 const CurrentProductTab = memo(() => {
 	const { tab, handleTabSelect } = useContext(
-		productcontext
+		productcontext,
 	) as IProductContext;
 	const Component = useMemo(() => {
 		switch (tab) {

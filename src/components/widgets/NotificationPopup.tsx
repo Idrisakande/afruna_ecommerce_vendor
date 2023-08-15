@@ -11,7 +11,7 @@ import { RxCross2 } from "react-icons/rx";
 
 export const NotificationPopup = () => (
 	<Popover.Root>
-		<Popover.Trigger asChild>
+		<Popover.Trigger className="text-afruna-blue" asChild>
 			<button
 				className="relative cursor-pointer focus:outline-none"
 				aria-label="Update dimensions"
@@ -24,7 +24,7 @@ export const NotificationPopup = () => (
 		</Popover.Trigger>
 		<Popover.Portal className="relative">
 			<Popover.Content
-				className="PopoverContent sticky top-[45%] z-50 overflow-hidden bg-white w-[30rem] shadow-md mt-6 mr-40 rounded-md"
+				className="PopoverContent sticky text-xs text-afruna-blue top-[45%] z-50 overflow-hidden bg-white w-[30rem] shadow-md mt-6 mr-40 rounded-md"
 				sideOffset={5}
 			>
 				<div className="flex pb-5 mt-20 px-4 justify-between items-start">

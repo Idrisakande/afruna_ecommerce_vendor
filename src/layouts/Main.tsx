@@ -5,6 +5,7 @@ import LocaleSelector from "@/components/widgets/LocaleSelector";
 import { NotificationPopup } from "@/components/widgets/NotificationPopup";
 import { SelectPicker } from "@/components/widgets/SelectPicker";
 import { images, svgs } from "@/constants/images";
+import Auth10 from "@/services/auth.service";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -24,7 +25,10 @@ export const Main: FC<MainProps> = ({
 }) => {
 	const router = useRouter();
 	const settings = router.route === "/settings" ? true : "";
-	const handleLogout = useCallback(() => router.push("auth/login"), [router]);
+	const handleLogout = useCallback(() => {
+		const authService = new Auth10(router);
+		authService.handleLogout();
+	}, []);
 
 	return (
 		<>
@@ -33,25 +37,16 @@ export const Main: FC<MainProps> = ({
 			<DashboardHeader
 				rightComponent={
 					<>
-						{/* <LanguageSelector
-							className="z-40 text-xs"
-							dropdownBgColor="red"
-							dropDownIcon={<BiWorld />}
-						/> */}
 						<SelectPicker
-							items={["item one", "item two", "item three"]}
+							items={["item two", "item three"]}
 							placeholder={"Help"}
-							triggerLeftIcon={<MdHelp />}
+							triggerLeftIcon={<MdHelp className="text-lg" />}
 							getSelected={(value) => console.log(value)}
 							contentClassName="z-20"
 							triggerClassName="flex text-xs space-x-1 items-center text-afruna-blue"
 						/>
-						<LocaleSelector />
 						<NotificationPopup />
-						<HeaderDropdown
-							title={"Jon Dov"}
-							profileSrc={images.userImg}
-						>
+						<HeaderDropdown title={"Jon Dov"} profileSrc={images.userImg}>
 							<header className="w-full flex justify-between items-center border-b border-dotted p-2 py-4 text-slate-500 font-medium">
 								<span>0 Followers</span>
 								<span>1 Followings</span>

@@ -1,8 +1,6 @@
-/* eslint-disable react/display-name */
-import { Main } from "@/layouts/Main";
-
 import { MdAdd } from "react-icons/md";
 
+import { Main } from "@/layouts/Main";
 import Breadcrumbs from "@/components/widgets/Breadcrumbs";
 import { DashboardStats } from "@/components/DashboardStats";
 import { ChartStats } from "@/components/ChartStats";
@@ -11,12 +9,22 @@ import { ProductListView } from "@/components/ProductListView";
 import { CreateBtn } from "@/components/widgets/CreateBtn";
 import { ReviewsSlide } from "@/components/ReviewsSlide";
 
+import withAuth10 from "@/hooks/withAuth10";
+import Dashboard from "@/services/dashboard.service";
+import { useEffect } from "react";
+import { useRouter } from "next/router";
+
 const Index = () => {
+	useEffect(() => {
+		const dashboardService = new Dashboard();
+	}, []);
+	const router = useRouter();
 	return (
 		<Main
 			breadcrumbs={<Breadcrumbs />}
 			asideComponent={
 				<CreateBtn
+					createProduct={() => router.push("/products")}
 					placeholder="Create Product"
 					prefixIcon={<MdAdd />}
 				/>
@@ -42,4 +50,16 @@ const Index = () => {
 		</Main>
 	);
 };
-export default Index;
+export default withAuth10(Index);
+// export const getServerProps = () => {
+// 	const dashboardService = new Dashboard();
+// 	return {
+// 		props: {},
+// 	};
+// };
+// export const getStaticProps = () => {
+// 	const dashboardService = new Dashboard();
+// 	return {
+// 		props: {},
+// 	};
+// };

@@ -1,8 +1,5 @@
-/* eslint-disable import/no-anonymous-default-export */
-/* eslint-disable react/display-name */
-import { joiResolver } from "@hookform/resolvers/joi";
-
-import AuthLayout from "@/interfaces/auth.layout";
+import Head from "next/head";
+import Image from "next/image";
 import {
 	FieldValue,
 	FieldValues,
@@ -10,46 +7,139 @@ import {
 	useForm,
 } from "react-hook-form";
 import Joi from "joi";
-import Head from "next/head";
-import { ChangeEventHandler, ReactNode, useCallback, useState } from "react";
-import Image from "next/image";
-import { images } from "@/constants/images";
+import { joiResolver } from "@hookform/resolvers/joi";
+import {
+	ChangeEventHandler,
+	ReactNode,
+	useCallback,
+	useRef,
+	useState,
+} from "react";
 import { useRouter } from "next/router";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { PhoneInput } from "react-international-phone";
+import {
+	CountryIso2,
+	PhoneInput,
+	usePhoneValidation,
+} from "react-international-phone";
 import ReactFlagsSelect from "react-flags-select";
 import "react-international-phone/style.css";
 
+import { images } from "@/constants/images";
+import AuthLayout from "@/layouts/auth.layout";
+import getCountryUtil from "@/utils/get-country.util";
+import Auth10 from "@/services/auth.service";
+import { T_register_data } from "@/types/auth.type";
+
 const schema = Joi.object({
-	firstName: Joi.string().required(),
-	age: Joi.number().positive().integer().required(),
+	email: Joi.string()
+		.email({ tlds: { allow: false } })
+		.label("Email") // Simplified email validation for example
+		.required()
+		.messages({
+			"string.base": "Email is required!",
+			"string.email": "Invalid email format",
+			"any.only": "Email is required!",
+		}),
+	password: Joi.string()
+		.pattern(new RegExp("^[a-zA-Z0-9]{8,30}$"))
+		.min(8)
+		.max(30)
+		.label("Password")
+		.required()
+		.messages({
+			"string.pattern.base":
+				"{{#label}} should only contain letters and numbers",
+		}),
+	firstName: Joi.string().trim().label("First Name").required().messages({
+		"any.only": "{{#label}} is required!",
+	}),
+	lastName: Joi.string().trim().label("Last Name").required().messages({
+		"any.only": "{{#label}} is required!",
+	}),
+	confirmPassword: Joi.string()
+		.valid(Joi.ref("password"))
+		.required()
+		.label("Confirm Password")
+		.messages({
+			"any.only": "{{#label}} does not match the password",
+		}),
 }).required();
 
 export default function Register() {
 	const [agreed, setAgreed] = useState(false);
-	// const [email, setEmail] = useState("");
-	// const [firstname, setFirstname] = useState("");
-	// const [lastname, setLastname] = useState("");
-	// const [hashword, setHash] = useState("");
-	// const [consfirm_hashword, setConfirmHash] = useState("");
-	const [locale, setLocale] = useState("");
-	const [phone, setPhone] = useState("");
 	const [ishidden, setHidden] = useState(true);
+	const [phone, setPhone] = useState("");
+	const [currentCountry, setCurrentCountry] = useState<CountryIso2>("ng");
+	const [country, setCountry] = useState<{ Code: string; Name: string }>({
+		Code: "",
+		Name: "",
+	}); //returns as {Name: "Nigeria", Code: "NG"}
+	const validation = usePhoneValidation(phone);
+	const isPhoneValid = validation.isValid;
+	const localeRef = useRef<HTMLSpanElement>(null);
+	const phoneValidationRef = useRef<HTMLSpanElement>(null);
+	const router = useRouter();
 	const {
 		register,
 		handleSubmit,
-		formState: { errors },
+		formState: { errors, isValid },
 	} = useForm({
 		resolver: joiResolver(schema),
 	});
-	const router = useRouter();
-	const onSubmit = (data: FieldValue<{}>) => console.log(data);
+	const onSubmit = useCallback(
+		(
+			data: FieldValue<{
+				email: string;
+				phoneNumber: string;
+				firstName: string;
+				lastName: string;
+				password: string;
+			}>,
+		) => {
+			if (!isPhoneValid) {
+				phoneValidationRef.current
+					? (phoneValidationRef.current.textContent =
+							"Phone Number is not provided!")
+					: "";
+			}
+			if (country.Name === "") {
+				localeRef.current
+					? (localeRef.current.textContent = "Country is required!")
+					: "";
+			}
+			if (!isValid || !isPhoneValid || country.Name === "") {
+				return;
+			}
+			const user_data = {
+				...(data as unknown as T_register_data),
+				country: country.Name,
+				phoneNumber: phone,
+			};
+			const authService = new Auth10(router);
+			authService.handleSignup(user_data);
+		},
+		[
+			isValid,
+			isPhoneValid,
+			phoneValidationRef.current,
+			phone,
+			country.Name,
+		],
+	);
 	const handleAgreed: ChangeEventHandler<HTMLInputElement> = useCallback(
 		(event) => setAgreed(event.target.checked),
-		[]
+		[],
 	);
-	const handleLoccale = useCallback((value: string) => setLocale(value), []);
-	const handlePhone = useCallback((value: string) => setPhone(value), []);
+
+	const handleCountrySelection = useCallback((value: string) => {
+		let country = getCountryUtil(value);
+		setCountry(country);
+	}, []);
+	const handleGoogleLogin = useCallback(async () => {
+		const authService = new Auth10();
+		authService.googlesignin();
+	}, []);
 	return (
 		<AuthLayout>
 			<Head>
@@ -67,48 +157,57 @@ export default function Register() {
 			</h1>
 			<form
 				onSubmit={handleSubmit(onSubmit as SubmitHandler<FieldValues>)}
-				className="w-3/4 mx-auto rounded-2xl shadow-md p-10 bg-white border-[1px] text-xs my-10"
+				className="w-3/4 lg:w-2/4 flex flex-col content-between items-center mx-auto rounded-2xl shadow-md p-10 bg-white border-[1px] text-xs my-10 gap-2"
 			>
-				<section className="grid grid-cols-1 md:grid-cols-2 gap-8">
+				<section className="w-full grid grid-cols-1 md:grid-cols-2 gap-8">
 					<aside className="col-span-full md:col-span-1">
 						<fieldset className="flex flex-col w-full my-2">
-							<label htmlFor="firstname">
-								First Name
-								<span className="text-red-500">
-									{errors.firstname?.message as ReactNode}
-								</span>
+							<label htmlFor="firstName">
+								{errors.firstName && (
+									<span className="text-red-500 block bg-red-100 rounded-sm w-fit p-1">
+										{errors.firstName?.message as ReactNode}
+									</span>
+								)}
+								First Name{" "}
+								<sup className="text-red-500 text-xs">*</sup>
 							</label>
 							<input
-								{...register("firstname")}
-								type="firstname"
-								name="firstname"
-								id="firstname"
+								{...register("firstName")}
+								type="text"
+								name="firstName"
+								id="firstName"
 								className="p-3 border-[1px] border-slate-300 focus-within:border-slate-400 focus-within:shadow-lg rounded-md"
 								placeholder="firstname address"
 							/>
 						</fieldset>
 						<fieldset className="flex flex-col w-full my-2">
-							<label htmlFor="lastname">
-								Last Name
-								<span className="text-red-500">
-									{errors.lastname?.message as ReactNode}
-								</span>
+							<label htmlFor="lastName">
+								{errors.lastName && (
+									<span className="text-red-500 block bg-red-100 rounded-sm w-fit p-1">
+										{errors.lastName?.message as ReactNode}
+									</span>
+								)}
+								Last Name{" "}
+								<sup className="text-red-500 text-xs">*</sup>
 							</label>
 							<input
-								{...register("lastname")}
-								type="lastname"
-								name="lastname"
-								id="lastname"
+								{...register("lastName")}
+								type="text"
+								name="lastName"
+								id="lastName"
 								className="p-3 border-[1px] border-slate-300 focus-within:border-slate-400 focus-within:shadow-lg rounded-md"
 								placeholder="lastname address"
 							/>
 						</fieldset>
 						<fieldset className="flex flex-col w-full my-2">
 							<label htmlFor="email">
-								Your Email
-								<span className="text-red-500">
-									{errors.email?.message as ReactNode}
-								</span>
+								{errors.email && (
+									<span className="text-red-500 block bg-red-100 rounded-sm w-fit p-1">
+										{errors.email?.message as ReactNode}
+									</span>
+								)}
+								Email{" "}
+								<sup className="text-red-500 text-xs">*</sup>
 							</label>
 							<input
 								{...register("email")}
@@ -121,51 +220,66 @@ export default function Register() {
 						</fieldset>
 						<fieldset className="flex flex-col w-full my-2">
 							<label htmlFor="phone">
-								Phone Number
-								<span className="text-red-500">
-									{errors.phone?.message as ReactNode}
-								</span>
+								{!isPhoneValid && (
+									<span
+										ref={phoneValidationRef}
+										className="text-red-500 block bg-red-100 rounded-sm w-fit p-1"
+									></span>
+								)}
+								Phone Number{" "}
+								<sup className="text-red-500 text-xs">*</sup>
 							</label>
-							<PhoneInput
-								// onChange={handlePhoneChange}
-								// value={phone}
-								defaultCountry="ng"
-								inputClassName="ml-2"
-								inputProps={{
-									...register("phone"),
-								}}
-								inputStyle={{
-									border: "none",
-									width: "100%",
-								}}
-								countrySelectorStyleProps={{
-									buttonStyle: {
+							{
+								<PhoneInput
+									defaultCountry="ng"
+									inputStyle={{
 										border: "none",
-									},
-								}}
-								placeholder="phone number"
-								className="flex items-center p-2 border-[1px] border-slate-300 focus-within:border-slate-400 focus-within:shadow-lg rounded-md"
-							/>
+										width: "100%",
+									}}
+									onChange={(ph, iso) => {
+										setPhone(ph);
+										setCurrentCountry(iso);
+									}}
+									countrySelectorStyleProps={{
+										buttonStyle: {
+											border: "none",
+										},
+									}}
+									placeholder="phone number"
+									className="flex items-center p-2 border-[1px] border-slate-300 focus-within:border-slate-400 focus-within:shadow-lg rounded-md"
+								/>
+							}
 						</fieldset>
 					</aside>
 					<aside className="col-span-full md:col-span-1">
 						<fieldset className="flex flex-col w-full my-2">
 							<label htmlFor="phone">
-								Country
-								<span className="text-red-500">
-									{errors.phone?.message as ReactNode}
-								</span>
+								{country.Name === "" && (
+									<span
+										ref={localeRef}
+										className="text-red-500 block bg-red-100 rounded-sm w-fit p-1"
+									></span>
+								)}
+								Country{" "}
+								<sup className="text-red-500 text-xs">*</sup>
 							</label>
 							<ReactFlagsSelect
-								onSelect={handleLoccale}
-								selected={locale}
+								id="country"
+								searchable
+								onSelect={handleCountrySelection}
+								selected={country.Code}
 							/>
 						</fieldset>
 						<fieldset className="flex flex-col w-full my-2">
-							<label htmlFor="password">Password </label>
-							<span className="text-red-500">
-								{errors.password?.message as ReactNode}
-							</span>
+							<label htmlFor="password">
+								{errors.password && (
+									<span className="text-red-500 block bg-red-100 rounded-sm w-fit p-1">
+										{errors.password?.message as ReactNode}
+									</span>
+								)}
+								Password
+								<sup className="text-red-500 text-xs">*</sup>
+							</label>
 							<div className="flex justify-between items-center px-3 border-[1px] border-slate-300 focus-within:border-slate-400 focus-within:shadow-lg rounded-md">
 								<input
 									{...register("password")}
@@ -187,18 +301,24 @@ export default function Register() {
 							</div>
 						</fieldset>
 						<fieldset className="flex flex-col w-full my-2">
-							<label htmlFor="confirm_password">
+							<label htmlFor="confirmPassword">
+								{errors.confirmPassword && (
+									<span className="text-red-500 block bg-red-100 rounded-sm w-fit p-1">
+										{
+											errors.confirmPassword
+												?.message as ReactNode
+										}
+									</span>
+								)}
 								Confirm Password
+								<sup className="text-red-500 text-xs">*</sup>
 							</label>
-							<span className="text-red-500">
-								{errors.confirm_hashword?.message as ReactNode}
-							</span>
 							<div className="flex justify-between items-center px-3 border-[1px] border-slate-300 focus-within:border-slate-400 focus-within:shadow-lg rounded-md">
 								<input
-									{...register("confirm_hashword")}
+									{...register("confirmPassword")}
 									type={ishidden ? "password" : "text"}
-									name="confirm_hashword"
-									id="confirm_hashword"
+									name="confirmPassword"
+									id="confirmPassword"
 									className="w-full bg-transparent py-3"
 									placeholder="*******"
 								/>
@@ -258,6 +378,7 @@ export default function Register() {
 						</button>
 					</div>
 					<button
+						onClick={handleGoogleLogin}
 						type="button"
 						className="p-2 text-slate-700 justify-center items-center w-full rounded-md my-2 flex border-[1px] border-slate-300"
 					>

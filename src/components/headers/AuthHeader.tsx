@@ -14,10 +14,14 @@ export const AuthHeader = memo(() => (
 				<Image width={250} src={svgs.logo} alt="Afruna_Logo" />
 			</Link>
 			<SelectPicker
-				items={["item one", "item two", "item three"]}
+				items={["FAQs", "Contant Us"]}
 				placeholder={"Help"}
-				triggerLeftIcon={<MdHelp />}
+				triggerLeftIcon={<MdHelp className="text-xl" />}
 				getSelected={(value) => console.log(value)}
+				triggerClassName={
+					"gap-3 p-1 flex justify-between items-center text-sm text-afruna-blue"
+				}
+				contentClassName={"z-10 w-[150px]"}
 			/>
 		</nav>
 	</header>

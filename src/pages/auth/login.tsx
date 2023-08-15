@@ -1,8 +1,5 @@
-/* eslint-disable import/no-anonymous-default-export */
-/* eslint-disable react/display-name */
+import Image from "next/image";
 import { joiResolver } from "@hookform/resolvers/joi";
-
-import AuthLayout from "@/interfaces/auth.layout";
 import {
 	FieldValue,
 	FieldValues,
@@ -12,30 +9,45 @@ import {
 import Joi from "joi";
 import Head from "next/head";
 import { ChangeEventHandler, ReactNode, useCallback, useState } from "react";
-import Image from "next/image";
-import { images } from "@/constants/images";
 import { useRouter } from "next/router";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
+import { images } from "@/constants/images";
+import AuthLayout from "@/layouts/auth.layout";
+import Auth10 from "@/services/auth.service";
+import { T_login_data } from "@/types/auth.type";
+import { useSelector } from "react-redux";
+import { RootState } from "@/types/store.type";
+import withAuth10 from "@/hooks/withAuth10";
+
 const schema = Joi.object({
-	eamil: Joi.string().email({ tlds: { allow: ["com", "org", "io", "net"] } }),
-	password: Joi.string(),
+	email: Joi.string()
+		.email({ tlds: { allow: false } }) // Simplified email validation for example
+		.required()
+		.messages({
+			"string.base": "Email should be a string",
+			"string.email": "Invalid email format",
+			"any.required": "Email is required",
+		}),
+	password: Joi.string()
+		.pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
+		.required()
+		.messages({
+			"string.base": "Password should be a string",
+			"string.pattern.base":
+				"Password should only contain letters and numbers",
+			"any.required": "Password is required",
+		}),
 }).required();
 
-export default function Login() {
-	const [agreed, setAgreed] = useState(false);
-	// const [email, setEmail] = useState("");
-	// const [firstname, setFirstname] = useState("");
-	// const [lastname, setLastname] = useState("");
-	// const [hashword, setHash] = useState("");
-	// const [consfirm_hashword, setConfirmHash] = useState("");
-	// const [phone, setPhone] = useState("");
+function Login() {
+	const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+	const [remember_me, set_remember_Me] = useState(false);
 	const [ishidden, setHidden] = useState(true);
 	const {
 		register,
 		handleSubmit,
 		formState: { errors, isValid },
-		getValues,
 	} = useForm({
 		resolver: joiResolver(schema),
 	});
@@ -43,21 +55,28 @@ export default function Login() {
 	const onSubmit = (
 		data: FieldValue<{
 			email: string;
-			phone: string;
-			firstname: string;
-			lastname: string;
 			password: string;
-		}>
+		}>,
 	) => {
 		if (!isValid) {
 			return;
 		}
-		router.push("/dashboard");
+		// router.push("/dashboard");
+		const authService = new Auth10(router);
+		const user = data as T_login_data;
+
+		authService.handleLogin({ ...user, remember_me });
 	};
-	const handleAgreed: ChangeEventHandler<HTMLInputElement> = useCallback(
-		(event) => setAgreed(event.target.checked),
-		[]
+	const handleRememberMe: ChangeEventHandler<HTMLInputElement> = useCallback(
+		(event) => set_remember_Me(event.target.checked),
+		[],
 	);
+
+	const handleGoogleLogin = useCallback(async () => {
+		const authService = new Auth10();
+		authService.googlesignin();
+	}, []);
+
 	return (
 		<AuthLayout>
 			<Head>
@@ -75,14 +94,16 @@ export default function Login() {
 			</h1>
 			<form
 				onSubmit={handleSubmit(onSubmit as SubmitHandler<FieldValues>)}
-				className="w-3/4 lg:w-2/5 flex flex-col content-between items-center mx-auto rounded-2xl shadow-md p-10 bg-white border-[1px] text-xs my-10"
+				className="w-3/4 lg:w-2/5 flex flex-col content-between items-center mx-auto rounded-2xl shadow-md p-10 bg-white border-[1px] text-xs my-10 gap-2"
 			>
-				<fieldset className="flex flex-col w-full my-2">
+				<fieldset className="flex flex-col w-full gap-2">
 					<label htmlFor="email">
-						Your email
-						<span className="text-red-500">
-							{errors.email?.message as ReactNode}
-						</span>
+						{errors.email && (
+							<span className="text-red-500 block bg-red-100 rounded-sm w-fit p-1">
+								{errors.email?.message as ReactNode}
+							</span>
+						)}
+						Your Email <sup className="text-red-500 text-xs">*</sup>
 					</label>
 					<input
 						{...register("email")}
@@ -93,8 +114,15 @@ export default function Login() {
 						placeholder="email address"
 					/>
 				</fieldset>
-				<fieldset className="flex flex-col w-full my-2">
-					<label htmlFor="password">Password</label>
+				<fieldset className="flex flex-col w-full gap-2">
+					<label htmlFor="password">
+						{errors.password && (
+							<span className="text-red-500 block bg-red-100 rounded-sm w-fit p-1">
+								{errors.password?.message as ReactNode}
+							</span>
+						)}
+						Password <sup className="text-red-500 text-xs">*</sup>
+					</label>
 					<div className="flex justify-between items-center px-3 border-[1px] border-slate-300 focus-within:border-slate-400 focus-within:shadow-lg rounded-md">
 						<input
 							{...register("password", {
@@ -118,6 +146,8 @@ export default function Login() {
 				<fieldset className="flex justify-between items-center w-full">
 					<div className="flex justify-between items-center">
 						<input
+							onChange={handleRememberMe}
+							checked={remember_me}
 							className="w-5 h-5 focus-within:border-slate-400"
 							type="checkbox"
 							id="remember"
@@ -133,7 +163,12 @@ export default function Login() {
 						forgot password
 					</button>
 				</fieldset>
-				<button className="bg-gradient-y-deepblue p-2 text-white w-full rounded-md hover:bg-gradient-whitishblue my-2">
+				<button
+					disabled={!isValid}
+					className={`${
+						!isValid && "cursor-not-allowed"
+					} bg-gradient-y-deepblue p-2 text-white w-full rounded-md hover:bg-gradient-whitishblue my-2`}
+				>
 					Log in
 				</button>
 				{/* <div className="flex items-center my-3">
@@ -142,6 +177,7 @@ export default function Login() {
 						<Hr.Root style={{ margin: "15px 0" }} />
 					</div> */}
 				<button
+					onClick={handleGoogleLogin}
 					type="button"
 					className="p-2 text-slate-700 justify-center items-center w-full rounded-md my-2 flex border-[1px] border-slate-300"
 				>
@@ -166,3 +202,5 @@ export default function Login() {
 		</AuthLayout>
 	);
 }
+
+export default withAuth10(Login);
