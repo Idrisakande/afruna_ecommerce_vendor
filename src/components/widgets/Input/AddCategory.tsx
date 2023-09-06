@@ -3,7 +3,7 @@ import { FC, useCallback, useState } from "react";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 import { Dropzone, ExtFile, FileMosaic } from "@files-ui/react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import ItemPicker from "../ItemPicker";
+import ItemPicker from "../ItemLabelPicker";
 import { IAddCategoryInput } from "@/interfaces/inputs.interfaces";
 import { GoPlus, GoTrash } from "react-icons/go";
 import { MdImage } from "react-icons/md";
@@ -36,7 +36,7 @@ export const AddCategory: FC<AddCategoryProps> = ({ isOpen, onClose }) => {
 						alert(`The file size of ${file.name} is too large.`);
 						return;
 					}
-				})
+				}),
 			);
 		} else {
 			alert("Maximum files reached!");
@@ -46,7 +46,7 @@ export const AddCategory: FC<AddCategoryProps> = ({ isOpen, onClose }) => {
 		(id: string | number | undefined) => {
 			setFiles(files.filter((x: ExtFile) => x.id !== id));
 		},
-		[files]
+		[files],
 	);
 
 	return (

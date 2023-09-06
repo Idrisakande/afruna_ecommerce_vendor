@@ -5,3 +5,5 @@ export declare interface EventTarget {
 		options?: boolean | AddEventListenerOptions,
 	): void;
 }
+
+export type T_app_provider = {isLoading?:boolean, setIsloading?:(arg:boolean)=>void}

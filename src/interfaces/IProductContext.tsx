@@ -1,12 +1,13 @@
 import { TTabs } from "@/contexts/ProductProvider";
-import { IProductItem } from "./IProductItem";
+import { IProduct, IProductItem } from "./IProductItem";
 import { IProductReview } from "./IProductReview";
+import { T_product_reviews } from "@/components/products/ProductReviews";
 
 export interface IProductContext {
 	tab: TTabs;
 	handleTabSelect: (v: any) => void;
-	manageItems?: IProductItem[];
-	itemsSelector: (item: IProductItem) => void;
-	product_review?: IProductReview;
-	handleViewReview: (review: IProductReview) => void;
+	manageItems?: IProduct[];
+	itemsSelector: (item: IProduct) => void;
+	product_review?: T_product_reviews;
+	handleViewReview: (review: T_product_reviews) => void;
 }

@@ -7,16 +7,25 @@ import Breadcrumbs from "@/components/widgets/Breadcrumbs";
 import { useRouter } from "next/router";
 import { Content } from "@/components/products/Content";
 import { Header } from "@/components/products/Header";
-import { FC, ReactElement, ReactNode, useState } from "react";
+import { FC, ReactElement, ReactNode, useEffect, useState } from "react";
 import classNames from "classnames";
 import { RxChevronRight } from "react-icons/rx";
 import { HiX } from "react-icons/hi";
+import { useSelector } from "react-redux";
+import { RootState } from "@/types/store.type";
+import PageLoarder from "@/components/widgets/PageLoarder";
+import Transactions from "@/services/transactions.service";
 
 const Index = () => {
 	const router = useRouter();
 	const [showAFCModel, setShowAFCModel] = useState(false);
 	const [showPendingModel, setShowPendingModel] = useState(false);
-	return (
+	const { transactions } = useSelector((state: RootState) => state.transactions)
+	useEffect(() => {
+		const _ = new Transactions();
+	},[])
+	if (!transactions) return <PageLoarder />
+	return  (
 		<Main breadcrumbs={<Breadcrumbs />}>
 			<main className="relative my-8 m-12 pb-20">
 				<div className="grid grid-cols-7 gap-4">
@@ -82,7 +91,7 @@ const Index = () => {
 						key={"transaction history"}
 						headerTitle={"Transaction history"}
 					/>
-					<TransactionHistory />
+{transactions.length?(					<TransactionHistory />):(<div className="flex flex-col justify-center items-center h-1/2"><Image height={100} src={images.noResult} alt="no_result" /><h1>No transactional data</h1></div>)}
 				</Content>
 				<div
 					className={`${
@@ -181,7 +190,7 @@ const Index = () => {
 			</main>
 			{/* popover coin */}
 		</Main>
-	);
+	)
 };
 
 const TransactionStat: FC<{

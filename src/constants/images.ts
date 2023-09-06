@@ -34,6 +34,8 @@ import clipart_5 from "../assets/imgs/clipart-05.png";
 import clipart_6 from "../assets/imgs/clipart-06.png";
 import google_icon from "../assets/imgs/google.png";
 import authwall from "../assets/imgs/africa_map.png";
+import afruna_logo from "../assets/imgs/afruna.png";
+import afruna_round_logo from "../assets/imgs/afruna_r.png";
 
 //svgs
 import logoSvg from "../assets/icons/logo.svg";
@@ -51,6 +53,8 @@ import supportSvg from "../assets/icons/support.svg";
 import walletSvg from "../assets/icons/wallet 1.svg";
 
 export const images = {
+	afruna_logo,
+	afruna_round_logo,
 	google_icon,
 	vendorhomeart,
 	authwall,

@@ -12,41 +12,49 @@ import Image from "next/image";
 import { MdDeleteOutline, MdRemoveRedEye } from "react-icons/md";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 
-import { IRecentOrders } from "@/interfaces/tables.interface";
-import { recent_order } from "@/constants/data";
 import Link from "next/link";
 
-interface RecentOrderType {}
+import recent_itemsUtil from "@/utils/recent_items.util";
+import { T_updated_order } from "@/types/user.type";
+import Dashboard from "@/services/dashboard.service";
+import { useRouter } from "next/router";
 
-const REcentOrderTable: FC<RecentOrderType> = () => {
-	const [data, setData] = useState(() => [...recent_order]);
+const RecentOrderTable: FC = () => {
+	const router = useRouter();
+	const recent_orders = useMemo(() => {
+		const dashboardService = new Dashboard();
+		return dashboardService.getRecentOrder();
+	}, []);
 
 	const [sorting, setSorting] = useState<SortingState>([]);
-	const columns = useMemo<ColumnDef<IRecentOrders>[]>(
+	const columns = useMemo<ColumnDef<T_updated_order>[]>(
 		() => [
 			{
-				accessorKey: "id",
+				accessorKey: "_id",
 				cell: (info) => {
 					const id = `#${info.getValue()}`;
-					return <div className="ml-2">{id}</div>;
+					return <div className="ml-2">{id.slice(0, 7)}</div>;
 				},
 				header: () => <span className="">ID</span>,
 			},
 			{
-				accessorKey: "image",
-				cell: ({ cell }) => (
-					<Image
-						className="w-[45px] h-[45px] object-fill rounded-md border-[1px] shadow-sm"
-						src={cell.getValue() as unknown as string}
-						width={40}
-						height={40}
-						alt="item Image"
-					/>
-				),
+				accessorKey: "coverPhoto",
+				cell: (info) => {
+					let image = info.getValue() as string[];
+					return (
+						<Image
+							className="w-12 h-12 object-fill rounded-md border-[1px] shadow-sm"
+							src={image[0]}
+							width={40}
+							height={40}
+							alt="item Image"
+						/>
+					);
+				},
 				header: () => <span className="">Image</span>,
 			},
 			{
-				accessorKey: "itm_name",
+				accessorKey: "productName",
 				cell: (info) => {
 					const itemName = `${info.getValue()}`;
 					return <div className="ml-2">{itemName}</div>;
@@ -54,17 +62,17 @@ const REcentOrderTable: FC<RecentOrderType> = () => {
 				header: () => <span className="">Item Name</span>,
 			},
 			{
-				accessorKey: "qty",
+				accessorKey: "quantity",
 				cell: (info) => info.getValue(),
 				header: () => <span className="">Quantity</span>,
 			},
 			{
-				accessorKey: "order_date",
+				accessorKey: "createdAt",
 				cell: (info) => info.getValue(),
 				header: () => <span className="">Order Date</span>,
 			},
 			{
-				accessorKey: "status",
+				accessorKey: "deliveryStatus",
 				cell: ({ cell }) => {
 					switch (cell.getValue()) {
 						case "Pending":
@@ -106,7 +114,7 @@ const REcentOrderTable: FC<RecentOrderType> = () => {
 				header: () => <span className="">Status</span>,
 			},
 			{
-				accessorKey: "amount",
+				accessorKey: "total",
 				cell: ({ cell }) => <>${cell.getValue()}</>,
 				header: () => <span className="">Price</span>,
 			},
@@ -114,32 +122,37 @@ const REcentOrderTable: FC<RecentOrderType> = () => {
 				accessorKey: "actions",
 				cell: ({ row }) => (
 					<div className="flex justify-start gap-3 items-center">
-						<Link
-							href={"/orders/details"}
+						<button
+							onClick={() =>
+								router.push({
+									pathname: `/orders/details`,
+									query: row.original,
+								})
+							}
 							className="hover:scale-90 border-none transition duration-300"
 						>
 							<MdRemoveRedEye size={24} />
-						</Link>
-						<button
+						</button>
+						{/* 	<button
 							className="hover:scale-90 border-none transition duration-300"
 							onClick={() => {
 								const newData = data.filter(
-									(_, idx) => idx !== row.index
+									(_, idx) => idx !== row.index,
 								);
 								setData(newData);
 							}}
 						>
 							<MdDeleteOutline size={24} />
-						</button>
+						</button> */}
 					</div>
 				),
 				header: () => <span className="">Action</span>,
 			},
 		],
-		[data]
+		[recent_orders],
 	);
 	const table = useReactTable({
-		data,
+		data: recent_orders,
 		columns,
 		state: {
 			sorting,
@@ -148,75 +161,80 @@ const REcentOrderTable: FC<RecentOrderType> = () => {
 		getCoreRowModel: getCoreRowModel(),
 		getSortedRowModel: getSortedRowModel(),
 	});
-
 	return (
-		<div className="w-screen lg:w-full relative">
-			<table className="w-screen px-2 lg:w-full  relative">
-				<thead className="sticky  bg-white top-[4.3rem] left-0 right-0">
-					{table.getHeaderGroups().map((headerGroup) => (
-						<tr
-							className="text-left text-afruna-gray text-[12px] font-extralight"
-							key={headerGroup.id}
-						>
-							{headerGroup.headers.map((header) => (
-								<th key={header.id}>
-									{header.index > 2 &&
-									header.id !== "actions" ? (
-										<div className="flex px-1 justify-between items-center w-fit">
-											{flexRender(
-												header.column.columnDef.header,
-												header.getContext()
-											)}
-											<span className="flex flex-col">
-												<BiChevronUp
-													onClick={header.column.getToggleSortingHandler()}
-													size={24}
-													className="relative top-2 text-slate-400"
-												/>
-												<BiChevronDown
-													onClick={header.column.getToggleSortingHandler()}
-													size={24}
-													className="relative bottom-[7px]"
-												/>
-											</span>
-										</div>
-									) : (
-										<span className="px-2">
-											{flexRender(
-												header.column.columnDef.header,
-												header.getContext()
-											)}
-										</span>
-									)}
-								</th>
-							))}
-						</tr>
-					))}
-				</thead>
-				<tbody className="my-10">
-					{table.getRowModel().rows.map((row) => {
-						return (
+		<div className="w-screen lg:w-full relative text-center items-center">
+			{recent_orders.length ? (
+				<table className="w-screen px-2 lg:w-full h-[45vh]  relative">
+					<thead className="sticky  bg-white top-[4.3rem] left-0 right-0">
+						{table.getHeaderGroups().map((headerGroup) => (
 							<tr
-								className="text-left odd:border-y-[1px] odd:border-slate-300 text-afruna-blue text-[12px]"
-								key={row.id}
+								className="text-left text-afruna-gray text-[12px] font-extralight"
+								key={headerGroup.id}
 							>
-								{row.getVisibleCells().map((cell) => {
-									return (
-										<td className="py-1" key={cell.id}>
-											{flexRender(
-												cell.column.columnDef.cell,
-												cell.getContext()
-											)}
-										</td>
-									);
-								})}
+								{headerGroup.headers.map((header) => (
+									<th key={header.id}>
+										{header.index > 2 &&
+										header.id !== "actions" ? (
+											<div className="flex px-1 justify-between items-center w-fit">
+												{flexRender(
+													header.column.columnDef
+														.header,
+													header.getContext(),
+												)}
+												<span className="flex flex-col">
+													<BiChevronUp
+														onClick={header.column.getToggleSortingHandler()}
+														size={24}
+														className="relative top-2 text-slate-400"
+													/>
+													<BiChevronDown
+														onClick={header.column.getToggleSortingHandler()}
+														size={24}
+														className="relative bottom-[7px]"
+													/>
+												</span>
+											</div>
+										) : (
+											<span className="px-2">
+												{flexRender(
+													header.column.columnDef
+														.header,
+													header.getContext(),
+												)}
+											</span>
+										)}
+									</th>
+								))}
 							</tr>
-						);
-					})}
-				</tbody>
-			</table>
+						))}
+					</thead>
+					<tbody className="my-10">
+						{table.getRowModel().rows.map((row) => {
+							return (
+								<tr
+									className="text-left odd:border-y-[1px] odd:border-slate-300 text-afruna-blue text-[12px]"
+									key={row.id}
+								>
+									{row.getVisibleCells().map((cell) => {
+										return (
+											<td className="py-1" key={cell.id}>
+												{flexRender(
+													cell.column.columnDef.cell,
+													cell.getContext(),
+												)}
+											</td>
+										);
+									})}
+								</tr>
+							);
+						})}
+					</tbody>
+				</table>
+			) : (
+				<div>Recent orders not available </div>
+			)}
 		</div>
 	);
 };
 
-export default memo(REcentOrderTable);
+export default memo(RecentOrderTable);

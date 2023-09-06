@@ -13,10 +13,13 @@ import {
 } from "@tanstack/react-table";
 import { FC, useMemo, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/router";
 
 interface OrderDetailsTableProps {}
 
 export const OrderDetailsTable: FC<OrderDetailsTableProps> = ({}) => {
+	
+	const {query} = useRouter()
 	const [rowSelection, setRowSelection] = useState({});
 	// const [globalFilter, setGlobalFilter] = useState("");
 	const [data, setData] = useState([...OrederDetailsData]);

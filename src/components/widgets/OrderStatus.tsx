@@ -3,13 +3,11 @@ import * as ScrollArea from "@radix-ui/react-scroll-area";
 import { orderStatus } from "@/constants/data";
 import * as Progress from "@radix-ui/react-progress";
 import { IoMdCheckmark } from "react-icons/io";
-import { UpdateStatus } from "./Input/UpdateStatus";
 
 interface OrderStatusProps {}
 
 export const OrderStatus: FC<OrderStatusProps> = ({}) => {
   const [progress, setProgress] = useState(0);
-  const [updateStatusModelOpen, setUpdateStatusModelOpen] = useState(false);
   useEffect(() => {
     const timer = setTimeout(() => setProgress(50), 500);
     return () => clearTimeout(timer);
@@ -24,16 +22,12 @@ export const OrderStatus: FC<OrderStatusProps> = ({}) => {
               Order Status
             </h3>
             <button
-              onClick={() => setUpdateStatusModelOpen(true)}
+            
               className="px-8 py-3 rounded font-semibold tracking-tight bg-[#FFE7E5]
 "
             >
               Update Status
             </button>
-            <UpdateStatus
-              isOpen={updateStatusModelOpen}
-              onClose={() => setUpdateStatusModelOpen(false)}
-            />
           </div>
           <div className="border-t border-slate-300" />
           <div className="flex justify-between relative items-center max-w-[88%] pt-12 pb-28 mx-auto">

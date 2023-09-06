@@ -2,7 +2,7 @@ import { IAuthProps } from "@/interfaces/auth.interface";
 
 export type T_initial_state = {
 	isAuthenticated: boolean;
-	token?: string | undefined;
+	// token?: string | undefined;
 };
 
 // Define the type of the original component
@@ -26,3 +26,23 @@ export type T_register_data = {
 	password: string;
 	phoneNumber: string;
 };
+
+export type T_UnAuthorized = {
+	success: false;
+	message: "jwt expired";
+	error: {
+		name: "TokenExpiredError";
+		message: "jwt expired";
+		expiredAt: "2023-08-21T14:34:37.000Z";
+	};
+};
+
+export type T_error_response = {
+	success: boolean;
+	message: string;
+	error: {
+		statusCode: number;
+		data: [] | string | null;
+		message: string;
+	};
+}

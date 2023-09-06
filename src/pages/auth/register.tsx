@@ -27,7 +27,7 @@ import "react-international-phone/style.css";
 
 import { images } from "@/constants/images";
 import AuthLayout from "@/layouts/auth.layout";
-import getCountryUtil from "@/utils/get-country.util";
+import getCountryUtil from "@/utils/get_country.util";
 import Auth10 from "@/services/auth.service";
 import { T_register_data } from "@/types/auth.type";
 
@@ -229,26 +229,25 @@ export default function Register() {
 								Phone Number{" "}
 								<sup className="text-red-500 text-xs">*</sup>
 							</label>
-							{
-								<PhoneInput
-									defaultCountry="ng"
-									inputStyle={{
+
+							<PhoneInput
+								defaultCountry="ng"
+								inputStyle={{
+									border: "none",
+									width: "100%",
+								}}
+								onChange={(ph, iso) => {
+									setPhone(ph);
+									setCurrentCountry(iso);
+								}}
+								countrySelectorStyleProps={{
+									buttonStyle: {
 										border: "none",
-										width: "100%",
-									}}
-									onChange={(ph, iso) => {
-										setPhone(ph);
-										setCurrentCountry(iso);
-									}}
-									countrySelectorStyleProps={{
-										buttonStyle: {
-											border: "none",
-										},
-									}}
-									placeholder="phone number"
-									className="flex items-center p-2 border-[1px] border-slate-300 focus-within:border-slate-400 focus-within:shadow-lg rounded-md"
-								/>
-							}
+									},
+								}}
+								placeholder="phone number"
+								className="flex items-center p-2 border-[1px] border-slate-300 focus-within:border-slate-400 focus-within:shadow-lg rounded-md"
+							/>
 						</fieldset>
 					</aside>
 					<aside className="col-span-full md:col-span-1">

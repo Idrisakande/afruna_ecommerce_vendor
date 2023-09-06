@@ -1,5 +1,7 @@
-import { T_initial_state } from "@/types/auth.type";
+import Cookies from 'js-cookie';
+
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { T_initial_state } from "@/types/auth.type";
 
 const Auth = createSlice({
 	initialState: { isAuthenticated: false } as T_initial_state,
@@ -8,8 +10,8 @@ const Auth = createSlice({
 		setAuth10(state, action: PayloadAction<boolean>) {
 			state.isAuthenticated = action.payload;
 		},
-		setToken(state, action: PayloadAction<string | undefined>) {
-			state.token = action.payload;
+		setToken(_, action: PayloadAction<string>) {
+			Cookies.set("token", action.payload,{expires: 3})
 		},
 	},
 });

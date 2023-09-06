@@ -3,27 +3,46 @@ import { OrderStatus } from "@/components/widgets/OrderStatus";
 import { OrderDetailsTable } from "@/components/widgets/tables/OrderDetailsTable";
 import { Main } from "@/layouts/Main";
 import Link from "next/link";
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import { BsTruck } from "react-icons/bs";
 import { RiFileListFill } from "react-icons/ri";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
+import { useRouter } from "next/router";
+import { UpdateStatus } from "@/components/widgets/Input/UpdateStatus";
+import User from "@/services/user.service";
 
-interface OrderDetailsProps {}
-
-const OrderDetails: FC<OrderDetailsProps> = ({}) => {
+const OrderDetails: FC = () => {
+	const { query } = useRouter();
+	const [updateStatusModelOpen, setUpdateStatusModelOpen] = useState(false);
+	useEffect(() => {
+		// const userServices = new User()
+		// userServices.getUserById(query.userId as string).then(res => console.log(res));
+		console.log(query)
+	},[query.userId])
 	return (
 		<Main breadcrumbs={<Breadcrumbs />}>
 			<main className="m-7 pb-20">
 				<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:max-w-[96%] sm:mx-auto">
-					<h2 className="text-xl font-semibold">Order ID: #6565</h2>
+					<h2 className="text-xl font-semibold">Order ID: #{query._id}</h2>
 					<div className="flex justify-start sm:justify-end items-center">
-						<Link
+					<button
+              onClick={() => setUpdateStatusModelOpen(true)}
+              className="px-8 py-3 text-white rounded font-semibold tracking-tight bg-gradient-y-deepblue
+"
+            >
+              Order Status
+            </button>
+            <UpdateStatus
+              isOpen={updateStatusModelOpen}
+              onClose={() => setUpdateStatusModelOpen(false)}
+            />
+						{/* <Link
 							href={"/orders/invoice"}
 							className="px-6 py-2 text-xs text-white bg-gradient-y-deepblue flex gap-1 justify-center items-center rounded"
 						>
 							<RiFileListFill size={20} />
-							<span className="tracking-tight">Invoice</span>
-						</Link>
+							<span className="tracking-tight">Order Status</span>
+						</Link> */}
 					</div>
 				</div>
 				<div className="flex flex-col sm:flex-row lg:ml-3 gap-6 mt-8 justify-start sm:items-center">

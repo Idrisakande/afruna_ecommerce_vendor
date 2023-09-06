@@ -12,65 +12,88 @@ import {
 	useReactTable,
 } from "@tanstack/react-table";
 import classNames from "classnames";
-import { FC, HTMLProps, useEffect, useMemo, useRef, useState } from "react";
+import {
+	FC,
+	HTMLProps,
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import { MdDeleteOutline, MdRemoveRedEye, MdSearch } from "react-icons/md";
 import Link from "next/link";
 import Image, { StaticImageData } from "next/image";
 import { InputLabel } from "../Input/InputLabel";
-import ItemPicker from "../ItemPicker";
 import { SelectPicker } from "../SelectPicker";
+import { IOrderContext, OrdersContext } from "@/contexts/OrdersProvider";
+import { useSelector } from "react-redux";
+import { RootState } from "@/types/store.type";
+import { T_order, T_updated_order } from "@/types/user.type";
+import { useRouter } from "next/router";
 
-interface OrderTableProps {}
-
-export const OrderTable: FC<OrderTableProps> = ({}) => {
+export const OrderTable: FC = () => {
+	const router = useRouter()
 	const [rowSelection, setRowSelection] = useState({});
-	// const [globalFilter, setGlobalFilter] = useState("");
-	const [data, setData] = useState([...orderData]);
+	const { selectedFilter } = useContext(OrdersContext) as IOrderContext;
+	const { orders } = useSelector((state: RootState) => state.user);
+
+	const filter = useMemo(() => {
+		if (selectedFilter !== "All Orders") {
+			return orders.filter(
+				(type) => type.deliveryStatus === selectedFilter,
+			);
+		} else return orders;
+	}, [orders, selectedFilter]);
 	const [sorting, setSorting] = useState<SortingState>([]);
 
-	const columns = useMemo<ColumnDef<IOrder>[]>(
+
+	const columns = useMemo<ColumnDef<T_order|T_updated_order>[]>(
 		() => [
 			{
-				accessorKey: "id",
+				accessorKey: "_id",
 				cell: (info) => {
 					const id = `#${info.getValue()}`;
-					return <div className="ml-2">{id}</div>;
+					return <div className="ml-2">{id.slice(0,7)}</div>;
 				},
 				header: () => <span>ID</span>,
 			},
 			{
-				accessorKey: "img",
-				cell: ({ getValue }) => (
-					<Image
-						width={35}
-						className="rounded-md border border-afruna-base/40"
-						src={getValue() as StaticImageData}
-						alt="Item_Img "
-					/>
-				),
+				accessorKey: "coverPhoto",
+				cell: ({ getValue }) => {
+					const image = getValue() as string[];
+					return (
+						<Image
+							width={35}
+							height={35}
+							className="rounded-md w-12 h-12 object-fill border border-afruna-base/40"
+							src={image[0]}
+							alt="Item_Img "
+						/>
+					);
+				},
 				header: () => <span>Image</span>,
 			},
 			{
-				accessorKey: "Quantity",
-				cell: ({ row }) =>
-					Math.ceil(
-						Math.random() * row.original.amount
-					).toLocaleString(),
+				accessorKey: "quantity",
+				cell: ({ getValue }) => getValue(),
+				header: () => <span>Quantity</span>,
 			},
 			{
-				accessorKey: "item_name",
+				accessorKey: "productName",
 				cell: ({ getValue }) => getValue(),
 				header: () => <span>Item Name</span>,
 			},
 			{
-				accessorKey: "order_date",
+				accessorKey: "createdAt",
 
-				cell: ({ cell }) => cell.getValue(),
+				cell: ({ getValue }) =>
+					new Date(getValue() as string).toUTCString(),
 				header: () => <span>Order Date</span>,
 			},
 			{
-				accessorKey: "delivery_status",
+				accessorKey: "deliveryStatus",
 				cell: ({ cell }) => {
 					switch (cell.getValue()) {
 						case "Pending":
@@ -132,41 +155,36 @@ export const OrderTable: FC<OrderTableProps> = ({}) => {
 				header: () => <span>Status</span>,
 			},
 			{
-				accessorKey: "amount",
-				cell: (info) => `$${info.getValue()}`,
+				accessorKey: "total",
+				cell: (info) => `$${(info.getValue()as number).toLocaleString()}`,
 				header: () => <span>Amount</span>,
 			},
 			{
 				id: "actions",
 				cell: ({ row }) => (
 					<div className="flex justify-between items-center">
-						<Link
-							href={"/orders/details"}
+						
+							<button
+							onClick={() =>
+								router.push({
+									pathname: `/orders/details`,
+									query: row.original,
+								})
+							}
 							className="hover:scale-90 border-none transition duration-300"
 						>
 							<MdRemoveRedEye size={24} />
-						</Link>
-						<button
-							className="hover:scale-90 border-none transition duration-300"
-							onClick={() => {
-								const newData = data.filter(
-									(_, idx) => idx !== row.index
-								);
-								setData(newData);
-							}}
-						>
-							<MdDeleteOutline size={24} />
 						</button>
 					</div>
 				),
 				header: () => <span>Action</span>,
 			},
 		],
-		[data]
+		[filter],
 	);
 
 	const table = useReactTable({
-		data,
+		data:filter,
 		columns,
 		state: {
 			rowSelection,
@@ -234,7 +252,7 @@ export const OrderTable: FC<OrderTableProps> = ({}) => {
 													{flexRender(
 														header.column.columnDef
 															.header,
-														header.getContext()
+														header.getContext(),
 													)}
 													<span className="flex flex-col">
 														<BiChevronUp
@@ -254,7 +272,7 @@ export const OrderTable: FC<OrderTableProps> = ({}) => {
 													{flexRender(
 														header.column.columnDef
 															.header,
-														header.getContext()
+														header.getContext(),
 													)}
 												</span>
 											)}
@@ -279,7 +297,7 @@ export const OrderTable: FC<OrderTableProps> = ({}) => {
 													{flexRender(
 														cell.column.columnDef
 															.cell,
-														cell.getContext()
+														cell.getContext(),
 													)}
 												</td>
 											);
@@ -319,7 +337,7 @@ export const OrderTable: FC<OrderTableProps> = ({}) => {
 							<button
 								onClick={() =>
 									table.setPageIndex(
-										table.getState().pagination.pageIndex
+										table.getState().pagination.pageIndex,
 									)
 								}
 							>
@@ -330,7 +348,7 @@ export const OrderTable: FC<OrderTableProps> = ({}) => {
 									table.getCanNextPage() &&
 									table.setPageIndex(
 										table.getState().pagination.pageIndex +
-											1
+											1,
 									)
 								}
 							>
@@ -342,7 +360,7 @@ export const OrderTable: FC<OrderTableProps> = ({}) => {
 										table.getPageCount() &&
 									table.setPageIndex(
 										table.getState().pagination.pageIndex +
-											1
+											1,
 									)
 								}
 							>
@@ -356,7 +374,7 @@ export const OrderTable: FC<OrderTableProps> = ({}) => {
 							<button
 								onClick={() =>
 									table.setPageIndex(
-										table.getState().pagination.pageSize
+										table.getState().pagination.pageSize,
 									)
 								}
 							>
@@ -398,7 +416,7 @@ function IndeterminateCheckbox({
 			ref={ref}
 			className={classNames(
 				className,
-				"w-4 h-4 text-slate-500 bg-white border-slate-300 rounded-md focus:ring-slate-900 dark:focus:ring-blue-900 dark:ring-offset-gray-800 focus:ring-1 dark:bg-gray-700 dark:border-gray-600"
+				"w-4 h-4 text-slate-500 bg-white border-slate-300 rounded-md focus:ring-slate-900 dark:focus:ring-blue-900 dark:ring-offset-gray-800 focus:ring-1 dark:bg-gray-700 dark:border-gray-600",
 			)}
 			{...rest}
 		/>

@@ -1,19 +1,18 @@
-import Breadcrumbs from "@/components/widgets/Breadcrumbs";
-import { CreateBtn } from "@/components/widgets/CreateBtn";
-import { Main } from "@/layouts/Main";
 import {
 	FC,
 	ReactNode,
 	createContext,
 	useCallback,
-	useEffect,
 	useState,
 } from "react";
 import { MdAdd } from "react-icons/md";
-import { IProductItem } from "@/interfaces/IProductItem";
+import Breadcrumbs from "@/components/widgets/Breadcrumbs";
+import { CreateBtn } from "@/components/widgets/CreateBtn";
+import { Main } from "@/layouts/Main";
+import { IProduct, IProductItem } from "@/interfaces/IProductItem";
 import { IProductContext } from "@/interfaces/IProductContext";
 import { IProductReview } from "@/interfaces/IProductReview";
-import Products from "@/services/products.service";
+import { T_product_reviews } from "@/components/products/ProductReviews";
 
 export type TTabs =
 	| "Product Listing"
@@ -26,50 +25,22 @@ export const productcontext = createContext<IProductContext | null>(null);
 export const ProductProvider: FC<{ children: ReactNode }> = ({ children }) => {
 	const [tab, setTab] = useState<TTabs>("Product Listing");
 	const handleTabSelect = useCallback((tab: TTabs) => setTab(tab), []);
-	const [manageItems, setManageItems] = useState<IProductItem[]>([]);
-	const [product_review, setProductReview] = useState<IProductReview>();
+	const [manageItems, setManageItems] = useState<IProduct[]>([]);
+	const [product_review, setProductReview] = useState<T_product_reviews>();
 	const handleViewReview = useCallback(
-		(review: IProductReview) => setProductReview(review),
+		(review: T_product_reviews) => setProductReview(review),
 		[],
 	);
-	useEffect(() => {
-		(async () => {
-			const productsService = new Products();
-			const products = await productsService.createProduct({
-				name: "Mashamallow Cakes",
-				desc: "Food is good for your body especially this.",
-				size: "sm",
-				sold: false,
-				brand: "Fanr Sweeten Inc",
-				color: "Blue",
-				images: [""],
-				ratedBy: 48483,
-				ratings: 47432,
-				customId: "445",
-				discount: 44,
-				metaData: ["Calories"],
-				quantity: 394,
-				vendorId: "42",
-				condition: "90% New",
-				categoryId: "484",
-				isPromoted: true,
-				isOutOfStock: false,
-				deliveryLocations: ["NG"],
-				price: 9422,
-			});
-			console.log(products);
-		})();
-	}, []);
-
+	
 	const itemsSelector = useCallback(
-		(item: IProductItem) => {
+		(item: IProduct) => {
 			let itemExist = manageItems.some(
-				(pair) => pair.item_img === item.item_img,
+				(pair) => pair._id === item._id,
 			);
 			if (itemExist) {
 				setManageItems(
 					manageItems.filter(
-						(pair) => pair.item_img !== item.item_img,
+						(pair) => pair.coverPhoto[0] !== item.coverPhoto[0],
 					),
 				);
 			} else {

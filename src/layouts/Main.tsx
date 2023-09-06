@@ -4,13 +4,15 @@ import { HeaderDropdown } from "@/components/widgets/HeaderDropdown";
 import LocaleSelector from "@/components/widgets/LocaleSelector";
 import { NotificationPopup } from "@/components/widgets/NotificationPopup";
 import { SelectPicker } from "@/components/widgets/SelectPicker";
-import { images, svgs } from "@/constants/images";
+import { images } from "@/constants/images";
 import Auth10 from "@/services/auth.service";
+import { RootState } from "@/types/store.type";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { FC, ReactElement, useCallback } from "react";
 import { MdHelp, MdSettings, MdShoppingCart } from "react-icons/md";
+import { useSelector } from "react-redux";
 
 interface MainProps {
 	children: React.ReactNode;
@@ -29,7 +31,8 @@ export const Main: FC<MainProps> = ({
 		const authService = new Auth10(router);
 		authService.handleLogout();
 	}, []);
-
+	const { bio_data } = useSelector((state: RootState) => state.user)
+	if (!bio_data) return <></>
 	return (
 		<>
 			{/* sticky p-10 top-0 z-30 flex justify-between items-center w-full */}
@@ -38,18 +41,18 @@ export const Main: FC<MainProps> = ({
 				rightComponent={
 					<>
 						<SelectPicker
-							items={["item two", "item three"]}
-							placeholder={"Help"}
+							items={["FAQs", "Contant Us"]}
+							placeholder={"Get help"}
 							triggerLeftIcon={<MdHelp className="text-lg" />}
 							getSelected={(value) => console.log(value)}
 							contentClassName="z-20"
 							triggerClassName="flex text-xs space-x-1 items-center text-afruna-blue"
 						/>
-						<NotificationPopup />
-						<HeaderDropdown title={"Jon Dov"} profileSrc={images.userImg}>
+						{/* <NotificationPopup /> */}
+						<HeaderDropdown profileSrc={bio_data.avatar} title={`${bio_data.firstName} ${bio_data.lastName}`} subtitle={bio_data.role} >
 							<header className="w-full flex justify-between items-center border-b border-dotted p-2 py-4 text-slate-500 font-medium">
-								<span>0 Followers</span>
-								<span>1 Followings</span>
+								<span>{bio_data.followers} Followers</span>
+								<span>{bio_data.following} Followings</span>
 							</header>
 							{[
 								{

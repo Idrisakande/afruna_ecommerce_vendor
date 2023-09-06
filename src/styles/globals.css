@@ -43,7 +43,6 @@
 }
 
 * {
-  /* letter-spacing: 0.05rem; */
   outline: 0;
   box-sizing: border-box;
 }
@@ -78,6 +77,13 @@ fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td {
     /* border: none; */
 }
 
+/* Hide the default number input arrows */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
 
 ::-webkit-scrollbar {
 	width: 7px;
@@ -124,3 +130,4 @@ table {
 }
 
 @import url("./vendor-auth.style.css");
+@import url("./loader.css");

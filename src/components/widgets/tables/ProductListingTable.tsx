@@ -1,4 +1,4 @@
-import { FC, memo, useMemo, useState } from "react";
+import { FC, memo, useEffect, useMemo, useState } from "react";
 
 import {
 	ColumnDef,
@@ -8,45 +8,52 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
+import Link from "next/link";
+import { useSelector } from "react-redux";
 import Image from "next/image";
 import { MdDeleteOutline, MdRemoveRedEye } from "react-icons/md";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 
-import { IRecentOrders } from "@/interfaces/tables.interface";
-import { recent_order } from "@/constants/data";
-import Link from "next/link";
+import { RootState } from "@/types/store.type";
+import { IProduct } from "@/interfaces/IProductItem";
+import Products from "@/services/products.service";
 
-interface ProductListingProps {}
+type T_data = IProduct & { categoryName: string };
+const ProductListingTable: FC = () => {
+	const { products } = useSelector((state: RootState) => state.products);
+	const { categories } = useSelector((state: RootState) => state.categories);
 
-const REcentOrderTable: FC<ProductListingProps> = () => {
-	const [data, setData] = useState(() => [...recent_order]);
+	const [data, setData] = useState<T_data[]>([]);
 
 	const [sorting, setSorting] = useState<SortingState>([]);
-	const columns = useMemo<ColumnDef<IRecentOrders>[]>(
+	const columns = useMemo<ColumnDef<T_data>[]>(
 		() => [
 			{
-				accessorKey: "id",
+				accessorKey: "_id",
 				cell: (info) => {
-					const id = `#${info.getValue()}`;
-					return <div className="ml-2">{id}</div>;
+					const id = info.getValue() as string;
+					return <div className="ml-2">#{id.slice(0, 7)}</div>;
 				},
 				header: () => <span className="">Product ID</span>,
 			},
 			{
-				accessorKey: "image",
-				cell: ({ cell }) => (
-					<Image
-						className="w-[45px] h-[45px] object-fill rounded-md border-[1px] shadow-sm"
-						src={cell.getValue() as unknown as string}
-						width={40}
-						height={40}
-						alt="item Image"
-					/>
-				),
+				accessorKey: "coverPhoto",
+				cell: ({ cell }) => {
+					let image = cell.getValue() as string[];
+					return (
+						<Image
+							className="w-12 h-12 object-fill rounded-md border-[1px] shadow-sm"
+							src={image[0]}
+							width={40}
+							height={40}
+							alt="item Image"
+						/>
+					);
+				},
 				header: () => <span className="">Image</span>,
 			},
 			{
-				accessorKey: "itm_name",
+				accessorKey: "name",
 				cell: (info) => {
 					const itemName = `${info.getValue()}`;
 					return <div className="ml-2">{itemName}</div>;
@@ -54,20 +61,24 @@ const REcentOrderTable: FC<ProductListingProps> = () => {
 				header: () => <span className="">Item Name</span>,
 			},
 			{
-				accessorKey: "category",
-				cell: () => {
-					let items = ["Fashion", "COD", "Electronics", "Agros"];
-					let idx = Math.floor(Math.random() * items.length);
-					return items[idx];
+				accessorKey: "categoryName",
+				cell: (info) => {
+					let items = `${info.getValue()}`;
+					return <div className="ml-2">{items}</div>;
 				},
 				header: () => <span className="">Category</span>,
 			},
 			{
-				accessorKey: "order_date",
-				cell: (info) => info.getValue(),
+				accessorKey: "createdAt",
+				cell: (info) => {
+					let date = new Date(
+						info.getValue() as string,
+					).toUTCString();
+					return <>{date}</>;
+				},
 				header: () => <span className="">Order Date</span>,
 			},
-			{
+			/* {
 				accessorKey: "status",
 				cell: ({ cell }) => {
 					switch (cell.getValue()) {
@@ -108,9 +119,9 @@ const REcentOrderTable: FC<ProductListingProps> = () => {
 					}
 				},
 				header: () => <span className="">Status</span>,
-			},
+			}, */
 			{
-				accessorKey: "amount",
+				accessorKey: "price",
 				cell: ({ cell }) => <>${cell.getValue()}</>,
 				header: () => <span className="">Price</span>,
 			},
@@ -127,10 +138,8 @@ const REcentOrderTable: FC<ProductListingProps> = () => {
 						<button
 							className="hover:scale-90 border-none transition duration-300"
 							onClick={() => {
-								const newData = data.filter(
-									(_, idx) => idx !== row.index
-								);
-								setData(newData);
+								const productsService = new Products();
+								productsService.deleteproduct(row.original._id);
 							}}
 						>
 							<MdDeleteOutline size={24} />
@@ -140,7 +149,7 @@ const REcentOrderTable: FC<ProductListingProps> = () => {
 				header: () => <span className="">Action</span>,
 			},
 		],
-		[data]
+		[data],
 	);
 	const table = useReactTable({
 		data,
@@ -153,6 +162,30 @@ const REcentOrderTable: FC<ProductListingProps> = () => {
 		getSortedRowModel: getSortedRowModel(),
 	});
 
+	useEffect(() => {
+		if (products) {
+			const max_sorted_products = products.slice(0, 7); // Use slice to get the first 7 elements
+
+			let max_categories = [] as unknown as T_data[];
+
+			//compare categoryid and modify the data with the category name that matches with category id
+			for (let i in categories) {
+				for (let j in max_sorted_products) {
+					if (
+						max_sorted_products[j].categoryId === categories[i]._id
+					) {
+						max_categories.push({
+							categoryName: categories[i].name,
+							...max_sorted_products[j],
+						});
+					}
+				}
+			}
+			setData(max_categories);
+		}
+	}, [products, categories]);
+
+	if (!data) return <></>;
 	return (
 		<div className="w-screen lg:w-full relative">
 			<table className="w-screen px-2 lg:w-full  relative">
@@ -169,7 +202,7 @@ const REcentOrderTable: FC<ProductListingProps> = () => {
 										<div className="flex px-1 justify-between items-center w-fit">
 											{flexRender(
 												header.column.columnDef.header,
-												header.getContext()
+												header.getContext(),
 											)}
 											<span className="flex flex-col">
 												<BiChevronUp
@@ -188,7 +221,7 @@ const REcentOrderTable: FC<ProductListingProps> = () => {
 										<span className="px-2">
 											{flexRender(
 												header.column.columnDef.header,
-												header.getContext()
+												header.getContext(),
 											)}
 										</span>
 									)}
@@ -209,7 +242,7 @@ const REcentOrderTable: FC<ProductListingProps> = () => {
 										<td className="py-1" key={cell.id}>
 											{flexRender(
 												cell.column.columnDef.cell,
-												cell.getContext()
+												cell.getContext(),
 											)}
 										</td>
 									);
@@ -223,4 +256,4 @@ const REcentOrderTable: FC<ProductListingProps> = () => {
 	);
 };
 
-export default memo(REcentOrderTable);
+export default memo(ProductListingTable);

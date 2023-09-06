@@ -9,41 +9,20 @@ interface OrdersProviderProps {
 }
 
 export interface IOrderContext {
-	isOpen: boolean;
-	toggleOrderButton: () => void;
-	orders: IOrder[];
-	addOrder?: (payload: IOrder) => void;
-	removeOrder?: (id: string | number) => void;
+	selectedFilter: string;
+	handleActiveFilter: (arg: string) => void;
 }
 
 export const OrdersContext = createContext<IOrderContext | null>(null);
 
 export const OrdersProvider: FC<OrdersProviderProps> = ({ children }) => {
-	const [isOpen, setIsOpen] = useState(false);
-
-	const [orders, setOrders] = useState([...orderData]);
-
-	const toggleOrderButton = () => setIsOpen((prev) => !prev);
-
-	const addOrder = useCallback(
-		(payload: IOrder) => {
-			setOrders([...orders, { ...payload }]);
-		},
-		[orders]
+	const [selectedFilter, setSelectedFilter] = useState("All Orders");
+	const handleActiveFilter = useCallback(
+		(item: string) => setSelectedFilter(item),
+		[],
 	);
-
-	const removeOrder = useCallback(
-		(id: string | number) => {
-			const newOrders = orders.filter((_, idx) => idx !== id);
-			setOrders(newOrders);
-		},
-		[orders]
-	);
-
 	return (
-		<OrdersContext.Provider
-			value={{ isOpen, toggleOrderButton, addOrder, removeOrder, orders }}
-		>
+		<OrdersContext.Provider value={{ handleActiveFilter, selectedFilter }}>
 			<Main breadcrumbs={<Breadcrumbs />}>{children}</Main>
 		</OrdersContext.Provider>
 	);
