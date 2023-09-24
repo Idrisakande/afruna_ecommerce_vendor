@@ -11,20 +11,27 @@ import {
 	updateWeeklyRevenueVsOrder,
 	updateYealyRevenueVsOrder,
 } from "@/redux/features/user.slice";
-import { T_order, T_updated_order } from "@/types/user.type";
+import {
+	T_order,
+	T_updated_order,
+	T_updated_user_order,
+	T_user_order,
+} from "@/types/user.type";
 import recent_itemsUtil from "@/utils/recent_items.util";
+import { T_store } from "@/types/store.type";
 
-class Dashboard {
-	private store = store.store;
+class Order {
+	protected store!: T_store;
 	constructor() {
+		this.store = store.store;
 		this.getDailyRevenueVsOrder();
 		this.getMonthlyRevenueVsOrder();
 		this.getWeeklyRevenueVsOrder();
 		this.getYearlyRevenueVsOrder();
-		this.getOrders();
+		this.getOrdersByUsers();
 	}
 
-	async getDashboardStats() {
+	async getOrderStats() {
 		try {
 			const { data } = await axios.get("/api/products/cards", {
 				headers: {
@@ -82,7 +89,7 @@ class Dashboard {
 			handleAuthErrors(error as AxiosError<T_error_response>);
 		}
 	}
-	private async getOrders() {
+	private async getOrdersByVendor() {
 		try {
 			const { data } = await axios.get("/api/orders?role=vendor", {
 				headers: {
@@ -90,7 +97,7 @@ class Dashboard {
 				},
 			});
 			const orders: T_order[] = data.data;
-			const newOrders: T_updated_order[] = [];
+			/* const newOrders: T_updated_order[] = [];
 			if (!orders.length) {
 				this.store.dispatch(updateOrder(orders));
 			} else {
@@ -98,15 +105,72 @@ class Dashboard {
 				for (let i of orders) {
 					for (let j of products) {
 						if (i.productId === j._id) {
-							newOrders.push({ ...i, coverPhoto: j.coverPhoto, productName:j.name });
+							newOrders.push({
+								...i,
+								coverPhoto: j.coverPhoto,
+								productName: j.name,
+							});
 						}
 					}
 				}
-				this.store.dispatch(updateOrder(newOrders));
+			} */
+
+			this.store.dispatch(updateOrder(orders));
+		} catch (error) {
+			handleAuthErrors(error as AxiosError<T_error_response>);
+		}
+	}
+	private async getOrdersByUsers() {
+		try {
+			const { data } = await axios.get("/api/orders?role=user", {
+				headers: {
+					Authorization: `Bearer ${Cookies.get("token")}`,
+				},
+			});
+			const orders: T_user_order[] = data.data;
+			
+			const updatedOrders: T_updated_user_order[] = [];
+			if (!orders.length) {
+				this.store.dispatch(updateOrder(orders));
+			} else {
+				const { products } = this.store.getState().products;
+				for (let i of orders) {
+					for (let _i_ of i.items) {
+						for (let j of products) {
+							if (_i_.productId == j._id) {
+								updatedOrders.push({
+									...i,
+									items: [...i.items],
+									coverPhoto: j.coverPhoto[0],
+									productName: j.name,
+								});
+							}
+						}
+					}
+				}
+				this.store.dispatch(updateOrder(updatedOrders));
 			}
+			// const newOrders = [];
+			// if (!orders.length) {
+			// 	this.store.dispatch(updateOrder(orders));
+			// } else {
+			// 	const { products } = this.store.getState().products;
+			// 	for (let i of orders) {
+			// 		for (let j of products) {
+			// 			if (i.productId === j._id) {
+			// 				newOrders.push({
+			// 					...i,
+			// 					coverPhoto: j.coverPhoto,
+			// 					productName: j.name,
+			// 				});
+			// 			}
+			// 		}
+			// }
+			// this.store.dispatch(updateOrder(orders));
+			// 	}
 		} catch (error) {
 			handleAuthErrors(error as AxiosError<T_error_response>);
 		}
 	}
 }
-export default Dashboard;
+export default Order;

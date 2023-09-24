@@ -13,6 +13,7 @@ import {
 import { line_data } from "@/constants/data";
 import { useSelector } from "react-redux";
 import { RootState } from "@/types/store.type";
+import { ResultsFallback } from "./widgets/ResultsFallback";
 
 export function ChartStats({ rightComponent }: { rightComponent: ReactNode }) {
 	const [tf, setTF] = useState<string>("daily");
@@ -92,9 +93,7 @@ export function ChartStats({ rightComponent }: { rightComponent: ReactNode }) {
 						</LineChart>
 					</ResponsiveContainer>
 				) : (
-					<div className="flex h-fit flex-col items-center">
-						<h1>No Available Data</h1>
-					</div>
+				<ResultsFallback/>	
 				)}
 			</div>
 			{rightComponent}

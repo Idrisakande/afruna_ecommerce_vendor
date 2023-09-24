@@ -3,27 +3,28 @@ import { AxiosError, isAxiosError } from "axios";
 import Router from "next/router";
 import { toast } from "react-toastify";
 
-
-export function handleAuthErrors(
-	error: AxiosError<T_error_response>, 
-) {
+export function handleAuthErrors(error: AxiosError<T_error_response>) {
 	if (isAxiosError(error)) {
 		if (error.response) {
-			if (error.response.data.message === "jwt expired") {
+			if (
+				error.response.data.message === "jwt expired" ||
+				error.response.data.message === "jwt malformed"
+			) {
 				let router = Router;
-				router.push("/auth/login")
-			}else
+				router.replace("/auth/login");
+			}
 			//successful request with server response.
-			toast.error(error.response.data.message as string, {
-				position: "top-center",
-				autoClose: 5000,
-				hideProgressBar: true,
-				closeOnClick: true,
-				pauseOnHover: true,
-				draggable: true,
-				progress: undefined,
-				theme: "colored",
-			});
+			else
+				toast.error(error.response.data.message as string, {
+					position: "top-center",
+					autoClose: 5000,
+					hideProgressBar: true,
+					closeOnClick: true,
+					pauseOnHover: true,
+					draggable: true,
+					progress: undefined,
+					theme: "colored",
+				});
 			return error.response.data;
 		} else if (error.request) {
 			// request made but no server response

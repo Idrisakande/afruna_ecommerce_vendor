@@ -1,9 +1,10 @@
 import { conversations } from "@/constants/data";
+import { images } from "@/constants/images";
 import Image, { StaticImageData } from "next/image";
 import { FC } from "react";
 
 interface CurrentUsersConversationsProps {
-  img: StaticImageData;
+  img: string|undefined;
   message: string;
   time: string;
   isOwn: boolean;
@@ -19,7 +20,9 @@ export const CurrentUsersConversations: FC<CurrentUsersConversationsProps> = ({
   return (
     <div className={`flex gap-3 w-full p-2 ${isOwn && "justify-end"}`}>
       <Image
-        src={img}
+      height={40}
+      width={40}
+        src={img??images.afruna_logo}
         alt="img"
         priority
         className={`w-8 h-8 rounded-full ${isOwn && "order-2"}`}

@@ -1,9 +1,9 @@
-import { orderData } from "@/constants/data";
 import { IOrder } from "@/interfaces/tables.interface";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 import {
 	ColumnDef,
 	SortingState,
+	Table,
 	flexRender,
 	getCoreRowModel,
 	getFilteredRowModel,
@@ -11,64 +11,60 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
-import classNames from "classnames";
-import {
-	FC,
-	HTMLProps,
-	useContext,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
-import { BiChevronDown, BiChevronUp } from "react-icons/bi";
-import { MdDeleteOutline, MdRemoveRedEye, MdSearch } from "react-icons/md";
-import Link from "next/link";
-import Image, { StaticImageData } from "next/image";
+import { FC, memo, useContext, useMemo, useState } from "react";
+import { useRouter } from "next/router";
+import { BiCaretRight, BiChevronDown, BiChevronUp } from "react-icons/bi";
+import { MdRemoveRedEye, MdSearch } from "react-icons/md";
+import Image from "next/image";
+
+import { orderData } from "@/constants/data";
 import { InputLabel } from "../Input/InputLabel";
 import { SelectPicker } from "../SelectPicker";
 import { IOrderContext, OrdersContext } from "@/contexts/OrdersProvider";
-import { useSelector } from "react-redux";
-import { RootState } from "@/types/store.type";
-import { T_order, T_updated_order } from "@/types/user.type";
-import { useRouter } from "next/router";
+import { ResultsFallback } from "../ResultsFallback";
+import { formattedDate } from "@/utils/formatted_date";
+import { RxChevronLeft, RxChevronRight, RxDoubleArrowLeft, RxDoubleArrowRight } from "react-icons/rx";
+// import { useSelector } from "react-redux";
+// import { RootState } from "@/types/store.type";
 
-export const OrderTable: FC = () => {
-	const router = useRouter()
-	const [rowSelection, setRowSelection] = useState({});
+export const OrderTable: FC = memo(() => {
+	const router = useRouter();
 	const { selectedFilter } = useContext(OrdersContext) as IOrderContext;
-	const { orders } = useSelector((state: RootState) => state.user);
-
-	const filter = useMemo(() => {
-		if (selectedFilter !== "All Orders") {
-			return orders.filter(
-				(type) => type.deliveryStatus === selectedFilter,
-			);
-		} else return orders;
-	}, [orders, selectedFilter]);
+	// const { orders } = useSelector((state: RootState) => state.user);
 	const [sorting, setSorting] = useState<SortingState>([]);
+	const [data, setData] = useState(orderData);
 
+	useMemo(() => {
+		if (selectedFilter === "All Orders") {
+			setData(orderData);
+		} else {
+			const newData = orderData.filter(
+				(datum) => datum.delivery_status === selectedFilter,
+			);
+			setData(newData);
+		}
+	}, [selectedFilter]);
 
-	const columns = useMemo<ColumnDef<T_order|T_updated_order>[]>(
+	const columns = useMemo<ColumnDef<IOrder>[]>(
 		() => [
 			{
-				accessorKey: "_id",
+				accessorKey: "id",
 				cell: (info) => {
 					const id = `#${info.getValue()}`;
-					return <div className="ml-2">{id.slice(0,7)}</div>;
+					return <div className="ml-2">{id.slice(0, 7)}</div>;
 				},
 				header: () => <span>ID</span>,
 			},
 			{
-				accessorKey: "coverPhoto",
+				accessorKey: "img",
 				cell: ({ getValue }) => {
-					const image = getValue() as string[];
+					const image = getValue() as string;
 					return (
 						<Image
 							width={35}
 							height={35}
 							className="rounded-md w-12 h-12 object-fill border border-afruna-base/40"
-							src={image[0]}
+							src={image}
 							alt="Item_Img "
 						/>
 					);
@@ -76,24 +72,24 @@ export const OrderTable: FC = () => {
 				header: () => <span>Image</span>,
 			},
 			{
-				accessorKey: "quantity",
-				cell: ({ getValue }) => getValue(),
-				header: () => <span>Quantity</span>,
-			},
-			{
-				accessorKey: "productName",
+				accessorKey: "buyers_name",
 				cell: ({ getValue }) => getValue(),
 				header: () => <span>Item Name</span>,
 			},
 			{
-				accessorKey: "createdAt",
+				accessorKey: "amount",
+				cell: ({ getValue }) => getValue(),
+				header: () => <span>Quantity</span>,
+			},
+			{
+				accessorKey: "delivery_date",
 
 				cell: ({ getValue }) =>
-					new Date(getValue() as string).toUTCString(),
+					formattedDate(getValue as unknown as string),
 				header: () => <span>Order Date</span>,
 			},
 			{
-				accessorKey: "deliveryStatus",
+				accessorKey: "delivery_status",
 				cell: ({ cell }) => {
 					switch (cell.getValue()) {
 						case "Pending":
@@ -155,22 +151,22 @@ export const OrderTable: FC = () => {
 				header: () => <span>Status</span>,
 			},
 			{
-				accessorKey: "total",
-				cell: (info) => `$${(info.getValue()as number).toLocaleString()}`,
+				accessorKey: "method_of_payment",
+				cell: (info) => info.getValue() as number,
+				// cell: (info) => `$${(info.getValue()as number).toLocaleString()}`,
 				header: () => <span>Amount</span>,
 			},
 			{
 				id: "actions",
 				cell: ({ row }) => (
 					<div className="flex justify-between items-center">
-						
-							<button
-							onClick={() =>
+						<button
+							onClick={() => {
 								router.push({
 									pathname: `/orders/details`,
-									query: row.original,
-								})
-							}
+									// query: row.original,
+								});
+							}}
 							className="hover:scale-90 border-none transition duration-300"
 						>
 							<MdRemoveRedEye size={24} />
@@ -180,32 +176,34 @@ export const OrderTable: FC = () => {
 				header: () => <span>Action</span>,
 			},
 		],
-		[filter],
+		[data],
 	);
 
 	const table = useReactTable({
-		data:filter,
+		data,
 		columns,
 		state: {
-			rowSelection,
 			sorting,
 		},
 		enableRowSelection: true,
 		onSortingChange: setSorting,
-		onRowSelectionChange: setRowSelection,
 		getSortedRowModel: getSortedRowModel(),
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
 	});
+	if (!data.length) {
+		return <ResultsFallback />;
+	}
 
 	return (
+		<main className="relative">
 		<div className="my-10 w-full  h-[85vh] pb-2 bg-white overflow-auto rounded-md border shadow-sm border-slate-300">
-			<header className="flex justify-between items-center border-b border-slate-300 text-afruna-blue">
+			<header className="flex sticky top-0 justify-between items-center border-b border-slate-300 text-afruna-blue bg-white ">
 				<h1 className="p-3 font-bold ">Orders</h1>
 				<div className="flex justify-between items-center p-3 space-x-2">
 					<InputLabel
-						getValue={(val) => console.log(val)}
+						getValue={(val) => console.log("")}
 						placeholder={"Search"}
 						inputClassName="text-sm p-1"
 						inputsuffixIcon={
@@ -235,192 +233,129 @@ export const OrderTable: FC = () => {
 					/>
 				</div>
 			</header>
-			<ScrollArea.Root className="px-4 ScrollAreaRoot w-full ">
-				<ScrollArea.Viewport className="ScrollAreaViewport w-full h-full pb-6">
-					<table className="w-screen lg:w-full px-8 relative">
-						<thead className=" sticky top-0 bg-white">
-							{table.getHeaderGroups().map((headerGroup) => (
-								<tr
-									className="text-left text-afruna-gray text-[12px] font-extralight"
-									key={headerGroup.id}
-								>
-									{headerGroup.headers.map((header) => (
-										<th key={header.id}>
-											{header.index > 1 &&
-											header.id !== "actions" ? (
-												<div className="flex px-1 justify-between items-center w-fit">
-													{flexRender(
-														header.column.columnDef
-															.header,
-														header.getContext(),
-													)}
-													<span className="flex flex-col">
-														<BiChevronUp
-															onClick={header.column.getToggleSortingHandler()}
-															size={24}
-															className="relative top-2 text-slate-400"
-														/>
-														<BiChevronDown
-															onClick={header.column.getToggleSortingHandler()}
-															size={24}
-															className="relative bottom-[7px]"
-														/>
-													</span>
-												</div>
-											) : (
-												<span className="px-2">
-													{flexRender(
-														header.column.columnDef
-															.header,
-														header.getContext(),
-													)}
-												</span>
+			<table className="w-screen lg:w-full px-8 relative">
+				<thead className=" sticky top-16 bg-white">
+					{table.getHeaderGroups().map((headerGroup) => (
+						<tr
+							className="text-left text-afruna-gray text-[12px] font-extralight"
+							key={headerGroup.id}
+						>
+							{headerGroup.headers.map((header) => (
+								<th key={header.id}>
+									{header.index > 1 &&
+									header.id !== "actions" ? (
+										<div className="flex px-1 justify-between items-center w-fit">
+											{flexRender(
+												header.column.columnDef.header,
+												header.getContext(),
 											)}
-										</th>
-									))}
-								</tr>
+											<span className="flex flex-col">
+												<BiChevronUp
+													onClick={header.column.getToggleSortingHandler()}
+													size={24}
+													className="relative top-2 text-slate-400"
+												/>
+												<BiChevronDown
+													onClick={header.column.getToggleSortingHandler()}
+													size={24}
+													className="relative bottom-[7px]"
+												/>
+											</span>
+										</div>
+									) : (
+										<span className="px-2">
+											{flexRender(
+												header.column.columnDef.header,
+												header.getContext(),
+											)}
+										</span>
+									)}
+								</th>
 							))}
-						</thead>
-						<tbody className="">
-							{table.getRowModel().rows.map((row) => {
-								return (
-									<tr
-										className="text-left odd:border-y-[1px] odd:border-slate-300 text-afruna-blue text-[12px]"
-										key={row.id}
-									>
-										{row.getVisibleCells().map((cell) => {
-											return (
-												<td
-													className="py-2"
-													key={cell.id}
-												>
-													{flexRender(
-														cell.column.columnDef
-															.cell,
-														cell.getContext(),
-													)}
-												</td>
-											);
-										})}
-									</tr>
-								);
-							})}
-						</tbody>
-					</table>
-				</ScrollArea.Viewport>
-				<ScrollArea.Scrollbar
-					className="ScrollAreaScrollbar p-[2px] rounded-xl mb-4 flex bg-slate-100 hover:bg-slate-200"
-					orientation="vertical"
-				>
-					<ScrollArea.Thumb className="relative flex-1 rounded-xl bg-slate-400" />
-				</ScrollArea.Scrollbar>
-				<ScrollArea.Scrollbar
-					className="ScrollAreaScrollbar p-[2px] rounded-xl mb-4 flex bg-slate-100 hover:bg-slate-200 "
-					orientation="horizontal"
-				>
-					<ScrollArea.Thumb className="relative flex-1 rounded-xl bg-slate-400" />
-				</ScrollArea.Scrollbar>
-				<ScrollArea.Corner className="" />
-			</ScrollArea.Root>
+						</tr>
+					))}
+				</thead>
+				<tbody className="">
+					{table.getRowModel().rows.map((row) => {
+						return (
+							<tr
+								className="text-left odd:border-y-[1px] odd:border-slate-300 text-afruna-blue text-[12px]"
+								key={row.id}
+							>
+								{row.getVisibleCells().map((cell) => {
+									return (
+										<td className="py-2" key={cell.id}>
+											{flexRender(
+												cell.column.columnDef.cell,
+												cell.getContext(),
+											)}
+										</td>
+									);
+								})}
+							</tr>
+						);
+					})}
+				</tbody>
+			</table>
+		</div>
+		<Pagination table={table} />
+		</main>
+	);
+});
 
-			<div className="h-fit mt-2">
-				<div className="flex items-center gap-2">
+function createPaginationWithCustomType<T>() {
+	// Create a new type that extends CustomType with an additional property
+	type TTable = Table<T>;
+
+	// Define a pagination component that uses the extended table type [TTable]
+	return ({ table }: { table: TTable }) => {
+		const pageCount = table.getPageCount();
+		const next = table.nextPage;
+		const previous = table.previousPage;
+		const canGoBackward = !table.getCanPreviousPage();
+		const canGoForward = !table.getCanNextPage();
+		return (
+			<div className="h-fit mt-2 absolute right-0 pb-20">
+				<div className="flex text-md text-afruna-blue items-center gap-2">
 					<button
-						className="border rounded p-1"
-						onClick={() => table.setPageIndex(0)}
-						disabled={!table.getCanPreviousPage()}
-					>
-						{"<<"}
+						className="w-7 h-7 bg-white rounded p-1"
+						onClick={()=> table.setPageIndex(0)}
+						disabled={!canGoBackward}
+						>
+						<RxDoubleArrowLeft />
 					</button>
-					{table.getState().pagination.pageIndex + 1 < 3 && (
-						<>
-							<button
-								onClick={() =>
-									table.setPageIndex(
-										table.getState().pagination.pageIndex,
-									)
-								}
-							>
-								{table.getState().pagination.pageIndex + 1}
-							</button>
-							<button
-								onClick={() =>
-									table.getCanNextPage() &&
-									table.setPageIndex(
-										table.getState().pagination.pageIndex +
-											1,
-									)
-								}
-							>
-								{table.getState().pagination.pageIndex + 2}
-							</button>
-							<button
-								onClick={() =>
-									table.getState().pagination.pageIndex + 2 <
-										table.getPageCount() &&
-									table.setPageIndex(
-										table.getState().pagination.pageIndex +
-											1,
-									)
-								}
-							>
-								{table.getState().pagination.pageIndex + 3}
-							</button>
-						</>
-					)}
-					{table.getState().pagination.pageIndex > 5 && (
-						<>
-							<div>...</div>
-							<button
-								onClick={() =>
-									table.setPageIndex(
-										table.getState().pagination.pageSize,
-									)
-								}
-							>
-								{table.getPageCount() + 1}
-							</button>
-						</>
-					)}
 					<button
-						className="border rounded p-1"
-						onClick={() =>
-							table.setPageIndex(table.getPageCount() - 1)
-						}
-						disabled={!table.getCanNextPage()}
+						className="w-7 h-7 bg-white rounded p-1"
+						onClick={previous}
+						disabled={!canGoBackward}
+						>
+						<RxChevronLeft />
+					</button>
+<button
+						className="w-7 h-7 text-sm bg-white rounded p-1"
+						
+						
+						>
+						{table.getPageCount()}
+					</button>
+					<button
+						className="w-7 h-7 bg-white rounded p-1"
+						onClick={next}
+						disabled={!table.getCan}
+						>
+						<RxChevronRight/>
+					</button>
+					<button
+						className="w-7 h-7 bg-white rounded p-1"
+						onClick={()=> table.setPageIndex(table.getPageCount() -1)}
+						disabled={!canGoForward}
 					>
-						{">>"}
+						<RxDoubleArrowRight />
 					</button>
 				</div>
 			</div>
-		</div>
-	);
-};
-
-function IndeterminateCheckbox({
-	indeterminate,
-	className = "",
-	...rest
-}: { indeterminate?: boolean } & HTMLProps<HTMLInputElement>) {
-	const ref = useRef<HTMLInputElement>(null!);
-
-	useEffect(() => {
-		if (typeof indeterminate === "boolean") {
-			ref.current.indeterminate = !rest.checked && indeterminate;
-		}
-	}, [ref, indeterminate, rest.checked]);
-
-	return (
-		<input
-			type="checkbox"
-			ref={ref}
-			className={classNames(
-				className,
-				"w-4 h-4 text-slate-500 bg-white border-slate-300 rounded-md focus:ring-slate-900 dark:focus:ring-blue-900 dark:ring-offset-gray-800 focus:ring-1 dark:bg-gray-700 dark:border-gray-600",
-			)}
-			{...rest}
-		/>
-	);
+		);
+	};
 }
 
-// export default memo(OrderTable);
+const Pagination = memo(createPaginationWithCustomType<IOrder>());

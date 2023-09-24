@@ -14,15 +14,23 @@ import {
 import { FC, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import { useSelector } from "react-redux";
+import { RootState } from "@/types/store.type";
+import { T_updated_user_order } from "@/types/user.type";
 
 interface OrderDetailsTableProps {}
 
 export const OrderDetailsTable: FC<OrderDetailsTableProps> = ({}) => {
-	
-	const {query} = useRouter()
+	const {viewOrder} = useSelector((state:RootState)=>state.user)
+	/* const data = useMemo(()=> {
+		if (viewOrder){
+			let info = viewOrder as T_updated_user_order;
+			return info.items;
+		}
+	},[viewOrder]) */
 	const [rowSelection, setRowSelection] = useState({});
 	// const [globalFilter, setGlobalFilter] = useState("");
-	const [data, setData] = useState([...OrederDetailsData]);
+	// const [data, setData] = useState([...OrederDetailsData]);
 	const [sorting, setSorting] = useState<SortingState>([]);
 
 	const columns = useMemo<ColumnDef<IOrederDetails>[]>(
@@ -38,7 +46,7 @@ export const OrderDetailsTable: FC<OrderDetailsTableProps> = ({}) => {
 				accessorKey: "img",
 				cell: ({ cell }) => (
 					<Image
-						src={cell.getValue() as unknown as string}
+						src={cell.getValue() as string}
 						width={45}
 						height={45}
 						alt="order-image"
@@ -84,7 +92,7 @@ export const OrderDetailsTable: FC<OrderDetailsTableProps> = ({}) => {
 	);
 
 	const table = useReactTable({
-		data,
+		data:OrederDetailsData,
 		columns,
 		state: {
 			rowSelection,

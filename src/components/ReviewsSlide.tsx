@@ -6,6 +6,7 @@ import { MdStar } from "react-icons/md";
 
 import { RootState } from "@/types/store.type";
 import { images } from "@/constants/images";
+import { ResultsFallback } from "./widgets/ResultsFallback";
 
 export const ReviewsSlide = () => {
 	const [currentIndex, setCurrentIndex] = useState(0);
@@ -20,16 +21,7 @@ export const ReviewsSlide = () => {
 	);
 
 	if (!recent_reviewers?.length)
-		return (
-			<div className="flex text-afruna-blue justify-center items-center flex-col gap-2 md:gap-4">
-				<Image
-					className="object-contain h-40 w-40"
-					src={images.noResult}
-					alt="no_recent_reviews"
-				/>
-				<h1 className="font-semibold text-xl">No Recents Reviews</h1>
-			</div>
-		);
+	return <ResultsFallback/>	
 	return reviews?.length ? (
 		<div className="relative p-3 space-y-2 h-fit">
 			<button

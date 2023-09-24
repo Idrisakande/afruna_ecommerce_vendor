@@ -2,9 +2,12 @@ import {
 	T_InitialUserState,
 	T_User,
 	T_order,
+	T_reports,
 	T_review,
 	T_updated_order,
+	T_updated_user_order,
 	T_user,
+	T_user_order,
 } from "@/types/user.type";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
@@ -13,7 +16,7 @@ const User = createSlice({
 		isActive: false,
 		bio_data: undefined,
 		reviews: [],
-		reviewers:[],
+		reviewers: [],
 		recent_reviewers: [],
 		revenue_vs_order: {
 			daily: [],
@@ -21,7 +24,9 @@ const User = createSlice({
 			weekly: [],
 			yearly: [],
 		},
-		orders: []
+		orders: [],
+		reports: undefined,
+		viewOrder: undefined
 	} as T_InitialUserState,
 	name: "User",
 	reducers: {
@@ -52,9 +57,15 @@ const User = createSlice({
 		updateYealyRevenueVsOrder(state, action: PayloadAction<[]>) {
 			state.revenue_vs_order.yearly = action.payload;
 		},
-		updateOrder(state, action: PayloadAction<T_order[]| T_updated_order[]>) {
+		updateOrder(state, action: PayloadAction<T_order[] | T_user_order[]>) {
 			state.orders = action.payload;
 		},
+		updateReports(state, action: PayloadAction<T_reports>) {
+			state.reports = action.payload;
+		},
+		setViewOrderData(state, action:PayloadAction<T_updated_order|T_updated_user_order>){
+			state.viewOrder = action.payload;
+		}
 	},
 });
 
@@ -68,6 +79,8 @@ export const {
 	updateMonthlyRevenueVsOrder,
 	updateWeeklyRevenueVsOrder,
 	updateYealyRevenueVsOrder,
-	updateOrder
+	updateOrder,
+	updateReports,
+	setViewOrderData
 } = User.actions;
 export default User.reducer;

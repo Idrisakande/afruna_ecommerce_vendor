@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
 
 import {
 	Bar,
@@ -15,8 +15,16 @@ import { Main } from "@/layouts/Main";
 import Breadcrumbs from "@/components/widgets/Breadcrumbs";
 import { BestSellingProductsTable } from "@/components/widgets/tables/BestSellingProductsTable";
 import { ReportStats } from "@/components/ReportStats";
+import Reports from "@/services/reports.service";
+import { useSelector } from "react-redux";
+import { RootState } from "@/types/store.type";
 
 const Index: FC<{}> = () => {
+	useEffect(()=> {
+		const reportServices = new Reports();
+		reportServices.getReports()
+	},[]);
+	
 	return (
 		<Main breadcrumbs={<Breadcrumbs />}>
 			<ReportStats />

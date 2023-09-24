@@ -15,36 +15,44 @@ import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import Link from "next/link";
 
 import recent_itemsUtil from "@/utils/recent_items.util";
-import { T_updated_order } from "@/types/user.type";
-import Dashboard from "@/services/dashboard.service";
+import {
+	T_order,
+	T_updated_order,
+	T_updated_user_order,
+} from "@/types/user.type";
+import Order from "@/services/order.service";
 import { useRouter } from "next/router";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/types/store.type";
+import { setViewOrderData } from "@/redux/features/user.slice";
+import { ResultsFallback } from "../ResultsFallback";
 
 const RecentOrderTable: FC = () => {
 	const router = useRouter();
+	const { orders } = useSelector((state: RootState) => state.user);
 	const recent_orders = useMemo(() => {
-		const dashboardService = new Dashboard();
-		return dashboardService.getRecentOrder();
-	}, []);
-
+		return recent_itemsUtil(orders, 12) as T_updated_user_order[];
+	}, [orders]);
+	const dispatch = useDispatch();
 	const [sorting, setSorting] = useState<SortingState>([]);
-	const columns = useMemo<ColumnDef<T_updated_order>[]>(
+	const columns = useMemo<ColumnDef<T_updated_user_order>[]>(
 		() => [
 			{
-				accessorKey: "_id",
+				accessorKey: "customId",
 				cell: (info) => {
-					const id = `#${info.getValue()}`;
-					return <div className="ml-2">{id.slice(0, 7)}</div>;
+					const id = `${info.getValue()}`;
+					return <div className="ml-2">{id}</div>;
 				},
 				header: () => <span className="">ID</span>,
 			},
 			{
 				accessorKey: "coverPhoto",
 				cell: (info) => {
-					let image = info.getValue() as string[];
+					let image = info.getValue() as string;
 					return (
 						<Image
 							className="w-12 h-12 object-fill rounded-md border-[1px] shadow-sm"
-							src={image[0]}
+							src={image}
 							width={40}
 							height={40}
 							alt="item Image"
@@ -62,8 +70,9 @@ const RecentOrderTable: FC = () => {
 				header: () => <span className="">Item Name</span>,
 			},
 			{
-				accessorKey: "quantity",
-				cell: (info) => info.getValue(),
+				accessorKey: "items",
+				cell: (info) =>
+					info ? (info.getValue() as T_order[])[0].quantity : null,
 				header: () => <span className="">Quantity</span>,
 			},
 			{
@@ -72,9 +81,9 @@ const RecentOrderTable: FC = () => {
 				header: () => <span className="">Order Date</span>,
 			},
 			{
-				accessorKey: "deliveryStatus",
+				accessorKey: "items",
 				cell: ({ cell }) => {
-					switch (cell.getValue()) {
+					switch ((cell.getValue() as T_order[])[0].deliveryStatus) {
 						case "Pending":
 							return (
 								<text className="flex justify-between items-center w-fit">
@@ -115,7 +124,9 @@ const RecentOrderTable: FC = () => {
 			},
 			{
 				accessorKey: "total",
-				cell: ({ cell }) => <>${cell.getValue()}</>,
+				cell: ({ cell }) => (
+					<>${(cell.getValue() as number).toLocaleString()}</>
+				),
 				header: () => <span className="">Price</span>,
 			},
 			{
@@ -123,12 +134,11 @@ const RecentOrderTable: FC = () => {
 				cell: ({ row }) => (
 					<div className="flex justify-start gap-3 items-center">
 						<button
-							onClick={() =>
-								router.push({
-									pathname: `/orders/details`,
-									query: row.original,
-								})
-							}
+							onClick={() => {
+								console.log(row.original);
+								dispatch(setViewOrderData(row.original));
+								router.push("/orders/details");
+							}}
 							className="hover:scale-90 border-none transition duration-300"
 						>
 							<MdRemoveRedEye size={24} />
@@ -161,9 +171,10 @@ const RecentOrderTable: FC = () => {
 		getCoreRowModel: getCoreRowModel(),
 		getSortedRowModel: getSortedRowModel(),
 	});
+	if (!recent_orders.length) return <ResultsFallback/>;
 	return (
 		<div className="w-screen lg:w-full relative text-center items-center">
-			{recent_orders.length ? (
+			{(
 				<table className="w-screen px-2 lg:w-full h-[45vh]  relative">
 					<thead className="sticky  bg-white top-[4.3rem] left-0 right-0">
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -230,9 +241,7 @@ const RecentOrderTable: FC = () => {
 						})}
 					</tbody>
 				</table>
-			) : (
-				<div>Recent orders not available </div>
-			)}
+			) }
 		</div>
 	);
 };

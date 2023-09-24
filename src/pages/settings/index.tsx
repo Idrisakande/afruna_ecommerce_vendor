@@ -5,7 +5,6 @@ import { FieldValue, useForm } from "react-hook-form";
 import {
 	CountryIso2,
 	PhoneInput,
-	usePhoneValidation,
 } from "react-international-phone";
 import "react-international-phone/style.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -52,8 +51,8 @@ export default function Index() {
 	const handlePhoneInputChange = (value: any) => {
 		setValue("phoneNumber", value);
 	};
-	const validation = usePhoneValidation(phone);
-	const isPhoneValid = validation.isValid;
+	
+	// const isPhoneValid = validation.isValid;
 
 	const handlePasswordChange = useCallback(
 		(data: FieldValue<{ password: string; oldPassword: string }>) => {
@@ -474,12 +473,12 @@ export default function Index() {
 												className="text-[0.9rem] font-semibold"
 												htmlFor="phone"
 											>
-												{!isPhoneValid && (
+												{/* {!isPhoneValid && (
 													<span
 														ref={phoneValidationRef}
 														className="text-red-500 block bg-red-100 rounded-sm w-fit p-1"
 													></span>
-												)}
+												)} */}
 												Phone Number{" "}
 												<sup className="text-red-500 text-xs">
 													*

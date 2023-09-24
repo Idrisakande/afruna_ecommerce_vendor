@@ -6,9 +6,9 @@ import { IoAlertCircle } from "react-icons/io5";
 
 interface CurrentUserHeaderProps {
   active: boolean;
-  id: string;
-  name: string;
-  img: StaticImageData;
+  id: string|undefined;
+  name: string|undefined;
+  img: string|undefined;
 }
 
 export const CurrentUserHeader: FC<CurrentUserHeaderProps> = ({

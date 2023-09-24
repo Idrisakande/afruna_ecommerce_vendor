@@ -13,13 +13,14 @@ import { CreateBtn } from "@/components/widgets/CreateBtn";
 import { ReviewsSlide } from "@/components/ReviewsSlide";
 
 import withAuth10 from "@/hooks/withAuth10";
-import Dashboard from "@/services/dashboard.service";
+import Order from "@/services/order.service";
 import { AppContext } from "@/contexts/AppProvider";
 import { T_app_provider } from "@/types/t";
 import { T_DashboardStats } from "@/types/user.type";
 import PageLoarder from "@/components/widgets/PageLoarder";
 import User from "@/services/user.service";
 import Products from "@/services/products.service";
+import Chat from "@/services/chat.service";
 
 const Index = () => {
 	const [isloading, setIsloading] = useState(true);
@@ -30,16 +31,23 @@ const Index = () => {
 		totalOrders: 0,
 	});
 	const router = useRouter();
+
+	//refreshes chats every 10 mins
+	/* useEffect(()=> {
+		const chatServices =  new Chat();
+		const timer = setInterval(chatServices.getConversations, 10e3 * 60);
+		return () => clearInterval(timer);
+	},[]) */
 	useEffect(() => {
 		const userService = new User();
 		userService.getReviews();
 	}, []);
 
 	useEffect(() => {
-		const dashboardServices = new Dashboard();
+		const orderServices = new Order();
 		const _ = new Products();
-		dashboardServices
-			.getDashboardStats()
+		orderServices
+			.getOrderStats()
 			.then((result) => setDashboardStats(result))
 			.then(() => setIsloading(false));
 	}, []);

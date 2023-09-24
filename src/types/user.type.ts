@@ -10,7 +10,9 @@ export type T_InitialUserState = {
 		monthly: [];
 		yearly: [];
 	};
-	orders: T_order[] |T_updated_order[];
+	orders: T_order[] | T_user_order[] | T_updated_user_order[];
+	reports: T_reports | undefined;
+	viewOrder: T_updated_order | T_updated_user_order | undefined;
 };
 export type T_User =
 	| {
@@ -58,6 +60,15 @@ export type T_user = {
 	createdAt: string;
 	updatedAt: string;
 };
+export type T_user_order = {
+	_id: string;
+	userId: string;
+	total: number;
+	createdAt: string;
+	updatedAt: string;
+	customId: string;
+	items: T_order[];
+};
 
 export type T_order = {
 	_id: string;
@@ -72,6 +83,13 @@ export type T_order = {
 	createdAt: string;
 	updatedAt: string;
 	customId: string;
+	deliveryAddress: {
+		address: string;
+		postCode: string;
+		city: string;
+		state: string;
+		country: string;
+	};
 };
 export type T_updated_order = {
 	_id: string;
@@ -89,3 +107,60 @@ export type T_updated_order = {
 	coverPhoto: string;
 	productName: string;
 };
+export type T_updated_user_order = T_user_order & {
+	coverPhoto: string;
+	productName: string;
+};
+
+export type T_reports = {
+	order: {
+		today: number;
+		yesterdayPercentage: number | null;
+	};
+	revenue: {
+		today: number;
+		yesterdayPercentage: number | null;
+	};
+	visitors: number;
+};
+
+
+export type T_convo = {
+	_id: string;
+	recipients: string[];
+	lastMessage: string;
+	alias: string;
+	aliasAvatar: string;
+	unreadMessages: number;
+	createdAt: string;
+	updatedAt: string;
+};
+
+export type T_msg = {
+	_id: string;
+	conversation: string;
+	to: T_msg_alias;
+	from: T_msg_alias;
+	message: string;
+	attachment: [];
+	seen: string[];
+	createdAt: string;
+	updatedAt: string;
+};
+
+export type T_msg_alias = {
+	_id: string;
+	firstName: string;
+	lastName: string;
+	phoneNumber: string;
+	country:string;
+	email: string;
+	password: string;
+	role: string;
+	verificationToken: string;
+	isVendor: boolean;
+	addresses: [];
+	createdAt: string;
+	updatedAt: string;
+	avatar: string;
+}
