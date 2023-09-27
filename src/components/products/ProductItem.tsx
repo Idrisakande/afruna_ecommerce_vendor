@@ -3,6 +3,7 @@ import { FC, memo } from "react";
 import { MdStar, MdStarHalf } from "react-icons/md";
 import Image from "next/image";
 import { IProductItem } from "@/interfaces/IProductItem";
+import { images } from "@/constants/images";
 
 export const ProductItem: FC<IProductItem> = memo(
 	({
@@ -39,10 +40,8 @@ export const ProductItem: FC<IProductItem> = memo(
 					<Image src={item_img} alt={"ProductImage_"} width={100} />
 					<div className="flex self-start w-full items-center justify-between">
 						<p>
-							${price}{" "}
-							<s className="text-afruna-gray/30">
-								${slashed_price}
-							</s>
+							${price}
+							<s className="text-afruna-gray/30">${slashed_price}</s>
 						</p>
 						<span className="space-x-1 flex items-center">
 							{rating}
@@ -90,7 +89,12 @@ export const ProductItem: FC<IProductItem> = memo(
 					</span>
 				) : null}
 				<header className="flex flex-col my-auto items-center space-y-2 p-1">
-					<Image src={item_img} alt={"ProductImage_"} width={100} />
+					<Image
+						src={item_img ?? "https://picsum.photos/200/300"}
+						alt={"ProductImage_"}
+						width={100}
+						height={100}
+					/>
 					<p>{item_name}</p>
 					<div className="flex items-center space-x-[1px]">
 						{Array(5)
@@ -115,5 +119,5 @@ export const ProductItem: FC<IProductItem> = memo(
 				</footer>
 			</div>
 		);
-	}
+	},
 );

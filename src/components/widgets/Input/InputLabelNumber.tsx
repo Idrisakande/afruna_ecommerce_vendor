@@ -1,5 +1,5 @@
 import { ChangeEvent, useCallback, useMemo, useRef, useState } from "react";
-import { IInputLabel, IInputLabelNumber } from "@/interfaces/inputs.interfaces";
+import {  IInputLabelNumber } from "@/interfaces/inputs.interfaces";
 import { RxChevronDown, RxChevronUp } from "react-icons/rx";
 
 export function InputLabelNumber({
@@ -9,11 +9,12 @@ export function InputLabelNumber({
 	prefix,
 	suffix,
 }: IInputLabelNumber) {
-	const [input, setInput] = useState<number>(0);
+	const [input, setInput] = useState<number|string>(0);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const inputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-		let val = parseInt(e.target.value);
-		setInput(isNaN(val) ? 0 : val);
+		// let val = parseInt(e.target.value);
+		// setInput(isNaN(val) ? 0 : val);
+		setInput(e.target.value)
 	}, []);
 	const increment = useCallback(() => {
 		if (inputRef.current) {
@@ -32,7 +33,7 @@ export function InputLabelNumber({
 			setInput(val);
 		}
 	}, []);
-	useMemo(() => getValue(input), [getValue, input]);
+	useMemo(() => getValue(input as number), [getValue, input]);
 	return (
 		<fieldset className="text-xs">
 			<h3 className="my-2">{headerTitle}</h3>

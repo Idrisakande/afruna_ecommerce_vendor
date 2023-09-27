@@ -22,7 +22,7 @@ export interface IInputLabel {
 }
 export interface IInputLabelNumber {
 	headerTitle: string;
-	getValue: (s: string | number | undefined) => void;
+	getValue: (n: number ) => void;
 	placeholder: string;
 	max?: number;
 	prefix?: boolean;

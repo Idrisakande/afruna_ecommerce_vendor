@@ -1,9 +1,13 @@
-import { useState } from "react";
+import { RootState } from "@/types/store.type";
+import { report } from "process";
+import { FC, memo, useState } from "react";
 import { CgArrowBottomRight, CgArrowTopRight } from "react-icons/cg";
+import { useSelector } from "react-redux";
 import { Line, LineChart, ResponsiveContainer, Tooltip } from "recharts";
 
 export const ReportStats = () => {
-	const [statData] = useState([
+	const { reports } = useSelector((state: RootState) => state.user);
+	/* const [statData] = useState([
 		{
 			stat_title: "Today's Revenue",
 			trend_value: 4.2,
@@ -73,70 +77,144 @@ export const ReportStats = () => {
 				{ x: 3 },
 			],
 		},
-	]);
+	]); */
 	return (
 		<div className={"grid grid-cols-3 gap-2 md:gap-4 p-10 text-xs"}>
-			{statData.map((stat, idx) => (
-				<div
-					key={idx}
-					className={
-						"bg-white/40 p-2 rounded-md border border-afruna-gray/5 flex justify-between w-full items-center"
-					}
-				>
-					<aside className={"flex flex-col space-y-2"}>
-						<p className={"font-semibold text-afruna-gray/20"}>
-							{stat.stat_title}
-						</p>
-						<h3 className={"font-medium text-sm"}>
-							{idx === 0 ? "$" : ""}
-							{stat.stat_value.toLocaleString()}
-						</h3>
-
-						{stat.trend_direction === "up" ? (
-							<div className={"flex space-x-2 items-center"}>
-								<span
-									className={
-										"flex items-center text-[12px] rounded-xl space-x-2 w-fit bg-green-500/20 p-1 text-green-500/90"
-									}
-								>
-									<CgArrowTopRight /> {stat.trend_value} %
-								</span>
-								<span className={"text-[10px]"}>
-									{" "}
-									from yesterday
-								</span>
-							</div>
-						) : (
-							<div className={"flex space-x-1 items-center"}>
-								<span
-									className={
-										"flex items-center text-[12px] rounded-xl space-x-2 w-fit bg-red-500/20 p-1 text-red-500/90"
-									}
-								>
-									<CgArrowBottomRight /> {stat.trend_value} %
-								</span>
-								<span className={"text-[10px]"}>
-									{" "}
-									from yesterday
-								</span>
-							</div>
-						)}
-					</aside>
-					<aside className={""}>
-						<ResponsiveContainer width="100%" height={100}>
-							<LineChart data={stat.chartdata}>
-								<Tooltip />
-								<Line
-									strokeWidth={2}
-									dataKey={"x"}
-									dot={false}
-									type={"natural"}
-								/>
-							</LineChart>
-						</ResponsiveContainer>
-					</aside>
-				</div>
-			))}
+			<ReportCard
+				stat_data={[
+					{ x: 4 },
+					{ x: 3 },
+					{ x: 10 },
+					{ x: 9 },
+					{ x: 29 },
+					{ x: 19 },
+					{ x: 22 },
+					{ x: 9 },
+					{ x: 12 },
+					{ x: 7 },
+					{ x: 19 },
+					{ x: 17 },
+					{ x: 12 },
+					{ x: 17 },
+					{ x: 25 },
+				]}
+				stat_title=""
+				stat_value={0}
+				trend_direction="up"
+				trend_value={23.3}
+				key={"trending"}
+			/>
+			<ReportCard
+				stat_data={[
+					{ x: 4 },
+					{ x: 3 },
+					{ x: 10 },
+					{ x: 9 },
+					{ x: 29 },
+					{ x: 19 },
+					{ x: 22 },
+					{ x: 9 },
+					{ x: 12 },
+					{ x: 7 },
+					{ x: 19 },
+					{ x: 17 },
+					{ x: 12 },
+					{ x: 17 },
+					{ x: 25 },
+				]}
+				stat_title=""
+				stat_value={0}
+				trend_direction="up"
+				trend_value={23.3}
+				key={"trending"}
+			/>
+			<ReportCard
+				stat_data={[
+					{ x: 4 },
+					{ x: 3 },
+					{ x: 10 },
+					{ x: 9 },
+					{ x: 29 },
+					{ x: 19 },
+					{ x: 22 },
+					{ x: 9 },
+					{ x: 12 },
+					{ x: 7 },
+					{ x: 19 },
+					{ x: 17 },
+					{ x: 12 },
+					{ x: 17 },
+					{ x: 25 },
+				]}
+				stat_title=""
+				stat_value={0}
+				trend_direction="up"
+				trend_value={23.3}
+				key={"trending"}
+			/>
 		</div>
 	);
 };
+interface I_report_card {
+	stat_title: string;
+	stat_value: number;
+	trend_direction: string;
+	trend_value: number;
+	stat_data: any[];
+}
+const ReportCard: FC<I_report_card> = memo(
+	({ stat_title, stat_value, trend_direction, trend_value, stat_data }) => (
+		<div
+			className={
+				"bg-white/40 p-2 rounded-md border border-afruna-gray/5 flex justify-between w-full items-center"
+			}
+		>
+			<aside className={"flex flex-col space-y-2"}>
+				<p className={"font-semibold text-afruna-gray/20"}>
+					{stat_title}
+				</p>
+				<h3 className={"font-medium text-sm"}>
+					{stat_value === 0 ? "$" : ""}
+					{stat_value.toLocaleString()}
+				</h3>
+
+				{trend_direction === "up" ? (
+					<div className={"flex space-x-2 items-center"}>
+						<span
+							className={
+								"flex items-center text-[12px] rounded-xl space-x-2 w-fit bg-green-500/20 p-1 text-green-500/90"
+							}
+						>
+							<CgArrowTopRight /> {trend_value} %
+						</span>
+						<span className={"text-[10px]"}> from yesterday</span>
+					</div>
+				) : (
+					<div className={"flex space-x-1 items-center"}>
+						<span
+							className={
+								"flex items-center text-[12px] rounded-xl space-x-2 w-fit bg-red-500/20 p-1 text-red-500/90"
+							}
+						>
+							<CgArrowBottomRight /> {trend_value} %
+						</span>
+						<span className={"text-[10px]"}> from yesterday</span>
+					</div>
+				)}
+			</aside>
+			<aside className={""}>
+				<ResponsiveContainer width="100%" height={100}>
+					<LineChart data={stat_data}>
+						<Tooltip />
+						<Line
+							strokeWidth={2}
+							dataKey={"x"}
+							dot={false}
+							type={"natural"}
+						/>
+					</LineChart>
+				</ResponsiveContainer>
+			</aside>
+		</div>
+	),
+);

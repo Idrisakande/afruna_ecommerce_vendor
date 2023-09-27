@@ -3,11 +3,13 @@ import { FC } from "react";
 import { Avatar } from "./widgets/Avatar";
 
 interface UsersListProps {
-	active: boolean;
-	id: number;
-	number: number;
+	id: string;
+	img: string;
+	lastMessage:string;
 	name: string;
-	img: StaticImageData;
+	number: number;
+	setActiveChat: () => void;
+	active?: boolean;
 }
 
 export const UsersList: FC<UsersListProps> = ({
@@ -16,20 +18,22 @@ export const UsersList: FC<UsersListProps> = ({
 	number,
 	name,
 	active,
+	setActiveChat,
+	lastMessage
 }) => {
 	return (
-		<>
-			<div
+			<button
+				onClick={setActiveChat}
 				key={id}
-				className="bg-white p-4 mr-2 rounded-md flex gap-5 justify-start items-center"
+				className="bg-white p-4 mr-2 rounded-md w-full flex gap-5 justify-start items-center cursor-pointer hover:bg-afruna-gray/5"
 			>
-				<Avatar img={img} active={active} />
+				<Avatar img={img.length?img:undefined} active={active} />
 				<div className="flex flex-1 flex-col gap-1 w-full">
 					<h2 className="text-sm text-[#0C0E3B] font-semibold tracking-tight">
 						{name}
 					</h2>
 					<p className="text-xs text-[#A2A2A2] tracking-tight">
-						#CU679H
+						{lastMessage}
 					</p>
 				</div>
 				{number > 0 && (
@@ -39,7 +43,6 @@ export const UsersList: FC<UsersListProps> = ({
 						</span>
 					</div>
 				)}
-			</div>
-		</>
+			</button>
 	);
 };

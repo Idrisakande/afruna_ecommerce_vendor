@@ -1,13 +1,15 @@
 import Image from "next/image";
 import { images } from "@/constants/images";
+import { memo } from "react";
+import { T_DashboardStats } from "@/types/user.type";
 
-export const DashboardStats = () => (
+export const DashboardStats = memo(({listedProducts,canceledOrders,shippedOrders,totalOrders}:T_DashboardStats) => (
   <div className="grid grid-cols-4 gap-2 md:gap-4 my-10 snap-mandatory snap-y snap-center">
     {[
-      { title: "Listed Products", value: 22933 },
-      { title: "Total Orders", value: 1137 },
-      { title: "Shipped Orders", value: 1202 },
-      { title: "Cancelled Orders", value: 4159 },
+      { title: "Listed Products", value: listedProducts },
+      { title: "Total Orders", value: totalOrders },
+      { title: "Shipped Orders", value: shippedOrders },
+      { title: "Cancelled Orders", value: canceledOrders },
     ].map(({ title, value }, idx) => (
       <div
         key={idx}
@@ -48,4 +50,4 @@ export const DashboardStats = () => (
       </div>
     ))}
   </div>
-);
+));

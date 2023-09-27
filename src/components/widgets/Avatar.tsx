@@ -1,19 +1,22 @@
+import { images } from "@/constants/images";
 import Image, { StaticImageData } from "next/image";
-import { FC } from "react";
+import { FC, memo } from "react";
 
 interface AvatarProps {
-  img: StaticImageData;
+  img: string|undefined;
   active?: boolean;
   isOwn?: boolean;
   convo?: boolean;
 }
 
-export const Avatar: FC<AvatarProps> = ({ img, active, isOwn, convo }) => {
+export const Avatar: FC<AvatarProps> = memo(({ img, active, isOwn, convo }) => {
   return (
     <div className="flex relative ">
       <Image
-        src={img}
-        alt="image"
+      height={40}
+      width={40}
+      src={img??images.afruna_logo}
+      alt="image"
         priority
         className={`${convo ? "w-8 h-8" : "w-12 h-12"} rounded-full ${
           isOwn && "order-2"
@@ -28,4 +31,4 @@ export const Avatar: FC<AvatarProps> = ({ img, active, isOwn, convo }) => {
       />
     </div>
   );
-};
+});

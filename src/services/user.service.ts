@@ -1,69 +1,113 @@
-import { setAuth10, setToken } from "@/redux/features/auth.slice";
-import { updateUserActiveness } from "@/redux/features/user.slice";
+import axios, { AxiosError } from "axios";
+
+import {
+	setUserBio,
+	updateRecentReviewers,
+	updateReviewers,
+	updateReviews,
+} from "@/redux/features/user.slice";
 import store from "@/redux/store";
+import { T_error_response } from "@/types/auth.type";
+import { handleAuthErrors } from "@/utils/auth.util";
+import Cookies from "js-cookie";
+import { T_review } from "@/types/user.type";
+import recent_itemsUtil from "@/utils/recent_items.util";
+import { toast } from "react-toastify";
 
 class User {
 	private store = store.store;
-	userActive: boolean = false;
-	lastInteractionTime: number = Date.now();
-
-	constructor() {
-		this.init();
-		this.eventHandlers();
-	}
-
-	// Listen for user interactions
-	private eventHandlers() {
-		document.addEventListener("mousemove", this.mouseMoveEvent);
-		document.addEventListener("scroll", this.scrollEvent);
-		document.addEventListener("keypress", this.keyPressEvent);
-	}
-	private mouseMoveEvent() {
-		this.update();
-	}
-	private scrollEvent() {
-		this.update();
-	}
-	private keyPressEvent() {
-		this.update();
-	}
-	// Function to set user as active and update interaction time
-	private update() {
-		const { dispatch } = this.store;
-		this.userActive = true;
-		this.lastInteractionTime = Date.now();
-		dispatch(updateUserActiveness(this.userActive));
-	}
-
-	// Check user activity periodically
-	checkUserActivity() {
-		const { dispatch } = this.store;
-		const currentTime = Date.now();
-		const inactiveTime = currentTime - this.lastInteractionTime;
-
-		if (this.userActive && inactiveTime > 30000) {
-			// If no activity for 30 seconds
-			this.userActive = false;
-			//set userActiveness to false
-			dispatch(updateUserActiveness(this.userActive));
-		}
-
-		setTimeout(this.checkUserActivity, 10000); // Check every 10 seconds
-	}
-	private init() {
-		const { dispatch, getState } = this.store;
-		const { user } = getState();
-		this.checkUserActivity();
-		const cleanup = setInterval(() => {
-			//track userActiveness every 15 minutes
-			if (!user.isActive) {
-				//when user is inactive then destroy priviledges and rights.
-				dispatch(setAuth10(false));
-				dispatch(setToken(undefined));
-				clearInterval(cleanup);
+	async getReviews() {
+		try {
+			const { products } = this.store.getState().products;
+			/**
+			 * Get the list of reviews by product @_id {string}
+			 * @update {Array} when the review by product @_id is not empty
+			 */
+			const product_reviews = [];
+			const reviews: T_review[] = [];
+			const recent_reviewers = [];
+			const reviewers = [];
+			for (let i in products) {
+				const data = await this.getReveiwsByProductId(products[i]._id);
+				if (data.length > 0) {
+					product_reviews.push(data);
+				}
 			}
-			return;
-		}, 1000 * 15);
+			for (let i in product_reviews) {
+				reviews.push(...product_reviews[i]); //extracting all child items for every iteration
+			}
+			const recent = recent_itemsUtil(reviews, 7); //get the most recent last 7 days;
+			for (let i in recent) {
+				const uuid = recent[i].userId; //get recents user data base on the reviews;
+				const user = await this.getUserById(uuid);
+				recent_reviewers.push(user);
+			}
+			for (let i in reviews) {
+				const uuid = reviews[i].userId;
+				const user = await this.getUserById(uuid);
+				reviewers.push(user);
+			}
+
+			this.store.dispatch(updateReviewers(reviewers));
+			this.store.dispatch(updateRecentReviewers(recent_reviewers));
+			this.store.dispatch(updateReviews(reviews));
+		} catch (error) {
+			handleAuthErrors(error as AxiosError<T_error_response>);
+		}
+	}
+	// async updatePassword(payload) {
+
+	// }
+
+	private async getReveiwsByProductId(id: string) {
+		try {
+			const { data } = await axios.get("/api/reviews/" + id, {
+				headers: {
+					Authorization: `Bearer ${Cookies.get("token")}`,
+				},
+			});
+			return data.data;
+		} catch (error) {
+			handleAuthErrors(error as AxiosError<T_error_response>);
+		}
+	}
+	async getUserById(id: string) {
+		try {
+			const { data } = await axios.get(`/api/users/${id}`, {
+				headers: {
+					Authorization: `Bearer ${Cookies.get("token")}`,
+				},
+			});
+			return data.data;
+		} catch (error) {
+			handleAuthErrors(error as AxiosError<T_error_response>);
+		}
+	}
+	async updateMe(payload: any) {
+		try {
+			const { data } = await axios.put("/api/users/me", payload, {
+				headers: {
+					Authorization: `Bearer ${Cookies.get("token")}`,
+				},
+			});
+
+			this.store.dispatch(setUserBio(data.data));
+			toast.success("Profile updated successfully!");
+		} catch (error) {
+			handleAuthErrors(error as AxiosError<T_error_response>);
+		}
+	}
+	async resetPassword(payload: any) {
+		try {
+			const { data } = await axios.put("/api/password", payload, {
+				headers: {
+					Authorization: `Bearer ${Cookies.get("token")}`,
+				},
+			});
+			toast.success("Password updated successfully!");
+		} catch (error) {
+			handleAuthErrors(error as AxiosError<T_error_response>);
+		}
 	}
 }
 export default User;

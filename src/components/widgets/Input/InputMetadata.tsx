@@ -20,12 +20,16 @@ export function InputMetadata({
 					className="w-full p-3"
 					placeholder={placeholder}
 					onKeyDown={(e) => {
-						if (e.code === "Space") {
+						if (e.code === "Space" || e.code === "Enter") {
 							if (inputRef.current) {
 								let val = inputRef.current.value;
+								if (val.trim() !== "") {
+									setMetadata((prevData) => [
+										...prevData,
+										val,
+									]);
+								}
 								inputRef.current.value = "";
-
-								setMetadata((prevData) => [...prevData, val]);
 							}
 						}
 					}}
@@ -35,7 +39,7 @@ export function InputMetadata({
 						<mark
 							onClick={() =>
 								setMetadata(
-									metadata.filter((_, idx) => idx !== id)
+									metadata.filter((_, idx) => idx !== id),
 								)
 							}
 							key={id}

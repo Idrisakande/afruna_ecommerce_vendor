@@ -1,5 +1,3 @@
-/* eslint-disable react/display-name */
-/* eslint-disable import/no-anonymous-default-export */
 import { useRouter } from "next/router";
 import OrderDetails from "./OrderDetails";
 import OrderInvoice from "./OrderInvoice";

@@ -7,7 +7,7 @@ export function ProductListView() {
 	const router = useRouter();
 	return (
 		<div className="my-10 w-full">
-			<ScrollArea.Root className="ScrollAreaRoot w-full h-[65vh] pb-2 bg-white overflow-auto rounded-xl border shadow-sm border-slate-300">
+			<ScrollArea.Root className="ScrollAreaRoot w-full h-fit pb-2 bg-white overflow-auto rounded-xl border shadow-sm border-slate-300">
 				<ScrollArea.Viewport className="ScrollAreaViewport relative w-full h-full pb-6">
 					<div className="bg-white px-4  z-10 sticky top-0 left-0 right-0 w-full flex justify-between items-center border-b border-[#D5D5E6] py-4">
 						<h1 className="font-bold text-afruna-blue text-sm md:text-lg">

@@ -1,6 +1,4 @@
-import { orderData } from "@/constants/data";
 import { IOrder } from "@/interfaces/tables.interface";
-import * as ScrollArea from "@radix-ui/react-scroll-area";
 import {
 	ColumnDef,
 	SortingState,
@@ -11,398 +9,322 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
-import classNames from "classnames";
-import { FC, HTMLProps, useEffect, useMemo, useRef, useState } from "react";
+import { FC, memo, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/router";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
-import { MdDeleteOutline, MdRemoveRedEye, MdSearch } from "react-icons/md";
-import Link from "next/link";
-import Image, { StaticImageData } from "next/image";
+import { MdRemoveRedEye, MdSearch } from "react-icons/md";
+import Image from "next/image";
+
+import { months, orderData } from "@/constants/data";
 import { InputLabel } from "../Input/InputLabel";
-import ItemPicker from "../ItemPicker";
 import { SelectPicker } from "../SelectPicker";
+import { IOrderContext, OrdersContext } from "@/contexts/OrdersProvider";
+import { ResultsFallback } from "../ResultsFallback";
+import { formattedDate } from "@/utils/formatted_date";
+import { createPaginationWithCustomType } from "@/utils/createPaginationWithCustomType";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/types/store.type";
+import { T_order, T_updated_user_order, T_user_order } from "@/types/user.type";
+import { setViewOrderData } from "@/redux/features/user.slice";
+import useCustomSearch from "@/hooks/useCustomSearch";
 
-interface OrderTableProps {}
-
-export const OrderTable: FC<OrderTableProps> = ({}) => {
-	const [rowSelection, setRowSelection] = useState({});
-	// const [globalFilter, setGlobalFilter] = useState("");
-	const [data, setData] = useState([...orderData]);
+export const OrderTable: FC = memo(() => {
+	const router = useRouter();
+	const { selectedFilter } = useContext(OrdersContext) as IOrderContext;
 	const [sorting, setSorting] = useState<SortingState>([]);
+	const { orders } = useSelector((state: RootState) => state.user);
+	const [data, setData] = useState(orders);
+	const dispatch = useDispatch();
+	useEffect(() => {
+		if (selectedFilter === "All Orders") {
+			setData(orders);
+		} else {
+			const orders_cast = orders as T_user_order[];
+			const newData = orders_cast.filter(
+				(datum) => datum.items[0].deliveryStatus === selectedFilter,
+			);
+			setData(newData);
+		}
+	}, [selectedFilter]);
 
-	const columns = useMemo<ColumnDef<IOrder>[]>(
+	const {
+		filteredItems,
+		updateDateFilter,
+		updateMonthFilter,
+		updateSearchTerm,
+	} = useCustomSearch<T_user_order>(data);
+	const handleSearch = useCallback((val: string) => {
+		// console.log(val); 
+		
+		updateSearchTerm(val);
+		if (val === undefined || val === '' ) {
+			setData(data);
+		} /* else {
+			setData(filteredItems);
+		} */
+	}, [filteredItems]);
+	console.log(filteredItems);
+	// const handleMonthFilter  = useCallback((val: any) => updateMonthFilter(""), [data]);
+	// const handleDateFilter  = useCallback((val: any) => updateDateFilter(""), [data]);
+
+	const columns = useMemo<
+		ColumnDef<T_order | T_user_order | T_updated_user_order>[]
+	>(
 		() => [
 			{
-				accessorKey: "id",
+				accessorKey: "customId",
 				cell: (info) => {
-					const id = `#${info.getValue()}`;
+					const id = `${info.getValue()}`;
 					return <div className="ml-2">{id}</div>;
 				},
-				header: () => <span>ID</span>,
+				header: () => <span className="">ID</span>,
 			},
 			{
-				accessorKey: "img",
-				cell: ({ getValue }) => (
-					<Image
-						width={35}
-						className="rounded-md border border-afruna-base/40"
-						src={getValue() as StaticImageData}
-						alt="Item_Img "
-					/>
-				),
-				header: () => <span>Image</span>,
+				accessorKey: "coverPhoto",
+				cell: (info) => {
+					let image = info.getValue() as string;
+					return (
+						<Image
+							className="w-12 h-12 object-fill rounded-md border-[1px] shadow-sm"
+							src={image}
+							width={40}
+							height={40}
+							alt="item Image"
+						/>
+					);
+				},
+				header: () => <span className="">Image</span>,
 			},
 			{
-				accessorKey: "Quantity",
-				cell: ({ row }) =>
-					Math.ceil(
-						Math.random() * row.original.amount
-					).toLocaleString(),
+				accessorKey: "productName",
+				cell: (info) => {
+					const itemName = `${info.getValue()}`;
+					return <div className="ml-2">{itemName}</div>;
+				},
+				header: () => <span className="">Item Name</span>,
 			},
 			{
-				accessorKey: "item_name",
-				cell: ({ getValue }) => getValue(),
-				header: () => <span>Item Name</span>,
+				accessorKey: "items",
+				cell: (info) =>
+					info ? (info.getValue() as T_order[])[0].quantity : null,
+				header: () => <span className="">Quantity</span>,
 			},
 			{
-				accessorKey: "order_date",
-
-				cell: ({ cell }) => cell.getValue(),
-				header: () => <span>Order Date</span>,
+				accessorKey: "createdAt",
+				cell: (info) => info.getValue(),
+				header: () => <span className="">Order Date</span>,
 			},
 			{
-				accessorKey: "delivery_status",
+				accessorKey: "items",
 				cell: ({ cell }) => {
-					switch (cell.getValue()) {
+					switch (
+						(cell.getValue() as T_order[])[0].deliveryStatus //gets to the item file an
+					) {
 						case "Pending":
 							return (
-								<div className="flex justify-between items-center w-fit">
-									<span className="p-1 rounded-full bg-[#FFC103] mr-1" />
-									<span className="text-[#FFC103]">
+								<text className="flex justify-between items-center w-fit">
+									<span className="p-1 rounded-full bg-amber-500 mr-1" />
+									<span className="text-amber-500">
 										Pending
 									</span>
-								</div>
+								</text>
+							);
+						case "Paid":
+							return (
+								<text className="flex justify-between items-center w-fit">
+									<span className="p-1 rounded-full bg-lime-600 mr-1" />
+									<span className="text-lime-600">Paid</span>
+								</text>
+							);
+						case "Cancelled":
+							return (
+								<text className="flex justify-between items-center w-fit">
+									<span className="p-1 rounded-full bg-red-500 mr-1" />
+									<span className="text-red-500">
+										Cancelled
+									</span>
+								</text>
 							);
 						case "Shipped":
 							return (
-								<div className="flex justify-between items-center w-fit">
-									<span className="p-1 rounded-full bg-[#0D61FF] mr-1" />
-									<span className="text-[#0D61FF]">
+								<text className="flex justify-between items-center w-fit">
+									<span className="p-1 rounded-full bg-blue-500 mr-1" />
+									<span className="text-blue-500">
 										Shipped
 									</span>
-								</div>
-							);
-						case "Delivered":
-							return (
-								<div className="flex justify-between items-center w-fit">
-									<span className="p-1 rounded-full bg-[#4D9A00] mr-1" />
-									<span className="text-[#4D9A00]">
-										Delivered
-									</span>
-								</div>
-							);
-						case "Pickup":
-							return (
-								<div className="flex justify-between items-center w-fit">
-									<span className="p-1 rounded-full bg-[#545ED7] mr-1" />
-									<span className="text-[#545ED7]">
-										Pickup
-									</span>
-								</div>
-							);
-						case "Canceled":
-							return (
-								<div className="flex justify-between items-center w-fit">
-									<span className="p-1 rounded-full bg-[#E93627] mr-1" />
-									<span className="text-[#E93627]">
-										Cancelled
-									</span>
-								</div>
-							);
-						default:
-							return (
-								<div className="flex justify-between items-center w-fit">
-									<span className="p-1 rounded-full bg-[#00C9FF] mr-1" />
-									<span className="text-[#00C9FF]">
-										Returnedvered
-									</span>
-								</div>
+								</text>
 							);
 					}
 				},
-				header: () => <span>Status</span>,
+				header: () => <span className="">Status</span>,
 			},
 			{
-				accessorKey: "amount",
-				cell: (info) => `$${info.getValue()}`,
-				header: () => <span>Amount</span>,
+				accessorKey: "total",
+				cell: ({ cell }) => (
+					<>${(cell.getValue() as number).toLocaleString()}</>
+				),
+				header: () => <span className="">Price</span>,
 			},
 			{
-				id: "actions",
+				accessorKey: "actions",
 				cell: ({ row }) => (
-					<div className="flex justify-between items-center">
-						<Link
-							href={"/orders/details"}
+					<div className="flex justify-start gap-3 items-center">
+						<button
+							onClick={() => {
+								console.log(row.original);
+								dispatch(setViewOrderData(row.original));
+								router.push("/orders/details");
+							}}
 							className="hover:scale-90 border-none transition duration-300"
 						>
 							<MdRemoveRedEye size={24} />
-						</Link>
-						<button
+						</button>
+						{/* 	<button
 							className="hover:scale-90 border-none transition duration-300"
 							onClick={() => {
 								const newData = data.filter(
-									(_, idx) => idx !== row.index
+									(_, idx) => idx !== row.index,
 								);
 								setData(newData);
 							}}
 						>
 							<MdDeleteOutline size={24} />
-						</button>
+						</button> */}
 					</div>
 				),
-				header: () => <span>Action</span>,
+				header: () => <span className="">Action</span>,
 			},
 		],
-		[data]
+		[data],
 	);
 
 	const table = useReactTable({
 		data,
 		columns,
 		state: {
-			rowSelection,
 			sorting,
 		},
 		enableRowSelection: true,
 		onSortingChange: setSorting,
-		onRowSelectionChange: setRowSelection,
 		getSortedRowModel: getSortedRowModel(),
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
+		debugTable: true,
 	});
+	if (!data.length) {
+		return <ResultsFallback />;
+	}
 
 	return (
-		<div className="my-10 w-full  h-[85vh] pb-2 bg-white overflow-auto rounded-md border shadow-sm border-slate-300">
-			<header className="flex justify-between items-center border-b border-slate-300 text-afruna-blue">
-				<h1 className="p-3 font-bold ">Orders</h1>
-				<div className="flex justify-between items-center p-3 space-x-2">
-					<InputLabel
-						getValue={(val) => console.log(val)}
-						placeholder={"Search"}
-						inputClassName="text-sm p-1"
-						inputsuffixIcon={
-							<button>
-								<MdSearch />
-							</button>
-						}
-						type={"text"}
-					/>
-					<SelectPicker
-						triggerClassName="relative top-[5px] flex w-24 justify-between items-center space-x-1 text-[12px] p-[11px] border border-afruna-gray/30 rounded-md"
-						placeholder="Months"
-						getSelected={(val) => console.log(val)}
-						items={["All", "January", "Febuary", "March", "April"]}
-					/>
-					<SelectPicker
-						triggerClassName="relative top-[5px] flex w-24 justify-between items-center space-x-1 text-[12px] p-[11px] border border-afruna-gray/30 rounded-md"
-						placeholder="Select"
-						getSelected={(val) => console.log(val)}
-						items={[
-							"This Month",
-							"3 Days",
-							"1 Week",
-							"2 Months",
-							"6 Months",
-						]}
-					/>
-				</div>
-			</header>
-			<ScrollArea.Root className="px-4 ScrollAreaRoot w-full ">
-				<ScrollArea.Viewport className="ScrollAreaViewport w-full h-full pb-6">
-					<table className="w-screen lg:w-full px-8 relative">
-						<thead className=" sticky top-0 bg-white">
-							{table.getHeaderGroups().map((headerGroup) => (
-								<tr
-									className="text-left text-afruna-gray text-[12px] font-extralight"
-									key={headerGroup.id}
-								>
-									{headerGroup.headers.map((header) => (
-										<th key={header.id}>
-											{header.index > 1 &&
-											header.id !== "actions" ? (
-												<div className="flex px-1 justify-between items-center w-fit">
-													{flexRender(
-														header.column.columnDef
-															.header,
-														header.getContext()
-													)}
-													<span className="flex flex-col">
-														<BiChevronUp
-															onClick={header.column.getToggleSortingHandler()}
-															size={24}
-															className="relative top-2 text-slate-400"
-														/>
-														<BiChevronDown
-															onClick={header.column.getToggleSortingHandler()}
-															size={24}
-															className="relative bottom-[7px]"
-														/>
-													</span>
-												</div>
-											) : (
-												<span className="px-2">
-													{flexRender(
-														header.column.columnDef
-															.header,
-														header.getContext()
-													)}
+		<main className="relative">
+			<div className="my-10 w-full  h-[85vh] pb-2 bg-white overflow-auto rounded-md border shadow-sm border-slate-300">
+				<header className="flex sticky top-0 justify-between items-center border-b border-slate-300 text-afruna-blue bg-white ">
+					<h1 className="p-3 font-bold ">Orders</h1>
+					<div className="flex justify-between items-center p-3 space-x-2">
+						<InputLabel
+							getValue={(v)=>handleSearch(v as string)}
+							placeholder={"Search"}
+							inputClassName="text-sm p-1"
+							inputsuffixIcon={
+								<button>
+									<MdSearch />
+								</button>
+							}
+							type={"text"}
+						/>
+						<SelectPicker
+							triggerClassName="relative top-[5px] flex w-24 justify-between items-center space-x-1 text-[12px] p-[11px] border border-afruna-gray/30 rounded-md"
+							placeholder="Months"
+							getSelected={(val) => console.log(val)}
+							items={months}
+						/>
+						<SelectPicker
+							triggerClassName="relative top-[5px] flex w-24 justify-between items-center space-x-1 text-[12px] p-[11px] border border-afruna-gray/30 rounded-md"
+							placeholder="Select"
+							getSelected={(val) => console.log(val)}
+							items={[
+								"This Month",
+								"3 Days",
+								"1 Week",
+								"2 Months",
+								"6 Months",
+							]}
+						/>
+					</div>
+				</header>
+				<table className="w-screen lg:w-full px-8 relative">
+					<thead className=" sticky top-16 bg-white">
+						{table.getHeaderGroups().map((headerGroup) => (
+							<tr
+								className="text-left text-afruna-gray text-[12px] font-extralight"
+								key={headerGroup.id}
+							>
+								{headerGroup.headers.map((header) => (
+									<th key={header.id}>
+										{header.index > 1 &&
+										header.id !== "actions" ? (
+											<div className="flex px-1 justify-between items-center w-fit">
+												{flexRender(
+													header.column.columnDef
+														.header,
+													header.getContext(),
+												)}
+												<span className="flex flex-col">
+													<BiChevronUp
+														onClick={header.column.getToggleSortingHandler()}
+														size={24}
+														className="relative top-2 text-slate-400"
+													/>
+													<BiChevronDown
+														onClick={header.column.getToggleSortingHandler()}
+														size={24}
+														className="relative bottom-[7px]"
+													/>
 												</span>
-											)}
-										</th>
-									))}
+											</div>
+										) : (
+											<span className="px-2">
+												{flexRender(
+													header.column.columnDef
+														.header,
+													header.getContext(),
+												)}
+											</span>
+										)}
+									</th>
+								))}
+							</tr>
+						))}
+					</thead>
+					<tbody className="">
+						{table.getRowModel().rows.map((row) => {
+							return (
+								<tr
+									className="text-left odd:border-y-[1px] odd:border-slate-300 text-afruna-blue text-[12px]"
+									key={row.original._id}
+								>
+									{row.getVisibleCells().map((cell) => {
+										return (
+											<td className="py-2" key={cell.id}>
+												{flexRender(
+													cell.column.columnDef.cell,
+													cell.getContext(),
+												)}
+											</td>
+										);
+									})}
 								</tr>
-							))}
-						</thead>
-						<tbody className="">
-							{table.getRowModel().rows.map((row) => {
-								return (
-									<tr
-										className="text-left odd:border-y-[1px] odd:border-slate-300 text-afruna-blue text-[12px]"
-										key={row.id}
-									>
-										{row.getVisibleCells().map((cell) => {
-											return (
-												<td
-													className="py-2"
-													key={cell.id}
-												>
-													{flexRender(
-														cell.column.columnDef
-															.cell,
-														cell.getContext()
-													)}
-												</td>
-											);
-										})}
-									</tr>
-								);
-							})}
-						</tbody>
-					</table>
-				</ScrollArea.Viewport>
-				<ScrollArea.Scrollbar
-					className="ScrollAreaScrollbar p-[2px] rounded-xl mb-4 flex bg-slate-100 hover:bg-slate-200"
-					orientation="vertical"
-				>
-					<ScrollArea.Thumb className="relative flex-1 rounded-xl bg-slate-400" />
-				</ScrollArea.Scrollbar>
-				<ScrollArea.Scrollbar
-					className="ScrollAreaScrollbar p-[2px] rounded-xl mb-4 flex bg-slate-100 hover:bg-slate-200 "
-					orientation="horizontal"
-				>
-					<ScrollArea.Thumb className="relative flex-1 rounded-xl bg-slate-400" />
-				</ScrollArea.Scrollbar>
-				<ScrollArea.Corner className="" />
-			</ScrollArea.Root>
-
-			<div className="h-fit mt-2">
-				<div className="flex items-center gap-2">
-					<button
-						className="border rounded p-1"
-						onClick={() => table.setPageIndex(0)}
-						disabled={!table.getCanPreviousPage()}
-					>
-						{"<<"}
-					</button>
-					{table.getState().pagination.pageIndex + 1 < 3 && (
-						<>
-							<button
-								onClick={() =>
-									table.setPageIndex(
-										table.getState().pagination.pageIndex
-									)
-								}
-							>
-								{table.getState().pagination.pageIndex + 1}
-							</button>
-							<button
-								onClick={() =>
-									table.getCanNextPage() &&
-									table.setPageIndex(
-										table.getState().pagination.pageIndex +
-											1
-									)
-								}
-							>
-								{table.getState().pagination.pageIndex + 2}
-							</button>
-							<button
-								onClick={() =>
-									table.getState().pagination.pageIndex + 2 <
-										table.getPageCount() &&
-									table.setPageIndex(
-										table.getState().pagination.pageIndex +
-											1
-									)
-								}
-							>
-								{table.getState().pagination.pageIndex + 3}
-							</button>
-						</>
-					)}
-					{table.getState().pagination.pageIndex > 5 && (
-						<>
-							<div>...</div>
-							<button
-								onClick={() =>
-									table.setPageIndex(
-										table.getState().pagination.pageSize
-									)
-								}
-							>
-								{table.getPageCount() + 1}
-							</button>
-						</>
-					)}
-					<button
-						className="border rounded p-1"
-						onClick={() =>
-							table.setPageIndex(table.getPageCount() - 1)
-						}
-						disabled={!table.getCanNextPage()}
-					>
-						{">>"}
-					</button>
-				</div>
+							);
+						})}
+					</tbody>
+				</table>
 			</div>
-		</div>
+			<Pagination table={table} />
+		</main>
 	);
-};
+});
 
-function IndeterminateCheckbox({
-	indeterminate,
-	className = "",
-	...rest
-}: { indeterminate?: boolean } & HTMLProps<HTMLInputElement>) {
-	const ref = useRef<HTMLInputElement>(null!);
-
-	useEffect(() => {
-		if (typeof indeterminate === "boolean") {
-			ref.current.indeterminate = !rest.checked && indeterminate;
-		}
-	}, [ref, indeterminate, rest.checked]);
-
-	return (
-		<input
-			type="checkbox"
-			ref={ref}
-			className={classNames(
-				className,
-				"w-4 h-4 text-slate-500 bg-white border-slate-300 rounded-md focus:ring-slate-900 dark:focus:ring-blue-900 dark:ring-offset-gray-800 focus:ring-1 dark:bg-gray-700 dark:border-gray-600"
-			)}
-			{...rest}
-		/>
-	);
-}
-
-// export default memo(OrderTable);
+const Pagination = createPaginationWithCustomType<
+	T_order | T_user_order | T_updated_user_order
+>();

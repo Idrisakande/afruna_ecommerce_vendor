@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Image, { StaticImageData } from "next/image";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { RxChevronDown, RxChevronUp } from "react-icons/rx";
+import { images } from "@/constants/images";
 
 export const HeaderDropdown = ({
 	children,
@@ -10,7 +11,7 @@ export const HeaderDropdown = ({
 	title,
 }: {
 	children: React.ReactNode;
-	profileSrc: StaticImageData;
+	profileSrc?: StaticImageData | string;
 	title: string;
 	subtitle?: string;
 }) => {
@@ -18,17 +19,19 @@ export const HeaderDropdown = ({
 	return (
 		<DropdownMenu.Root onOpenChange={setIsOpen}>
 			<DropdownMenu.Trigger className="hover:cursor-pointer " asChild>
-				<div className="flex justify-between items-start min-w-[40%] gap-2">
+				<div className="flex justify-between items-center min-w-[40%] gap-2">
 					<Image
-						src={profileSrc}
+						src={profileSrc ?? images.profileImg}
+						width={50}
+						height={50}
 						alt="profile_image"
-						className="w-[40px] mx-2 rounded-full -mt-1"
+						className="h-9  w-9 object-center mx-2 rounded-full -mt-1"
 					/>
 					<div className="">
-						<h2 className="text-xs md:text-md text-afruna-blue font-bold tracking-wide">
+						<h2 className="text-xs md:text-md text-afruna-blue font-bold tracking-wide capitalize">
 							{title}
 						</h2>
-						<p className="text-[12px] md:text-xs font-semibold text-slate-400">
+						<p className="text-[12px] md:text-xs font-semibold text-slate-400 capitalize">
 							{subtitle}
 						</p>
 					</div>

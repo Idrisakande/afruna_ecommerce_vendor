@@ -3,27 +3,52 @@ import { OrderStatus } from "@/components/widgets/OrderStatus";
 import { OrderDetailsTable } from "@/components/widgets/tables/OrderDetailsTable";
 import { Main } from "@/layouts/Main";
 import Link from "next/link";
-import { FC } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import { BsTruck } from "react-icons/bs";
 import { RiFileListFill } from "react-icons/ri";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
+import { useRouter } from "next/router";
+import { UpdateStatus } from "@/components/widgets/Input/UpdateStatus";
+import User from "@/services/user.service";
+import { useSelector } from "react-redux";
+import { RootState } from "@/types/store.type";
+import { T_updated_user_order } from "@/types/user.type";
 
-interface OrderDetailsProps {}
-
-const OrderDetails: FC<OrderDetailsProps> = ({}) => {
+const OrderDetails: FC = () => {
+	const { query } = useRouter();
+	const {viewOrder} = useSelector((state:RootState)=> state.user)
+	const [updateStatusModelOpen, setUpdateStatusModelOpen] = useState(false);
+	const buyer_address =  useMemo(()=> {
+		if (viewOrder) {
+			const info = viewOrder as T_updated_user_order; //meas of escaping ts error
+			return info.items[0].deliveryAddress ;
+		}
+	},[viewOrder])
+	
 	return (
 		<Main breadcrumbs={<Breadcrumbs />}>
 			<main className="m-7 pb-20">
 				<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:max-w-[96%] sm:mx-auto">
-					<h2 className="text-xl font-semibold">Order ID: #6565</h2>
+					<h2 className="text-xl font-semibold">Order ID: #{viewOrder?._id}</h2>
 					<div className="flex justify-start sm:justify-end items-center">
-						<Link
+					<button
+              onClick={() => setUpdateStatusModelOpen(true)}
+              className="px-8 py-3 text-white rounded font-semibold tracking-tight bg-gradient-y-deepblue
+"
+            >
+              Order Status
+            </button>
+            <UpdateStatus
+              isOpen={updateStatusModelOpen}
+              onClose={() => setUpdateStatusModelOpen(false)}
+            />
+						{/* <Link
 							href={"/orders/invoice"}
 							className="px-6 py-2 text-xs text-white bg-gradient-y-deepblue flex gap-1 justify-center items-center rounded"
 						>
 							<RiFileListFill size={20} />
-							<span className="tracking-tight">Invoice</span>
-						</Link>
+							<span className="tracking-tight">Order Status</span>
+						</Link> */}
 					</div>
 				</div>
 				<div className="flex flex-col sm:flex-row lg:ml-3 gap-6 mt-8 justify-start sm:items-center">
@@ -41,10 +66,10 @@ const OrderDetails: FC<OrderDetailsProps> = ({}) => {
 						<h2 className="text-lg mb-2 font-semibold tracking-tight ">
 							Shipping Address
 						</h2>
-						<p className="text-[0.85rem] font-semibold mb-1 tracking-tight max-w-[12.115rem] ">
-							No 23, Luis Jamar crescent Taskira, Abuja Nigeria.
+						<p className="text-[0.85rem] font-semibold mb-1 tracking-tight max-w-[12.115rem] capitalize">
+							{buyer_address?.postCode} {buyer_address?.address} {buyer_address?.city}, {buyer_address?.state} {buyer_address?.country}.
 						</p>
-						<span className="tracking-tight ">+234074653864</span>
+						{/* <span className="tracking-tight ">+234074653864</span> */}
 					</div>
 				</div>
 				<div className="flex justify-end mt-5 md:-mt-5 max-w-[97.5%] mx-auto">
@@ -60,7 +85,7 @@ const OrderDetails: FC<OrderDetailsProps> = ({}) => {
 					<div className="w-full max-w-[65%]">
 						<OrderDetailsTable />
 					</div>
-					<div className="w-full max-w-[34%]">
+				{/* 	<div className="w-full max-w-[34%]">
 						<ScrollArea.Root className="ScrollAreaRoot w-full h-[72vh] bg-white overflow-auto rounded-xl border shadow-sm border-slate-300">
 							<ScrollArea.Viewport className="ScrollAreaViewport w-full h-full pb-6">
 								<div className="border-b pt-4 pb-3 px-6 border-slate-300 flex justify-start items-center text-lg font-semibold">
@@ -123,7 +148,7 @@ const OrderDetails: FC<OrderDetailsProps> = ({}) => {
 							</ScrollArea.Scrollbar>
 							<ScrollArea.Corner className="bg-slate-100 hover:bg-slate-200" />
 						</ScrollArea.Root>
-					</div>
+					</div> */}
 				</div>
 				<OrderStatus />
 			</main>

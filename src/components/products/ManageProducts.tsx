@@ -9,9 +9,13 @@ import { SelectPicker } from "../widgets/SelectPicker";
 import { ProductItem } from "./ProductItem";
 import { images } from "@/constants/images";
 import { productcontext } from "@/contexts/ProductProvider";
+import { useSelector } from "react-redux";
+import { RootState } from "@/types/store.type";
+import Image from "next/image";
 
 export const ManageProducts: FC<{}> = memo(({ }) => {
 	const { tab, itemsSelector } = useContext(productcontext) as IProductContext;
+	const {products} = useSelector((state:RootState)=> state.products)
 	useEffect(() => {
 		const hiddenBTN = document.querySelector(
 			"button.bg-gradient-y-deepblue",
@@ -19,9 +23,10 @@ export const ManageProducts: FC<{}> = memo(({ }) => {
 		hiddenBTN.style.display = "flex";
 	}, []);
 
+
 	return (
 		<Content>
-			<Header
+		{products.length?(<>	<Header
 				rightComponent={
 					<div className="flex text-xs justify-between items-center space-x-1">
 						<InputLabel
@@ -42,69 +47,34 @@ export const ManageProducts: FC<{}> = memo(({ }) => {
 				headerTitle={tab}
 			/>
 			<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:-gap-4 p-10 pb-10">
-				{[
-					{
-						published: false,
-						date: null,
-						item_img: images.product6,
-						item_name: "Masashi Status",
-						rating: 3.5,
-						rated: 4,
-						price: 470,
-						slashed_price: 160,
-						category: "Arts",
-						stock: 104,
-						order: 74,
-					},
-					{
-						published: true,
-						date: new Date().toLocaleString("en-US"),
-						item_img: images.product7,
-						item_name: "Masashi Status",
-						rating: 4.5,
-						rated: 4,
-						price: 120,
-						slashed_price: 160,
-						category: "Arts",
-						stock: 259,
-						order: 210,
-					},
-					{
-						published: false,
-						date: null,
-						item_img: images.product5,
-						item_name: "Masashi Status",
-						rating: 4.5,
-						rated: 4,
-						price: 120,
-						slashed_price: 160,
-						category: "Arts",
-						stock: 259,
-						order: 210,
-					},
-					{
-						published: false,
-						date: null,
-						item_img: images.product3,
-						item_name: "Masashi Status",
-						rating: 4.5,
-						rated: 4,
-						price: 120,
-						slashed_price: 160,
-						category: "Arts",
-						stock: 259,
-						order: 210,
-						discount: 40,
-					},
-				].map((item, _) => (
+				{products.map((item, _) => (
 					<ProductItem
-						{...item}
-						key={_}
+					item_img={item.coverPhoto[0] ?? ""}
+					item_name={item.name}
+					price={
+						item.discount?
+						((
+							item.price -
+							(item.discount / 100) * item.price
+						).toFixed(2) as unknown as number):(item.price)
+					}
+					rated={item.ratedBy}
+					slashed_price={item.discount?item.price:0}
+					category={item.categoryId}
+					date={item.createdAt}
+					discount={item.discount}
+					order={item.quantity}
+					rating={item.ratings}
+					stock={item.quantity}
+					published={item.isPromoted}
 						checkbox
 						handleSelect={() => itemsSelector(item)}
 					/>
 				))}
-			</div>
+				</div></>) : (<div className="flex flex-col justify-center items-center">
+					<Image src={images.noResult} alt="no_result" />
+					<h1>Nothing Products</h1>
+			</div>)}
 		</Content>
 	);
 });

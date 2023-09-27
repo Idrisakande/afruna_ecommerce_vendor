@@ -30,3 +30,13 @@ export const STATUS_MSG = (CODE: number) => {
 			};
 	}
 };
+
+export const JWT_ERROR = {
+	success: false,
+	message: "jwt expired",
+	error: {
+		name: "TokenExpiredError",
+		message: "jwt expired",
+		expiredAt: "2023-08-21T14:34:37.000Z",
+	},
+};

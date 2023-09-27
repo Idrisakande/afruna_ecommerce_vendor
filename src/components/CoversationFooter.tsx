@@ -1,6 +1,7 @@
 "use client";
 
-import axios from "axios";
+import Chat from "@/services/chat.service";
+import { getMessage } from "@reduxjs/toolkit/dist/actionCreatorInvariantMiddleware";
 import { FC } from "react";
 import { useForm, SubmitHandler, FieldValues } from "react-hook-form";
 import { IoPaperPlane } from "react-icons/io5";
@@ -10,30 +11,25 @@ interface MessageInput {
   message: string;
 }
 
-interface CoversationFooterProps {}
+interface CoversationFooterProps {to?:string,id?:string;}
 
-export const CoversationFooter: FC<CoversationFooterProps> = ({}) => {
+export const CoversationFooter: FC<CoversationFooterProps> = ({to,id}) => {
   const {
     register,
     handleSubmit,
-    setValue,
+    reset,
     formState: { errors },
   } = useForm<MessageInput>();
 
-  const conversationId = "Gsdjksdh2112";
-
+  
   const onSubmit: SubmitHandler<MessageInput> = (data) => {
-    console.log(data);
-    axios.post("/api/message", { ...data, conversationId });
-    setValue("message", "", { shouldValidate: true });
+    const chatServices = new Chat()
+    chatServices.sendMessage({ ...data, to } as { message: string; to: string; });
+  
+    reset();
   };
 
-  const handleUpload = (data: any) => {
-    axios.post("/api/message", {
-      image: data,
-      conversationId,
-    });
-  };
+
 
   return (
     <div className="pt-1 pb-4 px-4">
@@ -51,12 +47,12 @@ export const CoversationFooter: FC<CoversationFooterProps> = ({}) => {
           })}
           className="w-full p-3 font-semibold text-gray-700 text-sm focus:outline-none placeholder:text-[#DBDBDB]"
         />
-        <div onClick={handleUpload} className=" min-w-[8rem]">
+        <button  className=" min-w-[8rem]">
           <MdAttachFile
             size={37}
             className="text-[#0C0E3B] hover:scale-90 transition duration-300 p-2 cursor-pointer"
           />
-        </div>
+        </button>
         <button
           type="submit"
           className="w-28 h-28 flex justify-start items-end p-4 absolute rounded-full -bottom-2 -right-12 bg-[#00AEEF]"

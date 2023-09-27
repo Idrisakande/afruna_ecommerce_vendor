@@ -2,8 +2,8 @@ import { Model } from "@/components/Model";
 import { IUpdateStatusInput } from "@/interfaces/inputs.interfaces";
 import { FC } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import ItemPicker from "@/components/widgets/ItemPicker";
 import { InputLabel } from "@/components/widgets/Input/InputLabel";
+import ItemLabelPicker from "../ItemLabelPicker";
 
 interface UpdateStatusProps {
   isOpen: boolean;
@@ -28,7 +28,9 @@ export const UpdateStatus: FC<UpdateStatusProps> = ({ isOpen, onClose }) => {
         onSubmit={handleSubmit(onSubmit)}
         className="min-w-[30rem] mt-4 px-12 pb-10 flex flex-col gap-2 text-start"
       >
-        <ItemPicker
+        <ItemLabelPicker
+          triggerClassName="flex"
+contentClassName="z-50"
           items={[
             "Order Proccessing",
             "Order Package",
