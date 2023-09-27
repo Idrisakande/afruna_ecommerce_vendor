@@ -63,7 +63,7 @@ const User = createSlice({
 		updateReports(state, action: PayloadAction<T_reports>) {
 			state.reports = action.payload;
 		},
-		setViewOrderData(state, action:PayloadAction<T_updated_order|T_updated_user_order>){
+		setViewOrderData(state, action:PayloadAction<T_order | T_user_order| T_updated_user_order>){
 			state.viewOrder = action.payload;
 		}
 	},

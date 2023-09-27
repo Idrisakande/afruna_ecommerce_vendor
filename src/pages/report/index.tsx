@@ -23,7 +23,10 @@ const Index: FC<{}> = () => {
 	useEffect(()=> {
 		const reportServices = new Reports();
 		reportServices.getReports()
-	},[]);
+	}, []);
+	
+	const {reports} = useSelector((state: RootState)=>state.user)
+	console.log(reports);
 	
 	return (
 		<Main breadcrumbs={<Breadcrumbs />}>
@@ -31,13 +34,13 @@ const Index: FC<{}> = () => {
 			<div className="mx-10 pb-28">
 				<ChartStats
 					rightComponent={
-						<div className="md:col-span-4 col-span-12 bg-white p-2 rounded-lg border-[1px] shadow-sm h-[50vh]">
+						<div className="md:col-span-4 col-span-12 bg-white p-2 rounded-lg border-[1px] shadow-sm">
 							<header className="flex justify-between w-full p-2 mb-2">
 								<h1 className="font-medium text-afruna-blue text-[12px] md:text-sm">
 									Visitors
 								</h1>
 							</header>
-							<ResponsiveContainer
+							{reports?.visitors?(<ResponsiveContainer
 								className={"p-1"}
 								width="100%"
 								height="80%"
@@ -71,7 +74,10 @@ const Index: FC<{}> = () => {
 										width={20}
 									/>
 								</BarChart>
-							</ResponsiveContainer>
+							</ResponsiveContainer>) : (<div className="items-center flex-col flex text-afruna-blue text-sm"><h2 className="text-lg">No visitors yet!</h2>
+									<p className="mt-5">Try featuring for recommendation from Admin.</p>
+							</div>)}
+							
 						</div>
 					}
 				/>

@@ -22,8 +22,7 @@ export const UsersList: FC<UsersListProps> = ({
 	lastMessage
 }) => {
 	return (
-		<>
-			<div
+			<button
 				onClick={setActiveChat}
 				key={id}
 				className="bg-white p-4 mr-2 rounded-md w-full flex gap-5 justify-start items-center cursor-pointer hover:bg-afruna-gray/5"
@@ -44,7 +43,6 @@ export const UsersList: FC<UsersListProps> = ({
 						</span>
 					</div>
 				)}
-			</div>
-		</>
+			</button>
 	);
 };

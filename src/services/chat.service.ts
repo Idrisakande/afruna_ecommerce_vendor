@@ -41,7 +41,10 @@ class Chat {
 			const { data } = await axios.post("/api/messages/", payload, {
 				headers: { Authorization: `Bearer ${Cookies.get("token")}` },
 			});
-			this.getMessage(data.data.message.conversation);
+			const id = data.data.convo._id;
+			console.log(id);
+			
+			this.getMessage(id);
 		} catch (error) {
 			handleAuthErrors(error as AxiosError<T_error_response>);
 		}

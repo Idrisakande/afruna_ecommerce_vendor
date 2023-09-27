@@ -23,7 +23,7 @@ export const ReviewsSlide = () => {
 	if (!recent_reviewers?.length)
 	return <ResultsFallback/>	
 	return reviews?.length ? (
-		<div className="relative p-3 space-y-2 h-fit">
+		<div className="relative p-3 space-y-2 mt-10 h-fit">
 			<button
 				disabled={currentIndex === 0}
 				onClick={handlePrevSlide}

@@ -88,7 +88,7 @@ export default function () {
             ) as HTMLButtonElement;
             hiddenBTN.style.display = "none";
         }, []);
-        const { query } = useRouter() as unknown as T_product_reviews;
+        const { query } = useRouter();
     const { reviews,reviewers } = useSelector((state: RootState) => state.user);
 
     const match_reviews =  useMemo(()=> reviews?.filter(review=> review.productId === query.productId),[reviews, query.productId])

@@ -1,6 +1,7 @@
 "use client";
 
 import Chat from "@/services/chat.service";
+import { getMessage } from "@reduxjs/toolkit/dist/actionCreatorInvariantMiddleware";
 import { FC } from "react";
 import { useForm, SubmitHandler, FieldValues } from "react-hook-form";
 import { IoPaperPlane } from "react-icons/io5";
@@ -23,16 +24,12 @@ export const CoversationFooter: FC<CoversationFooterProps> = ({to,id}) => {
   
   const onSubmit: SubmitHandler<MessageInput> = (data) => {
     const chatServices = new Chat()
-    chatServices.sendMessage({...data, to} as {message:string; to:string;})
+    chatServices.sendMessage({ ...data, to } as { message: string; to: string; });
+  
     reset();
   };
 
-  // const handleUpload = (data: any) => {
-  //   axios.post("/api/message", {
-  //     image: data,
-  //     conversationId,
-  //   });
-  // };
+
 
   return (
     <div className="pt-1 pb-4 px-4">

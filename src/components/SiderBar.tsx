@@ -91,9 +91,9 @@ export function SiderBar() {
 							</div>
 							{SidebarItem.notification && (
 								<div className="flex justify-end mr-6 items-center">
-									<div className="text-white text-[8px] bg-blue-400 w-[18px] h-[18px] flex justify-center items-center rounded-full">
+									{/* <div className="text-white text-[8px] bg-blue-400 w-[18px] h-[18px] flex justify-center items-center rounded-full">
 										{SidebarItem.notification}
-									</div>
+									</div> */}
 								</div>
 							)}
 							<div

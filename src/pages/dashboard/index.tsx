@@ -67,7 +67,7 @@ const Index = () => {
 				<DashboardStats {...dashboardStats} />
 				<ChartStats
 					rightComponent={
-						<div className="md:col-span-4 col-span-12 bg-white p-2 rounded-lg border-[1px] shadow-sm h-fit">
+						<div className="md:col-span-4 col-span-12 bg-white p-2 rounded-lg border-[1px] shadow-sm">
 							<header className="p-2 mb-2">
 								<h1 className="font-bold text-afruna-blue text-[12px] md:text-sm">
 									Recent Reviews

@@ -5,6 +5,7 @@ import { FieldValue, useForm } from "react-hook-form";
 import {
 	CountryIso2,
 	PhoneInput,
+	usePhoneValidation,
 } from "react-international-phone";
 import "react-international-phone/style.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -18,6 +19,7 @@ import { useSelector } from "react-redux";
 import get_countryUtil from "@/utils/get_country.util";
 import User from "@/services/user.service";
 import { ExtFile, FileInputButton } from "@files-ui/react";
+import { toast } from "react-toastify";
 export default function Index() {
 	const { bio_data } = useSelector((state: RootState) => state.user);
 	const {
@@ -33,36 +35,72 @@ export default function Index() {
 	const [phone, setPhone] = useState("");
 	const [currentCountry, setCurrentCountry] = useState<CountryIso2>("ng");
 	const [ishidden, setHidden] = useState(true);
+	const validation = usePhoneValidation(phone);
 
+	const phoneRegex = /^\+234-(90|70|80|81|090|070|080|081)(\d{8})$/;
+
+	const isPhoneValid = validation.isValid && phoneRegex.test(phone);
 	const phoneValidationRef = useRef<HTMLSpanElement>(null);
 	const handleCountrySelection = useCallback((value: string) => {
 		let country = get_countryUtil(value);
 		setCountry(country);
 	}, []);
-	// const [open, setOpen] = useState<boolean>(false);
 
-	// const slide = () => {
-	//   if (open) {
-	//     setOpen(false);
-	//   } else {
-	//     setOpen(true);
-	//   }
+	/* const handlePhoneSubmit = useCallback(() => {
+		const phoneRegex = /^(090|070|080|081)(\d{8})$/;
+		if (!phone.length) {
+			toast.warn("Phone number required!");
+			return;
+		}
+		if (phone.length < 16 || phone.length > 16) {
+			toast.warn("Phone number length is invalid!");
+			return;
+		}
+		if (!phoneRegex.test(phone)) {
+			toast.warn("Invalid phone number form!");
+			return;
+		}
+	}, [phone]); */
+
+	const handlePhoneSubmit = useCallback(() => {
+		if (isPhoneValid) {
+			const userServies = new User();
+userServies.updateMe({phoneNumber:phone}).then(()=>{setPhone("")})
+			return;
+		}
+		phoneValidationRef.current
+			? (phoneValidationRef.current.textContent =
+					"Phone number is not valid!")
+			: undefined;
+		setTimeout(() => {
+			if (phoneValidationRef.current) {
+				phoneValidationRef.current.textContent = "";
+			}
+		}, 1200);
+		return;
+	}, [phone, phoneValidationRef.current]);
+	// const handlePhoneInputChange = (value: any) => {
+	// 	setValue("phoneNumber", value);
 	// };
-	const handlePhoneInputChange = (value: any) => {
-		setValue("phoneNumber", value);
-	};
-	
+
 	// const isPhoneValid = validation.isValid;
 
+	type T_cp = { password: string; oldPassword: string };
 	const handlePasswordChange = useCallback(
-		(data: FieldValue<{ password: string; oldPassword: string }>) => {
+		(data: T_cp) => {
 			const userServices = new User();
-			const entries = Object.entries(data as {});
-			// const formdata = new FormData();
-			for (let i in entries as {}) {
-				const [key, value] = entries[i as unknown as number];
-				
+			console.log(data);
+			if (!data.oldPassword.length) {
+				toast.warn("Old password required!");
+				return;
 			}
+			if (!data.password.length) {
+				toast.warn("New password require!");
+				return;
+			}
+			userServices.resetPassword({ password: data.password, oldPassword: data.oldPassword });
+			setValue("password", "");
+			setValue("oldPpassword", "");
 		},
 		[phone],
 	);
@@ -274,65 +312,6 @@ export default function Index() {
 					</Accordion.Root>
 
 					<Accordion.Root
-						className="bg-white max-w-[80%] mt-4 border border-slate-300 rounded-lg px-10"
-						type="single"
-						defaultValue="item-1"
-						collapsible
-					>
-						<Accordion.Item
-							className="AccordionItem w-full"
-							value="item-1"
-						>
-							<Accordion.Header className="AccordionHeader">
-								<Accordion.Trigger className="AccordionTrigger w-full flex justify-between items-center py-6">
-									<h2 className="text-xl font-bold">
-										Language
-									</h2>
-									<ChevronDownIcon
-										className="AccordionChevron w-6 h-5 transition duration-300"
-										aria-hidden
-									/>
-								</Accordion.Trigger>
-							</Accordion.Header>
-							<Accordion.Content className="pb-12 pt-2 w-full">
-								<form className="flex flex-col gap-4">
-									<fieldset className="max-w-[49%] gap-2 flex flex-col">
-										<label
-											className="text-[0.9rem] font-semibold"
-											htmlFor="language"
-										>
-											Preferred Language
-										</label>
-										<input
-											id="language"
-											type="text"
-											placeholder="English"
-											className="w-full placeholder:text-[#959191] px-4 py-3 border border-[#E0E0E0] rounded-md shadow-sm outline-none focus:outline-[#9B9B9B] focus:border-none focus:outline-[1px]"
-											{...register("language", {})}
-										/>
-										{/* {errors.language && (
-											<p className="text-blue mt-1">
-												{errors.language.type ===
-													"required" &&
-													"This field is required."}
-											</p>
-										)} */}
-									</fieldset>
-
-									<div className="flex items-center justify-end mt-4 xs:mt-2">
-										<button
-											className="text-sm font-medium bg-[#1F74A2] text-white px-4 py-2 flex justify-center items-center gap-2 bg-blue rounded-md outline-none transition duration-500 xs:px-6 xs:py-3"
-											type="button"
-										>
-											Update anguage
-										</button>
-									</div>
-								</form>
-							</Accordion.Content>
-						</Accordion.Item>
-					</Accordion.Root>
-
-					<Accordion.Root
 						className="bg-white max-w-[80%] mt-6 border border-slate-300 rounded-lg px-8"
 						type="single"
 						defaultValue="item-1"
@@ -355,12 +334,7 @@ export default function Index() {
 								</Accordion.Trigger>
 							</Accordion.Header>
 							<Accordion.Content className="AccordionContent overflow-hidden pb-12 pt-2 w-full transition duration-500">
-								<form
-									onSubmit={handleSubmit(
-										handlePasswordChange,
-									)}
-									className="flex flex-col gap-4"
-								>
+								<form className="flex flex-col gap-4">
 									<div className="flex gap-2 px-2">
 										<div className="flex flex-col w-full gap-2">
 											<fieldset className="w-full gap-2 flex flex-col">
@@ -473,12 +447,12 @@ export default function Index() {
 												className="text-[0.9rem] font-semibold"
 												htmlFor="phone"
 											>
-												{/* {!isPhoneValid && (
+												{!isPhoneValid && (
 													<span
 														ref={phoneValidationRef}
 														className="text-red-500 block bg-red-100 rounded-sm w-fit p-1"
 													></span>
-												)} */}
+												)}
 												Phone Number{" "}
 												<sup className="text-red-500 text-xs">
 													*
@@ -512,10 +486,16 @@ export default function Index() {
 									</div>
 									<div className="flex items-center justify-end mt-4 xs:mt-3">
 										<div className="flex gap-4">
-											<button className="text-[0.9rem] font-semibold px-4 py-2 border border-[#1F74A2] flex justify-center items-center gap-2 rounded-md outline-none transition duration-500 xs:px-4 xs:py-2">
+											<button
+												onClick={handleSubmit(
+													handlePasswordChange as ()=> void,
+												)}
+												className="text-[0.9rem] font-semibold px-4 py-2 border border-[#1F74A2] flex justify-center items-center gap-2 rounded-md outline-none transition duration-500 xs:px-4 xs:py-2"
+											>
 												Update Password
 											</button>
 											<button
+												onClick={handlePhoneSubmit}
 												className="text-[0.9rem] font-semibold px-4 py-2 border border-[#1F74A2] flex justify-center items-center gap-2 rounded-md outline-none transition duration-500 xs:px-4 xs:py-2"
 												type="button"
 											>

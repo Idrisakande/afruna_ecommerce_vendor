@@ -22,7 +22,7 @@ export const NotificationPopup = () => (
 				</div>
 			</button>
 		</Popover.Trigger>
-		<Popover.Portal className="relative">
+		<Popover.Portal>
 			<Popover.Content
 				className="PopoverContent sticky text-xs text-afruna-blue top-[45%] z-50 overflow-hidden bg-white w-[30rem] shadow-md mt-6 mr-40 rounded-md"
 				sideOffset={5}

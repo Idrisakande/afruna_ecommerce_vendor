@@ -20,7 +20,7 @@ export const CurrentUserHeader: FC<CurrentUserHeaderProps> = ({
   return (
     <div className="flex justify-between items-center w-full">
       <div className="flex gap-5 justify-start items-center">
-        <Avatar img={img} active={active} />
+        <Avatar img={img as string} active={active} />
         <div className="flex flex-1 flex-col gap-1">
           <h2 className="text-sm font-semibold tracking-tight text-[#0C0E3B]">
             {name}

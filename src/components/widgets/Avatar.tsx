@@ -15,8 +15,8 @@ export const Avatar: FC<AvatarProps> = memo(({ img, active, isOwn, convo }) => {
       <Image
       height={40}
       width={40}
-        src={img??images.afruna_logo}
-        alt="image"
+      src={img??images.afruna_logo}
+      alt="image"
         priority
         className={`${convo ? "w-8 h-8" : "w-12 h-12"} rounded-full ${
           isOwn && "order-2"

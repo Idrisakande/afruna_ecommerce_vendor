@@ -12,7 +12,7 @@ export type T_InitialUserState = {
 	};
 	orders: T_order[] | T_user_order[] | T_updated_user_order[];
 	reports: T_reports | undefined;
-	viewOrder: T_updated_order | T_updated_user_order | undefined;
+	viewOrder: T_order | T_user_order | T_updated_user_order | undefined;
 };
 export type T_User =
 	| {
@@ -123,6 +123,7 @@ export type T_reports = {
 	};
 	visitors: number;
 };
+
 
 
 export type T_convo = {

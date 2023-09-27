@@ -16,16 +16,15 @@ export const CurrentUsersConversations: FC<CurrentUsersConversationsProps> = ({
   time,
   isOwn,
 }) => {
-  const convo = true;
   return (
     <div className={`flex gap-3 w-full p-2 ${isOwn && "justify-end"}`}>
       <Image
       height={40}
       width={40}
-        src={img??images.afruna_logo}
-        alt="img"
-        priority
-        className={`w-8 h-8 rounded-full ${isOwn && "order-2"}`}
+      src={img??images.afruna_logo}
+      alt="img"
+      priority
+      className={`w-8 h-8 rounded-full ${isOwn && "order-2"}`}
       />
       <div
         className={`flex flex-col gap-1 max-w-xs w-full ${

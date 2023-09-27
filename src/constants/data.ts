@@ -11,7 +11,20 @@ import {
 import { images } from "@/constants/images";
 import { IReview } from "@/interfaces/IReview";
 import { IBestSellingProduct } from "@/interfaces/IBestSellingProduct";
-
+export const months = [
+	"January",
+	"February",
+	"March",
+	"April",
+	"May",
+	"June",
+	"July",
+	"August",
+	"September",
+	"October",
+	"November",
+	"December",
+];
 export const vendorDetails = [
 	{
 		numbers: 978,

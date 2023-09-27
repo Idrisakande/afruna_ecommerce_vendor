@@ -252,7 +252,7 @@ export default function Register() {
 					</aside>
 					<aside className="col-span-full md:col-span-1">
 						<fieldset className="flex flex-col w-full my-2">
-							<label htmlFor="phone">
+							<label htmlFor="country">
 								{country.Name === "" && (
 									<span
 										ref={localeRef}

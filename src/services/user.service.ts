@@ -93,7 +93,21 @@ class User {
 
 			this.store.dispatch(setUserBio(data.data));
 			toast.success("Profile updated successfully!");
-		} catch (error) {}
+		} catch (error) {
+			handleAuthErrors(error as AxiosError<T_error_response>);
+		}
+	}
+	async resetPassword(payload: any) {
+		try {
+			const { data } = await axios.put("/api/password", payload, {
+				headers: {
+					Authorization: `Bearer ${Cookies.get("token")}`,
+				},
+			});
+			toast.success("Password updated successfully!");
+		} catch (error) {
+			handleAuthErrors(error as AxiosError<T_error_response>);
+		}
 	}
 }
 export default User;

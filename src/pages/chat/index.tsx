@@ -74,7 +74,7 @@ export default function Index() {
 						</div>
 					</div>
 				</div>
-				{activeChat && activeChat.length ? (
+				{activeChat.length ? (
 					<div className=" min-w-[68%] xl:max-h-[70vh] overflow-hidden flex flex-col bg-white border border-text-afruna-gray/30 rounded-2xl">
 						<div className="h-24 px-8 border-b border-text-afruna-gray/30 flex justify-center items-center">
 							<CurrentUserHeader
