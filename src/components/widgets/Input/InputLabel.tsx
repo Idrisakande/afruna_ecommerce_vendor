@@ -20,8 +20,8 @@ export function InputLabel({
 	useMemo(() => getValue(input), [getValue, input]);
 	return (
 		<fieldset>
-			<h3 className="my-2">{headerTitle}</h3>
-			<div className="w-full flex justify-between space-x-1 items-center border-[1px] border-slate-300 p-1 px-3 rounded-md">
+			<h3 className="my-1 text-sm font-semibold">{headerTitle}</h3>
+			<div className="w-full flex justify-between space-x-1 items-center border-[1px] border-slate-300 p-3 rounded-md">
 				{inputprefixIcon && inputprefixIcon}
 				<input
 					ref={inputRef}
@@ -29,7 +29,7 @@ export function InputLabel({
 					value={inputRef.current?.value}
 					type={type}
 					placeholder={placeholder}
-					className={classnames("", inputClassName)}
+					className={classnames("w-full text-sm", inputClassName)}
 				/>
 				{inputsuffixIcon && inputsuffixIcon}
 			</div>

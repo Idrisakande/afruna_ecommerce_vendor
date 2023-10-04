@@ -280,14 +280,14 @@ export const CreateProduct: FC<{}> = memo(({}) => {
 						)}
 					</div>
 				</div>
-				<div className="col-span-full md:col-span-7 p-10 space-y-8 ">
+				<div className="col-span-full md:col-span-7 p-10 space-y-4 ">
 					<ItemLabelPicker
 						items={categories.map((i) => i.name)}
 						headerTitle="Categories"
 						placeholder="Select categories"
 						key={"Items"}
 						contentClassName="z-20"
-						triggerClassName="flex text-xs space-x-1 items-center text-afruna-blue border border-afruna-gray/30 p-3 rounded-md"
+						triggerClassName="flex text-sm space-x-1 items-center text-afruna-blue border border-afruna-gray/30 p-3 rounded-md"
 						getSelected={(val: string) => {
 							const cat = categories.find((i) => i.name === val);
 							setCategory(cat as { _id: string; name: string });
@@ -299,7 +299,7 @@ export const CreateProduct: FC<{}> = memo(({}) => {
 						headerTitle="Product Name"
 						placeholder="Name of product"
 					/>
-					<div className="w-full grid grid-cols-2 gap-8">
+					<div className="w-full flex flex-col gap-5">
 						{/* <ColorSelector
 							colors={[
 								"red",
@@ -311,52 +311,72 @@ export const CreateProduct: FC<{}> = memo(({}) => {
 							getselectedColor={(color) => setColor(color)}
 							headerTitle="Colors"
 						/> */}
-						<div className="p-2 space-y-1">
-							<label
-								htmlFor="color-picker"
-								className="mr-2 text-gray-700 font-bold space-x-1"
-							>
-								Choose a color:
-								<button
-									onClick={handleColorAddition}
-									className={
-										"p-1 border border-afruna-blue rounded text-xs"
-									}
+						<div className="flex flex-col gap-4">
+							<div className="flex flex-col gap-2 justify-start items-start place-items-start">
+								<label
+									htmlFor="color-picker"
+									className="mr-2 text-gray-700  flex flex-col justify-start items-start gap-3 w-fit"
 								>
-									add
-								</button>
-								{colors.length ? (
-									<button
-										onClick={() => setColors([])}
-										className={
-											"p-1 border border-afruna-blue rounded text-xs"
-										}
-									>
-										reset
-									</button>
-								) : null}
-							</label>
-							<div className="grid grid-cols-2 gap-1">
-								{colors.map((color, idx) => (
-									<span
-										key={idx}
-										style={{ background: color }}
-										className={`h-8 w-12`}
-									/>
-								))}
+									<h3 className="font-semibold text-sm">
+										Choose a color:
+									</h3>
+									<div className="flex justify-start items-start place-items-start space-x-4 h-fit w-fit ">
+										<div className="flex gap-2 justify-start items-center">
+											{color && color.length > 0 ? (
+												<button
+													onClick={
+														handleColorAddition
+													}
+													className={
+														"px-2 py-1 border border-afruna-blue rounded text-xs"
+													}
+												>
+													Add color
+												</button>
+											) : null}
+											{colors.length ? (
+												<>
+													<button
+														onClick={() =>
+															setColors([])
+														}
+														className={
+															"px-2 py-1 border border-afruna-blue rounded text-xs"
+														}
+													>
+														Reset color
+													</button>
+												</>
+											) : null}
+										</div>
+										<fieldset className="w-fit justify-start cursor-pointer">
+											<input
+												type="color"
+												id="color-picker"
+												className="appearance-none w-8 h-8 "
+												onChange={(e) =>
+													setColor(e.target.value)
+												}
+											/>
+										</fieldset>
+									</div>
+								</label>
+								<div className="flex flex-wrap justify-start items-center gap-1">
+									{colors.map((color, idx) => (
+										<span
+											key={idx}
+											style={{ background: color }}
+											className={`h-6 w-8`}
+										/>
+									))}
+								</div>
 							</div>
+							<CheckBoxLabel
+								getselectedChecks={(checks) => setSizes(checks)}
+								headerTitle="Size"
+								placeholders={["S", "M", "L", "XL", "XXL"]}
+							/>
 						</div>
-						<input
-							type="color"
-							id="color-picker"
-							className="appearance-none w-12 h-12"
-							onChange={(e) => setColor(e.target.value)}
-						/>
-						<CheckBoxLabel
-							getselectedChecks={(checks) => setSizes(checks)}
-							headerTitle="Size"
-							placeholders={["S", "M", "L", "XL", "XXL"]}
-						/>
 						<InputLabelNumber
 							getValue={(val) =>
 								setPrice(val as unknown as number)
@@ -383,10 +403,16 @@ export const CreateProduct: FC<{}> = memo(({}) => {
 							suffix
 						/>
 						<ItemLabelPicker
-							items={["New", ">90% New", "Used"]}
+							items={[
+								"New",
+								">90% New",
+								"Used",
+								"Refurblished",
+								"Old items",
+							]}
 							contentClassName="z-20"
-							triggerClassName="flex text-xs space-x-1 items-center text-afruna-blue border border-afruna-gray/30 p-3 rounded-md"
-							getSelected={(val: string) => setCondition(val)}
+							triggerClassName="flex text-sm space-x-1 items-center text-afruna-blue border border-afruna-gray/30 p-3 rounded-md"
+							getSelected={(val) => setCondition(val as string)}
 							headerTitle="Product Condition"
 							placeholder="Conditon"
 						/>
@@ -399,8 +425,8 @@ export const CreateProduct: FC<{}> = memo(({}) => {
 								"Brand X-Y",
 							]}
 							contentClassName="z-20"
-							triggerClassName="flex text-xs space-x-1 items-center text-afruna-blue border border-afruna-gray/30 p-3 rounded-md"
-							getSelected={(val: string) => setBrand(val)}
+							triggerClassName="flex text-sm space-x-1 items-center text-afruna-blue border border-afruna-gray/30 p-3 rounded-md"
+							getSelected={(val) => setBrand(val as string)}
 							headerTitle="Brand"
 							placeholder="Select brand"
 						/>
@@ -416,33 +442,37 @@ export const CreateProduct: FC<{}> = memo(({}) => {
 						placeholder="Locations"
 					/>
 
-					<div className="flex">
+					<div className="flex gap-2">
 						<input
 							type="checkbox"
 							name="worldwide"
 							id="worldwide"
 						/>
-						<label htmlFor="worldwide">World wide</label>
+						<label htmlFor="worldwide" className="text-sm">
+							World wide
+						</label>
 					</div>
 					<div className="flex flex-col">
-						<h3 className="my-2">Product Description</h3>
+						<h3 className="mb-2 text-sm font-semibold">
+							Product Description
+						</h3>
 						<fieldset className="w-full border-[1px] border-slate-300 rounded-md">
 							<textarea
 								onChange={(val) =>
 									setDescription(val.target.value)
 								}
 								rows={5}
-								className="p-4 w-full resize-none"
-								placeholder="describe products"
+								className="p-3 w-full resize-none placeholder:text-sm"
+								placeholder="Describe your product"
 							/>
 						</fieldset>
 						<div className="flex justify-between items-center self-end mt-8 space-x-8">
-							<button className="p-3 text-[12px] md:text-xs border-[1px] border-slate-300 rounded-md">
+							<button className="px-4 py-3 text-[12px] font-semibold md:text-sm border-[1px] border-slate-300 rounded-md">
 								Add More Attributes
 							</button>
 							<button
 								onClick={handleSubmit}
-								className="p-3 text-[12px] md:text-xs bg-gradient-y-deepblue hover:bg-gradient-whitishblue rounded-md text-white"
+								className="px-6 py-3 text-[12px] font-semibold md:text-sm bg-gradient-y-deepblue hover:bg-gradient-whitishblue rounded-md text-white"
 							>
 								List Now
 							</button>

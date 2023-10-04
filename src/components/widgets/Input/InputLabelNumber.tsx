@@ -9,12 +9,11 @@ export function InputLabelNumber({
 	prefix,
 	suffix,
 }: IInputLabelNumber) {
-	const [input, setInput] = useState<number|string>(0);
+	const [input, setInput] = useState<number>(0);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const inputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-		// let val = parseInt(e.target.value);
-		// setInput(isNaN(val) ? 0 : val);
-		setInput(e.target.value)
+		let val = parseInt(e.target.value);
+		setInput(isNaN(val) ? 0 : val);
 	}, []);
 	const increment = useCallback(() => {
 		if (inputRef.current) {
@@ -33,11 +32,11 @@ export function InputLabelNumber({
 			setInput(val);
 		}
 	}, []);
-	useMemo(() => getValue(input as number), [getValue, input]);
+	useMemo(() => getValue(input), [getValue, input]);
 	return (
-		<fieldset className="text-xs">
-			<h3 className="my-2">{headerTitle}</h3>
-			<div className="flex justify-between items-center border-[1px] border-slate-300 px-2 rounded-md">
+		<fieldset>
+			<h3 className="mb-1 font-semibold text-sm">{headerTitle}</h3>
+			<div className="flex justify-between items-center border-[1px] border-slate-300 px-3 rounded-md">
 				{prefix && <span>$</span>}
 				<input
 					ref={inputRef}
@@ -45,18 +44,18 @@ export function InputLabelNumber({
 					value={inputRef.current?.value}
 					type="number"
 					placeholder={placeholder}
-					className="w-full p-1"
+					className="w-full px-1"
 				/>
 				{suffix ? (
 					<div className="flex flex-col items-center">
 						<button
-							className="relative  p-[5px] top-2"
+							className="relative  p-[3px] top-2"
 							onClick={increment}
 						>
 							<RxChevronUp size={18} />
 						</button>
 						<button
-							className="relative  p-[5px] bottom-2"
+							className="relative  p-[3px] bottom-2"
 							onClick={decrement}
 						>
 							<RxChevronDown size={18} />

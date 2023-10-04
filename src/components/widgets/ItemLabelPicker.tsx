@@ -19,57 +19,62 @@ const ItemLabelPicker: FC<
 	getSelected,
 	contentClassName,
 	triggerClassName,
-	headerTitle
+	headerTitle,
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	return (
-		<div className="flex flex-col justify-start gap-2 md:gap-4">
-			<h1>{headerTitle}</h1>
+		<div className="flex flex-col justify-start gap-1">
+			<h1 className="my-1 font-semibold text-sm">{headerTitle}</h1>
 			<Select.Root onOpenChange={setIsOpen} onValueChange={getSelected}>
-			<Select.Trigger className={classnames("", triggerClassName)}>
-				{triggerLeftIcon && (
-					<Select.Icon className="text-sm">
-						{triggerLeftIcon}
+				<Select.Trigger
+					className={classnames(
+						`w-full bg-white focus:bg-white text-sm text-slate-900 border border-slate-300 flex justify-between items-center rounded-lg`,
+						triggerClassName,
+					)}
+				>
+					{triggerLeftIcon && (
+						<Select.Icon className="text-sm">
+							{triggerLeftIcon}
+						</Select.Icon>
+					)}
+					<Select.Value placeholder={placeholder ?? "list items"} />
+					<Select.Icon className="text-lg">
+						<RxChevronDown
+							className={`${
+								isOpen && "rotate-180"
+							} transition ease-in duration-200 w-5 h-5`}
+						/>
 					</Select.Icon>
-				)}
-				<Select.Value placeholder={placeholder ?? "list items"} />
-				<Select.Icon className="text-lg">
-					<RxChevronDown
-						className={`${
-							isOpen && "rotate-180"
-						} transition ease-in duration-200`}
-					/>
-				</Select.Icon>
-			</Select.Trigger>
-			<Select.Portal
-				className={classnames(
-					"z-10 bg-slate-50 rounded-md shadow-md text-[12px] text-afruna-blue transition-all ease-out duration-200 delay-700",
-					contentClassName,
-				)}
-			>
-				<Select.Content position="popper">
-					<Select.ScrollUpButton className="">
-						<RxChevronUp />
-					</Select.ScrollUpButton>
-					<Select.Viewport>
-						{items?.length ? (
-							items.map((item, idx) => (
-								<SelectItem key={idx + item} value={item}>
-									{item}
-								</SelectItem>
-							))
-						) : (
-							<></>
-						)}
-					</Select.Viewport>
-					<Select.ScrollDownButton className="SelectScrollButton">
-						<RxChevronDown />
-					</Select.ScrollDownButton>
-				</Select.Content>
-			</Select.Portal>
-		</Select.Root>
+				</Select.Trigger>
+				<Select.Portal
+					className={classnames(
+						" bg-slate-50 rounded-md shadow-md text-afruna-blue w-full overflow-y-auto border border-slate-300 transition-all ease-out duration-200 delay-700",
+						contentClassName,
+					)}
+				>
+					<Select.Content position="popper">
+						<Select.ScrollUpButton className="">
+							<RxChevronUp />
+						</Select.ScrollUpButton>
+						<Select.Viewport className="p-2 gap-2 flex flex-col rounded-md  bg-white">
+							{items?.length ? (
+								items.map((item, idx) => (
+									<SelectItem key={idx + item} value={item} 
+									className="text-xs md:text-sm cursor-pointer">
+										{item}
+									</SelectItem>
+								))
+							) : (
+								<></>
+							)}
+						</Select.Viewport>
+						<Select.ScrollDownButton className="SelectScrollButton">
+							<RxChevronDown />
+						</Select.ScrollDownButton>
+					</Select.Content>
+				</Select.Portal>
+			</Select.Root>
 		</div>
-
 	);
 };
 const SelectItem = forwardRef(
