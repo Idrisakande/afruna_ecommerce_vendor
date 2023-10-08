@@ -11,13 +11,13 @@ export function InputMetadata({
 	useMemo(() => getMetadata(metadata), [getMetadata, metadata]);
 
 	return (
-		<div className="my-10 w-full">
-			<h3>{headerTitle}</h3>
-			<fieldset className="flex flex-wrap items-center mt-2 px-1  border-[1px] border-slate-300 rounded-lg">
+		<div className="w-full">
+		<h3 className="text-sm font-semibold mb-1 ">{headerTitle}</h3>
+			<fieldset className="flex flex-wrap items-center px-1  border-[1px] border-slate-300 rounded-lg">
 				<input
 					ref={inputRef}
 					type="text"
-					className="w-full p-3"
+					className="w-full p-3 text-sm"
 					placeholder={placeholder}
 					onKeyDown={(e) => {
 						if (e.code === "Space" || e.code === "Enter") {

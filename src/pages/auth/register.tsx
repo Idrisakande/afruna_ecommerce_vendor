@@ -160,8 +160,8 @@ export default function Register() {
 				className="w-3/4 lg:w-2/4 flex flex-col content-between items-center mx-auto rounded-2xl shadow-md p-10 bg-white border-[1px] text-xs my-10 gap-2"
 			>
 				<section className="w-full grid grid-cols-1 md:grid-cols-2 gap-8">
-					<aside className="col-span-full md:col-span-1">
-						<fieldset className="flex flex-col w-full my-2">
+					<aside className="col-span-full md:col-span-1 gap-4">
+						<fieldset className="flex flex-col w-full my-2 gap-1">
 							<label htmlFor="firstName">
 								{errors.firstName && (
 									<span className="text-red-500 block bg-red-100 rounded-sm w-fit p-1">
@@ -177,10 +177,10 @@ export default function Register() {
 								name="firstName"
 								id="firstName"
 								className="p-3 border-[1px] border-slate-300 focus-within:border-slate-400 focus-within:shadow-lg rounded-md"
-								placeholder="firstname address"
+								placeholder="First Name"
 							/>
 						</fieldset>
-						<fieldset className="flex flex-col w-full my-2">
+						<fieldset className="flex flex-col w-full my-2 gap-1">
 							<label htmlFor="lastName">
 								{errors.lastName && (
 									<span className="text-red-500 block bg-red-100 rounded-sm w-fit p-1">
@@ -196,10 +196,10 @@ export default function Register() {
 								name="lastName"
 								id="lastName"
 								className="p-3 border-[1px] border-slate-300 focus-within:border-slate-400 focus-within:shadow-lg rounded-md"
-								placeholder="lastname address"
+								placeholder="Last Name"
 							/>
 						</fieldset>
-						<fieldset className="flex flex-col w-full my-2">
+						<fieldset className="flex flex-col w-full my-2 gap-1">
 							<label htmlFor="email">
 								{errors.email && (
 									<span className="text-red-500 block bg-red-100 rounded-sm w-fit p-1">
@@ -215,10 +215,10 @@ export default function Register() {
 								name="email"
 								id="email"
 								className="p-3 border-[1px] border-slate-300 focus-within:border-slate-400 focus-within:shadow-lg rounded-md"
-								placeholder="email address"
+								placeholder="Email"
 							/>
 						</fieldset>
-						<fieldset className="flex flex-col w-full my-2">
+						<fieldset className="flex flex-col w-full my-2 gap-1">
 							<label htmlFor="phone">
 								{!isPhoneValid && (
 									<span
@@ -251,7 +251,7 @@ export default function Register() {
 						</fieldset>
 					</aside>
 					<aside className="col-span-full md:col-span-1">
-						<fieldset className="flex flex-col w-full my-2">
+						<fieldset className="flex flex-col w-full my-2 gap-1">
 							<label htmlFor="country">
 								{country.Name === "" && (
 									<span
@@ -269,7 +269,7 @@ export default function Register() {
 								selected={country.Code}
 							/>
 						</fieldset>
-						<fieldset className="flex flex-col w-full my-2">
+						<fieldset className="flex flex-col w-full my-2 gap-1">
 							<label htmlFor="password">
 								{errors.password && (
 									<span className="text-red-500 block bg-red-100 rounded-sm w-fit p-1">
@@ -299,7 +299,7 @@ export default function Register() {
 								</span>
 							</div>
 						</fieldset>
-						<fieldset className="flex flex-col w-full my-2">
+						<fieldset className="flex flex-col w-full my-2 gap-1">
 							<label htmlFor="confirmPassword">
 								{errors.confirmPassword && (
 									<span className="text-red-500 block bg-red-100 rounded-sm w-fit p-1">

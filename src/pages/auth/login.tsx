@@ -111,7 +111,7 @@ function Login() {
 						name="email"
 						id="email"
 						className="p-3 border-[1px] border-slate-300 focus-within:border-slate-400 focus-within:shadow-lg rounded-md"
-						placeholder="email address"
+						placeholder="Email"
 					/>
 				</fieldset>
 				<fieldset className="flex flex-col w-full gap-2">

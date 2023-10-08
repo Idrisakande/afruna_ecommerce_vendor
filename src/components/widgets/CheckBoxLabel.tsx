@@ -18,11 +18,11 @@ export default memo(function ColorSelector({
 	);
 	return (
 		<div className="w-full">
-			<h3 className="mb-2">{headerTitle}</h3>
-			<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 w-full gap-1">
+			<h3 className="mb-1 font-semibold text-sm">{headerTitle}</h3>
+			<div className="w-full rounded-lg mt-2 flex flex-wrap justify-start space-x-4 items-center">
 				{placeholders.map((placeholder, idx) => (
 					<div
-						className="flex flex-wrap w-fit items-center"
+						className="flex space-x-2  rounded-lg items-center"
 						key={idx}
 						onClick={() => {
 							if (selectedChecks.includes(placeholder)) {
@@ -43,17 +43,17 @@ export default memo(function ColorSelector({
 						}}
 					>
 						<div
-							className={`flex justify-center items-center ${
+							className={`flex justify-center overflow-hidden items-center ${
 								selectedChecks.includes(placeholder)
 									? "bg-slate-700 text-white"
 									: ""
-							} rounded-sm p-2 w-12 border-[1px] h-8 hover:cursor-pointer`}
+							} rounded overflow-hidden p-2 w-[30px] border-[1px] h-[20px] hover:cursor-pointer`}
 						>
 							{selectedChecks.includes(placeholder) ? (
 								<MdCheck size={25} />
 							) : null}
 						</div>
-						<span className={"p-1"}>{placeholder}</span>
+						<span className="text-xs">{placeholder}</span>
 					</div>
 				))}
 			</div>
