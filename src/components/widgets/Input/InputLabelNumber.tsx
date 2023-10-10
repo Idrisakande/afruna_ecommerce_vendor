@@ -34,7 +34,7 @@ export function InputLabelNumber({
 	}, []);
 	useMemo(() => getValue(input), [getValue, input]);
 	return (
-		<fieldset>
+		<fieldset className="flex justify-start items-start flex-col w-full">
 			<h3 className="mb-1 font-semibold text-sm">{headerTitle}</h3>
 			<div className="flex justify-between items-center border-[1px] border-slate-300 px-3 rounded-md">
 				{prefix && <span>$</span>}

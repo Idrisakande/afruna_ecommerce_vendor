@@ -10,7 +10,7 @@ import { ISelectPicker } from "@/interfaces/selectPicker.interface";
 // tailwind style to move div to the right end of the screen
 const ItemLabelPicker: FC<
 	ISelectPicker & {
-		headerTitle: string;
+		headerTitle?: string;
 	}
 > = ({
 	items,
@@ -23,7 +23,7 @@ const ItemLabelPicker: FC<
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	return (
-		<div className="flex flex-col justify-start gap-1">
+		<div className="flex flex-col justify-start items-start gap-1 w-full">
 			<h1 className="my-1 font-semibold text-sm">{headerTitle}</h1>
 			<Select.Root onOpenChange={setIsOpen} onValueChange={getSelected}>
 				<Select.Trigger

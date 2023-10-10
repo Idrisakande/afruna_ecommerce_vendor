@@ -41,7 +41,12 @@ export type T_DashboardStats = {
 export type T_review = {
 	_id: string;
 	productId: string;
-	userId: string;
+	userId: {
+		_id: string,
+		firstName: string,
+		lastName: string,
+		avatar: string
+	},
 	comment: string;
 	createdAt: string;
 	rating: number;

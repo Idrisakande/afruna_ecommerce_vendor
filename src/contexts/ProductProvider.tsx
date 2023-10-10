@@ -49,6 +49,20 @@ export const ProductProvider: FC<{ children: ReactNode }> = ({ children }) => {
 		},
 		[manageItems],
 	);
+	// let itemExist = manageItems.some(
+	// 	(pair) => pair._id === item._id,
+	// );
+	// const  newItem = manageItems.find(
+	// 	(pair) => pair._id === item._id,
+	// );
+	// if (itemExist) {
+	// 	setManageItems([...manageItems]);
+	// } else {
+	// 	if (newItem) {
+	//  manageItems.push(newItem)
+	// 	setManageItems([...manageItems])
+	// 	}
+	// }
 
 	return (
 		<productcontext.Provider

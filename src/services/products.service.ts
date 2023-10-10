@@ -52,6 +52,19 @@ class Products {
 			handleAuthErrors(error as AxiosError<T_error_response>);
 		}
 	}
+	async updateProduct(id: string) {
+		try {
+			const { data } = await axios.put("/api/products/" + id, {
+				headers: {
+					Authorization: `Bearer ${Cookies.get("token")}`,
+				},
+			});
+			this.getProducts();
+			toast.success("Product removed!");
+		} catch (error) {
+			handleAuthErrors(error as AxiosError<T_error_response>);
+		}
+	}
 	private async getProducts() {
 		try {
 			const { data } = await axios.get("/api/products/vendor", {

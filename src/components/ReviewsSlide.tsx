@@ -19,8 +19,10 @@ export const ReviewsSlide = () => {
 	const { reviews, recent_reviewers } = useSelector(
 		(state: RootState) => state.user,
 	);
+	console.log(reviews);
+	
 
-	if (!recent_reviewers?.length)
+	if (!reviews?.length)
 	return <ResultsFallback/>	
 	return reviews?.length ? (
 		<div className="relative p-3 space-y-2 mt-10 h-fit">
@@ -50,14 +52,17 @@ export const ReviewsSlide = () => {
 				<Image
 					width={50}
 					height={50}
-					src={recent_reviewers[currentIndex]?.avatar??images.afruna_logo}
+					src={reviews[currentIndex].userId.avatar??images.afruna_logo}
+					// src={recent_reviewers[currentIndex]?.avatar??images.afruna_logo}
 					alt="review image"
 					className="rounded-full h-12  w-12 object-center"
 				/>
 				<div className="flex flex-col text-afruna-blue">
 					<p className="text-xs font-bold">
-						{recent_reviewers[currentIndex]?.firstName}{" "}
-						{recent_reviewers[currentIndex]?.lastName}
+						{/* {recent_reviewers[currentIndex]?.firstName}{" "}
+						{recent_reviewers[currentIndex]?.lastName} */}
+						{reviews[currentIndex].userId.firstName}{" "}
+						{reviews[currentIndex].userId.lastName}
 					</p>
 					<span className="flex mx-[2px]">
 						{Array(5)
