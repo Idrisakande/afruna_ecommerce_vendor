@@ -52,12 +52,12 @@ export const CoversationFooter: FC<CoversationFooterProps> = ({ to, id }) => {
 					})}
 					className="w-full p-3 font-semibold text-gray-700 text-sm focus:outline-none placeholder:text-[#DBDBDB]"
 				/>
-				<button className=" min-w-[8rem]">
+				{/* <button className=" min-w-[8rem]">
 					<MdAttachFile
 						size={37}
 						className="text-[#0C0E3B] hover:scale-90 transition duration-300 p-2 cursor-pointer"
 					/>
-				</button>
+				</button> */}
 				<button
 					type="submit"
 					className="w-28 h-28 flex justify-start items-end p-4 absolute rounded-full -bottom-2 -right-12 bg-[#00AEEF]"

@@ -22,6 +22,7 @@ import { RootState } from "@/types/store.type";
 import { IProduct } from "@/interfaces/IProductItem";
 import Products from "@/services/products.service";
 import store from "@/redux/store";
+import { formattedDate } from "@/utils/formatted_date";
 
 const messages = [
 	{
@@ -49,48 +50,6 @@ const messages = [
 ];
 
 export default function () {
-	const RenderStatus = (): ReactNode => {
-		let render: JSX.Element;
-		switch (query.status) {
-			case "Rejected":
-				render = (
-					<p
-						className={
-							"flex text-[12px] space-x-2 items-center  text-red-500/70"
-						}
-					>
-						<MdCancel />
-						<span>{query.status}</span>
-					</p>
-				);
-				break;
-			case "Delivered":
-				render = (
-					<p
-						className={
-							"flex text-[12px] space-x-2 items-center  text-green-500/70"
-						}
-					>
-						<FaCheck />
-						<span>{query.status}</span>
-					</p>
-				);
-				break;
-			default:
-				render = (
-					<p
-						className={
-							"flex space-x-2 text-[12px] items-center text-slate-500/70"
-						}
-					>
-						<FaDotCircle />
-						<span>{query.status}</span>
-					</p>
-				);
-				break;
-		}
-		return render;
-	};
 	const [reply, setReply] = useState(false);
 	useEffect(() => {
 		const hiddenBTN = document.querySelector(
@@ -99,30 +58,7 @@ export default function () {
 		hiddenBTN.style.display = "none";
 	}, []);
 	const { query } = useRouter();
-	const { reviews, reviewers } = useSelector(
-		(state: RootState) => state.user,
-	);
-
-	const match_reviews = useMemo(
-		() => reviews?.filter((review) => review.productId === query.id),
-		[reviews, query.productId],
-	);
-	const with_bio_reviews = useMemo(() => {
-		const compile = [];
-		if (match_reviews?.length && reviewers?.length)
-			for (let match of match_reviews) {
-				for (let reviewer of reviewers) {
-					match.userId._id === reviewer._id &&
-						compile.push({
-							...match,
-							email: reviewer.email,
-							fullName: `${reviewer.firstName} ${reviewer.lastName}`,
-							avatar: reviewer.avatar,
-						});
-				}
-			}
-		return compile;
-	}, [reviewers, match_reviews]);
+	const {productsWithReviews } = useSelector((state:RootState) =>state.products)
 	const [product, setProduct] = useState<IProduct>();
 	useEffect(() => {
 		const { products } = store.store.getState().products;
@@ -130,51 +66,62 @@ export default function () {
 		setProduct(product);
 	}, [query, store.store]);
 
+
+	// product is found in proudcts with reviews;
+	const productWithReview = useMemo(() => {
+		if (!productsWithReviews) return;
+		return productsWithReviews.find(product => product._id === query.id);
+	}, [productsWithReviews, query.id]);
+	
+	const prod = productWithReview !== undefined? productWithReview : product;
+console.log(prod);
+
 	return (
 		<ProductProvider>
 			<div className="relative p-3 text-[12px] pb-28 md:pb-44">
 				<section className="grid grid-cols-4 md:h-48">
 					<Image
+						priority
 						height={40}
 						width={40}
-						src={product?.coverPhoto[0]as string}
+						src={prod?.coverPhoto[0] as string}
 						alt="productImage"
-						className="md:grid-span-1 border border-afruna-blue p-4 h-32 w-32"
+						className="md:grid-span-1 border border-afruna-blue h-32 w-32"
 					/>
 					<div className="md:grid-span-1 -ml-24 space-y-2">
 						<p className=" text-afruna-gold/70 text-lg">{product?.customId }</p>
 						<p className="text-afruna-blue text-lg">
-							{product?.name}
+							{prod?.name}
 						</p>
 						<p className="text-afruna-gray/70 leading-tight font-thin text-[12px]">
-							Brand: {product?.brand}
+							Brand: {prod?.brand}
 						</p>
 						<p className="text-afruna-gray leading-tight font-thin text-[12px]">
-							Price: &#x20A6; {product?.price.toLocaleString()}
+							Price: &#x20A6; {prod?.price.toLocaleString()}
 						</p>
 						<p className="text-afruna-gray leading-tight font-thin text-[12px]">
-							Discount: {product?.discount.toFixed(2)} %
+							Discount: {prod?.discount.toFixed(2)} %
 						</p>
 						{/* <RenderStatus /> */}
 					</div>
 				</section>
-				<div className="messages grid grid-cols-6">
-					{with_bio_reviews.map((review) => (
+				<div className="messages grid gap-2 grid-cols-3">
+					{productWithReview && productWithReview.reviews.length > 0 && productWithReview.reviews.map((review) => (
 						<div
-							key={review.rating}
-							className="md:col-span-3 bg-slate-200/40 rounded-md p-2 m-2 h-32"
+							key={review.comment}
+							className="md:col-span-1 bg-slate-200/40 rounded-md p-2 m-2 h-32"
 						>
 							<section className="flex mb-3">
 								<Image
 									height={40}
 									width={40}
-									src={review.avatar ?? images.afruna_logo}
+									src={review.userId.avatar ?? images.afruna_logo}
 									alt="userImage"
 									className="h-10 w-10 object-center rounded-full"
 								/>
 								<div className="ml-2">
 									<p className="capitalize">
-										{review.fullName}
+										{review.userId.firstName} {review.userId.lastName}
 									</p>
 									<p
 										className={
@@ -195,26 +142,25 @@ export default function () {
 											))}
 									</p>
 									<p>
-										{new Date(
-											review.createdAt,
-										).toUTCString()}
+										{formattedDate(review.createdAt)}
 									</p>
 								</div>
 							</section>
 							<div>
 								<p>{review.comment}</p>
 							</div>
-							<button
+							{/* <button
 								onClick={() => {
 									setReply((prev) => !prev);
 								}}
 								className="flex"
 							>
 								<MdReply /> Reply
-							</button>
+							</button> */}
 						</div>
 					))}
 				</div>
+				{/* === REPLY MODAL */}
 				<div
 					className={`${
 						reply

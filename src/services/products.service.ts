@@ -7,9 +7,11 @@ import { T_app_provider } from "@/types/t";
 import { handleAuthErrors } from "@/utils/auth.util";
 import Cookies from "js-cookie";
 import { updateCategories } from "@/redux/features/categories.slice";
-import { updateProducts } from "@/redux/features/products.slice";
+import { updateProdouctsWithReviews, updateProducts } from "@/redux/features/products.slice";
 import { T_error_response } from "@/types/auth.type";
 import { toast } from "react-toastify";
+import { productsWithReviews } from "@/utils/products_with_reviews";
+import { T_review } from "@/types/user.type";
 
 class Products {
 	protected store = store.store;
@@ -19,6 +21,7 @@ class Products {
 			() => opt?.setIsloading && opt.setIsloading(false),
 		);
 		this.getProducts();
+		this.getProductsWithReviews();
 	}
 	async createProduct(product: IProduct, opt: T_app_provider) {
 		const { setIsloading } = opt;
@@ -85,6 +88,13 @@ class Products {
 		} catch (error) {
 			handleAuthErrors(error as AxiosError<T_error_response>);
 		}
+	}
+	getProductsWithReviews() {
+		const products = this.store.getState().products.products;
+		const reviews = this.store.getState().user.reviews as T_review[];
+		const PWR = productsWithReviews(products, reviews);
+		this.store.dispatch(updateProdouctsWithReviews(PWR));
+		return PWR;
 	}
 	private async getCategories() {
 		try {

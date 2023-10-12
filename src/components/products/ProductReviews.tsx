@@ -18,6 +18,7 @@ import { FaCheck, FaDotCircle } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { RootState } from "@/types/store.type";
 import { T_review } from "@/types/user.type";
+import { formattedDate } from "@/utils/formatted_date";
 type T_extend = {
 	categoryName: string;
 	status: string;
@@ -28,40 +29,8 @@ export type T_product_reviews = T_review & T_extend;
 export const ProductReviews: FC<{}> = memo(({}) => {
 	const router = useRouter();
 	const { categories } = useSelector((state: RootState) => state.categories);
-	const { products } = useSelector((state: RootState) => state.products);
-	const { reviews } = useSelector((state: RootState) => state.user);
-	useEffect(() => {
-		const hiddenBTN = document.querySelector(
-			"button.bg-gradient-y-deepblue",
-		) as HTMLButtonElement;
-		hiddenBTN.style.display = "none";
-	}, []);
-
-	const product_reviews = useMemo(() => {
-		const product_reviews: T_product_reviews[] = [];
-		if (reviews?.length) {
-			for (let review of reviews) {
-				const matching_product_reviews = products.filter(
-					(product) => product._id === review.productId,
-				);
-				for (let category of categories) {
-					matching_product_reviews.filter(
-						(matched_with_category) =>
-							matched_with_category.categoryId === category._id &&
-							product_reviews.push({
-								...review,
-								categoryName: category.name,
-								status: "Delivered",
-								productName: matched_with_category.name,
-								coverPhoto: matched_with_category.coverPhoto[0],
-							}),
-					);
-				}
-			}
-		}
-		return product_reviews;
-	}, [reviews, categories, products]);
-	console.log(product_reviews);
+	const { products,productsWithReviews } = useSelector((state: RootState) => state.products);
+	
 
 	/* const RenderStatus = (): ReactNode => {
 		let render: JSX.Element;
@@ -108,85 +77,92 @@ export const ProductReviews: FC<{}> = memo(({}) => {
 	return (
 		<Content>
 			<div className={"px-3 py-5 w-fit"}>
-				{product_reviews.map((review) => {
-					const RenderStatus = (): ReactNode => {
-						let render: JSX.Element;
-						switch (review.status) {
-							case "Rejected":
-								render = (
-									<p
-										className={
-											"flex text-[12px] space-x-2 items-center  text-red-500/70"
-										}
-									>
-										<MdCancel />
-										<span>{review.status}</span>
-									</p>
-								);
-								break;
-							case "Delivered":
-								render = (
-									<p
-										className={
-											"flex text-[12px] space-x-2 items-center  text-green-500/70"
-										}
-									>
-										<FaCheck />
-										<span>{review.status}</span>
-									</p>
-								);
-								break;
-							default:
-								render = (
-									<p
-										className={
-											"flex space-x-2 text-[12px] items-center text-slate-500/70"
-										}
-									>
-										<FaDotCircle />
-										<span>{review.status}</span>
-									</p>
-								);
-								break;
-						}
-						return render;
-					};
+				{productsWithReviews.map((review) => {
+					// const RenderStatus = (): ReactNode => {
+					// 	let render: JSX.Element;
+					// 	switch (review.quantity) {
+					// 		case "Rejected":
+					// 			render = (
+					// 				<p
+					// 					className={
+					// 						"flex text-[12px] space-x-2 items-center  text-red-500/70"
+					// 					}
+					// 				>
+					// 					<MdCancel />
+					// 					<span>{review.status}</span>
+					// 				</p>
+					// 			);
+					// 			break;
+					// 		case "Delivered":
+					// 			render = (
+					// 				<p
+					// 					className={
+					// 						"flex text-[12px] space-x-2 items-center  text-green-500/70"
+					// 					}
+					// 				>
+					// 					<FaCheck />
+					// 					<span>{review.status}</span>
+					// 				</p>
+					// 			);
+					// 			break;
+					// 		default:
+					// 			render = (
+					// 				<p
+					// 					className={
+					// 						"flex space-x-2 text-[12px] items-center text-slate-500/70"
+					// 					}
+					// 				>
+					// 					<FaDotCircle />
+					// 					<span>{review.status}</span>
+					// 				</p>
+					// 			);
+					// 			break;
+					// 	}
+					// 	return render;
+					// };
 					return (
 						<div
 							key={review._id}
 							className={
-								"grid grid-cols-auto md:grid-cols-6 text-[14px] border border-afruna-gray/20 w-fit rounded-md m-4 p-4"
+								"grid grid-cols-auto md:grid-cols-6 text-[14px] border border-afruna-gray/20 w-fit rounded-md m-4 p-4 gap-2"
 							}
 						>
 							<Image
 								height={40}
 								width={40}
+								priority
 								alt={"Product_Image"}
-								src={review.coverPhoto}
+								src={review.coverPhoto[0]}
 								className={
 									"md:col-span-1 w-44 h-44 object-cover"
 								}
 							/>
 							<div className={"md:col-span-4 font-bold"}>
 								<span className={"text-afruna-gold/70"}>
-									Review [#{review._id}]
+									{ review.customId}
 								</span>
 								<p className={"text-afruna-blue/70"}>
-									{review.productName}
-								</p>
-								<span
+									{review.name}
+								</p><span
 									className={
-										"text-afruna-gray/40 font-thin text-[10px]"
+										"text-afruna-gray/90 font-thin text-[8px]"
 									}
 								>
-									{review.categoryName}
+									{review.categoryId}
 								</span>
-								<RenderStatus />
+								<h1
+									className={
+										"text-afruna-blue/90 font-thin text-[12px]"
+									}
+								>
+									{formattedDate(review.reviews[0].createdAt)}
+								</h1>
+								{/* <RenderStatus /> */}
 							</div>
 							<div className="md:col-span-1">
 								<button
 									onClick={() =>
-										router.push({pathname:"/products/" + review._id,query:review as unknown as string})}
+										router.push({pathname:"/products/" + review._id,query:review._id})}
 									className={
 										"text-afruna-gold/70 block tracking-tight font-semibold"
 									}
