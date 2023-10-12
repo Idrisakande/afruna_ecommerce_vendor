@@ -107,15 +107,15 @@ const ProductsTable = () => {
       {
         accessorKey: "price",
         cell: ({ cell }) => {
-          const price = `$${cell.getValue()}`;
-          return (
-            <div className="flex gap-2 items-center">
-              <span>{price}</span>
-              <span className="text-gray-500 font-medium text-sm line-through">
-                $2000
-              </span>
-            </div>
-          );
+          const price = `${cell.getValue()}`;
+			return (
+				<div className="flex gap-2 items-center">
+					<span>&#x20A6;{price}</span>
+					<span className="text-gray-500 font-medium text-sm line-through">
+						&#x20A6;2000
+					</span>
+				</div>
+			);
         },
         header: () => <span className="text-sm text-[#7C7C7C]">Price</span>,
       },
@@ -179,148 +179,164 @@ const ProductsTable = () => {
   });
 
   return (
-    <div className="my-8 pb-12 w-full">
-      <ScrollArea.Root className="ScrollAreaRoot w-full h-[70vh] px-4 pb-2 bg-white overflow-auto rounded-xl border shadow-sm border-slate-300">
-        <ScrollArea.Viewport className="ScrollAreaViewport w-full h-full pb-6">
-          <table className="w-screen lg:w-full px-8 relative">
-            <thead className="sticky top-0 bg-white">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <th
-                      className="text-left font-medium pt-3 text-[#7C7C7C] text-sm"
-                      key={header.id}
-                    >
-                      {header.index > 0 && header.id !== "actions" ? (
-                        <text className="flex justify-between gap-2 items-center w-fit">
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                          <span className="flex flex-col">
-                            <RxChevronUp
-                              onClick={header.column.getToggleSortingHandler()}
-                              size={24}
-                              className="relative top-2 text-slate-400"
-                            />
-                            <RxChevronDown
-                              onClick={header.column.getToggleSortingHandler()}
-                              size={24}
-                              className="relative -top-2"
-                            />
-                          </span>
-                        </text>
-                      ) : (
-                        flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )
-                      )}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody className="my-10">
-              {table.getRowModel().rows.map((row) => {
-                return (
-                  <tr
-                    className="px-2 odd:border-y-[1px] odd:border-slate-300"
-                    key={row.id}
-                  >
-                    {row.getVisibleCells().map((cell) => {
-                      return (
-                        <td
-                          className="py-4 font-semibold text-left text-[0.8rem]"
-                          key={cell.id}
-                        >
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </ScrollArea.Viewport>
-        <ScrollArea.Scrollbar
-          className="ScrollAreaScrollbar p-[2px] rounded-xl` mb-4 flex bg-slate-100 hover:bg-slate-200"
-          orientation="vertical"
-        >
-          <ScrollArea.Thumb className="relative flex-1 rounded-xl bg-slate-400" />
-        </ScrollArea.Scrollbar>
-        <ScrollArea.Scrollbar
-          className="ScrollAreaScrollbar p-[2px] rounded-xl` mb-4 flex bg-slate-100 hover:bg-slate-200 "
-          orientation="horizontal"
-        >
-          <ScrollArea.Thumb className="relative flex-1 rounded-xl bg-slate-400" />
-        </ScrollArea.Scrollbar>
-        <ScrollArea.Corner className="" />
-      </ScrollArea.Root>
+		<div className="my-8 pb-12 w-full">
+			<ScrollArea.Root className="ScrollAreaRoot w-full h-[70vh] px-4 pb-2 bg-white overflow-auto rounded-xl border shadow-sm border-slate-300">
+				<ScrollArea.Viewport className="ScrollAreaViewport w-full h-full pb-6">
+					<table className="w-screen lg:w-full px-8 relative">
+						<thead className="sticky top-0 bg-white">
+							{table.getHeaderGroups().map((headerGroup) => (
+								<tr key={headerGroup.id}>
+									{headerGroup.headers.map((header) => (
+										<th
+											className="text-left font-medium pt-3 text-[#7C7C7C] text-sm"
+											key={header.id}
+										>
+											{header.index > 0 &&
+											header.id !== "actions" ? (
+												<span className="flex justify-between gap-2 items-center w-fit">
+													{flexRender(
+														header.column.columnDef
+															.header,
+														header.getContext(),
+													)}
+													<span className="flex flex-col">
+														<RxChevronUp
+															onClick={header.column.getToggleSortingHandler()}
+															size={24}
+															className="relative top-2 text-slate-400"
+														/>
+														<RxChevronDown
+															onClick={header.column.getToggleSortingHandler()}
+															size={24}
+															className="relative -top-2"
+														/>
+													</span>
+												</span>
+											) : (
+												flexRender(
+													header.column.columnDef
+														.header,
+													header.getContext(),
+												)
+											)}
+										</th>
+									))}
+								</tr>
+							))}
+						</thead>
+						<tbody className="my-10">
+							{table.getRowModel().rows.map((row) => {
+								return (
+									<tr
+										className="px-2 odd:border-y-[1px] odd:border-slate-300"
+										key={row.id}
+									>
+										{row.getVisibleCells().map((cell) => {
+											return (
+												<td
+													className="py-4 font-semibold text-left text-[0.8rem]"
+													key={cell.id}
+												>
+													{flexRender(
+														cell.column.columnDef
+															.cell,
+														cell.getContext(),
+													)}
+												</td>
+											);
+										})}
+									</tr>
+								);
+							})}
+						</tbody>
+					</table>
+				</ScrollArea.Viewport>
+				<ScrollArea.Scrollbar
+					className="ScrollAreaScrollbar p-[2px] rounded-xl` mb-4 flex bg-slate-100 hover:bg-slate-200"
+					orientation="vertical"
+				>
+					<ScrollArea.Thumb className="relative flex-1 rounded-xl bg-slate-400" />
+				</ScrollArea.Scrollbar>
+				<ScrollArea.Scrollbar
+					className="ScrollAreaScrollbar p-[2px] rounded-xl` mb-4 flex bg-slate-100 hover:bg-slate-200 "
+					orientation="horizontal"
+				>
+					<ScrollArea.Thumb className="relative flex-1 rounded-xl bg-slate-400" />
+				</ScrollArea.Scrollbar>
+				<ScrollArea.Corner className="" />
+			</ScrollArea.Root>
 
-      <div className="h-fit mt-6 mb-16">
-        <div className="flex items-center gap-2">
-          <button
-            className="border rounded p-1"
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
-          >
-            {"<<"}
-          </button>
-          {table.getState().pagination.pageIndex + 1 < 3 && (
-            <>
-              <button
-                onClick={() =>
-                  table.setPageIndex(table.getState().pagination.pageIndex)
-                }
-              >
-                {table.getState().pagination.pageIndex + 1}
-              </button>
-              <button
-                onClick={() =>
-                  table.getCanNextPage() &&
-                  table.setPageIndex(table.getState().pagination.pageIndex + 1)
-                }
-              >
-                {table.getState().pagination.pageIndex + 2}
-              </button>
-              <button
-                onClick={() =>
-                  table.getState().pagination.pageIndex + 2 <
-                    table.getPageCount() &&
-                  table.setPageIndex(table.getState().pagination.pageIndex + 1)
-                }
-              >
-                {table.getState().pagination.pageIndex + 3}
-              </button>
-            </>
-          )}
-          {table.getState().pagination.pageIndex > 5 && (
-            <>
-              <text>...</text>
-              <button
-                onClick={() =>
-                  table.setPageIndex(table.getState().pagination.pageSize)
-                }
-              >
-                {table.getPageCount() + 1}
-              </button>
-            </>
-          )}
-          <button
-            className="border rounded p-1"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
-          >
-            {">>"}
-          </button>
-        </div>
-      </div>
-    </div>
+			<div className="h-fit mt-6 mb-16">
+				<div className="flex items-center gap-2">
+					<button
+						className="border rounded p-1"
+						onClick={() => table.setPageIndex(0)}
+						disabled={!table.getCanPreviousPage()}
+					>
+						{"<<"}
+					</button>
+					{table.getState().pagination.pageIndex + 1 < 3 && (
+						<>
+							<button
+								onClick={() =>
+									table.setPageIndex(
+										table.getState().pagination.pageIndex,
+									)
+								}
+							>
+								{table.getState().pagination.pageIndex + 1}
+							</button>
+							<button
+								onClick={() =>
+									table.getCanNextPage() &&
+									table.setPageIndex(
+										table.getState().pagination.pageIndex +
+											1,
+									)
+								}
+							>
+								{table.getState().pagination.pageIndex + 2}
+							</button>
+							<button
+								onClick={() =>
+									table.getState().pagination.pageIndex + 2 <
+										table.getPageCount() &&
+									table.setPageIndex(
+										table.getState().pagination.pageIndex +
+											1,
+									)
+								}
+							>
+								{table.getState().pagination.pageIndex + 3}
+							</button>
+						</>
+					)}
+					{table.getState().pagination.pageIndex > 5 && (
+						<>
+							<span>...</span>
+							<button
+								onClick={() =>
+									table.setPageIndex(
+										table.getState().pagination.pageSize,
+									)
+								}
+							>
+								{table.getPageCount() + 1}
+							</button>
+						</>
+					)}
+					<button
+						className="border rounded p-1"
+						onClick={() =>
+							table.setPageIndex(table.getPageCount() - 1)
+						}
+						disabled={!table.getCanNextPage()}
+					>
+						{">>"}
+					</button>
+				</div>
+			</div>
+		</div>
   );
 };
 

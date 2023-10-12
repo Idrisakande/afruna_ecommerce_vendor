@@ -101,7 +101,7 @@ export const ReportStats = () => {
 				stat_title=""
 				stat_value={0}
 				trend_direction="up"
-				trend_value={23.3}
+				trend_value={0}
 				key={"trending"}
 			/>
 			<ReportCard
@@ -125,7 +125,7 @@ export const ReportStats = () => {
 				stat_title=""
 				stat_value={0}
 				trend_direction="up"
-				trend_value={23.3}
+				trend_value={0}
 				key={"trending"}
 			/>
 			<ReportCard
@@ -149,7 +149,7 @@ export const ReportStats = () => {
 				stat_title=""
 				stat_value={0}
 				trend_direction="up"
-				trend_value={23.3}
+				trend_value={0}
 				key={"trending"}
 			/>
 		</div>
@@ -174,7 +174,7 @@ const ReportCard: FC<I_report_card> = memo(
 					{stat_title}
 				</p>
 				<h3 className={"font-medium text-sm"}>
-					{stat_value === 0 ? "$" : ""}
+					&#x20A6;
 					{stat_value.toLocaleString()}
 				</h3>
 
@@ -209,8 +209,8 @@ const ReportCard: FC<I_report_card> = memo(
 						<Line
 							strokeWidth={2}
 							dataKey={"x"}
-							dot={false}
-							type={"natural"}
+							dot={true}
+							type={"bump"}
 						/>
 					</LineChart>
 				</ResponsiveContainer>

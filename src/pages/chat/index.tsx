@@ -18,17 +18,21 @@ import { RootState } from "@/types/store.type";
 import Chat from "@/services/chat.service";
 import { T_convo, T_msg_alias } from "@/types/user.type";
 import { getChatTimeDiff } from "@/utils/chat_time_diff";
+import withAuth10 from "@/hooks/withAuth10";
+import store from "@/redux/store";
 
-export default function Index() {
+export default withAuth10(function Index() {
 	const router = useRouter();
-	const chat = router.route === "/chat" ? "Chat" : "";
 	const { convo, messages } = useSelector((state: RootState) => state.chat);
 	const { bio_data } = useSelector((state: RootState) => state.user);
 	useEffect(() => {
 		const _ = new Chat();
 	}, []);
-	const [activeChat] = useState(messages);
+	const [activeChat,setActiveChat] = useState(messages);
 	const [activeChatHeader, setActiveChatHeader] = useState<T_convo>(convo[0]);
+	useEffect(() => {
+		setActiveChat(messages);
+	},[convo])
 
 	return (
 		<Main breadcrumbs={<Breadcrumbs />}>
@@ -50,24 +54,27 @@ export default function Index() {
 					<div className="mt-1 pt-2">
 						<div className="flex flex-col gap-2 p-3 h-[45vh] overflow-x-hidden overflow-y-auto">
 							{convo
-								? convo.map((buyer) => (
+								? convo.map((user) => (
 										<UsersList
-											lastMessage={buyer.lastMessage}
+											lastMessage={user.lastMessage}
 											setActiveChat={() => {
 												const chatServices = new Chat();
 												chatServices.getMessage(
-													buyer._id,
+													user._id,
 												);
 												chatServices.getConversations();
 												
-												setActiveChatHeader(buyer);
+												const messages = store.store.getState().chat.messages;
+												setActiveChatHeader(user);
+												setActiveChat(messages);
+												// router.reload();const messages = store.store.getState().chat.messages;
 											}}
-											key={buyer._id}
-											name={buyer.alias}
-											number={buyer.unreadMessages}
+											key={user._id}
+											name={bio_data?._id ===user._id?bio_data.lastName:user.alias}
+											number={user.unreadMessages}
 											active={false}
-											img={buyer.aliasAvatar}
-											id={buyer.recipients[0]}
+											img={bio_data?._id ===user._id?bio_data.avatar:user.aliasAvatar}
+											id={user.recipients[0]}
 										/>
 								  ))
 								: null}
@@ -91,8 +98,14 @@ export default function Index() {
 										key={chat._id}
 										img={chat.from.avatar}
 										message={chat.message}
-										time={getChatTimeDiff(new Date(chat.createdAt))}
-										isOwn={chat.from._id === bio_data?._id?true:false}
+										time={getChatTimeDiff(
+											new Date(chat.createdAt),
+										)}
+										isOwn={
+											chat.from._id === bio_data?._id
+												? true
+												: false
+										}
 									/>
 								))}
 							</div>
@@ -103,4 +116,4 @@ export default function Index() {
 			</main>
 		</Main>
 	);
-}
+});

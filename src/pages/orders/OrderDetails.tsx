@@ -16,20 +16,20 @@ import { T_updated_user_order } from "@/types/user.type";
 
 const OrderDetails: FC = () => {
 	const { query } = useRouter();
-	const {viewOrder} = useSelector((state:RootState)=> state.user)
+	const {viewOrder,orderBySessionId} = useSelector((state:RootState)=> state.user)
 	const [updateStatusModelOpen, setUpdateStatusModelOpen] = useState(false);
-	const buyer_address =  useMemo(()=> {
-		if (viewOrder) {
-			const info = viewOrder as T_updated_user_order; //meas of escaping ts error
-			return info.items[0].deliveryAddress ;
-		}
-	},[viewOrder])
+	// const buyer_address =  useMemo(()=> {
+	// 	if (viewOrder) {
+	// 		const info = viewOrder as T_updated_user_order; //meas of escaping ts error
+	// 		return info.items[0].deliveryAddress ;
+	// 	}
+	// },[viewOrder])
 	
 	return (
 		<Main breadcrumbs={<Breadcrumbs />}>
 			<main className="m-7 pb-20">
 				<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:max-w-[96%] sm:mx-auto">
-					<h2 className="text-xl font-semibold">Order ID: #{viewOrder?._id}</h2>
+					<h2 className="text-xl font-semibold">Order ID:{orderBySessionId[0].customId}</h2>
 					<div className="flex justify-start sm:justify-end items-center">
 					<button
               onClick={() => setUpdateStatusModelOpen(true)}
@@ -67,7 +67,7 @@ const OrderDetails: FC = () => {
 							Shipping Address
 						</h2>
 						<p className="text-[0.85rem] font-semibold mb-1 tracking-tight max-w-[12.115rem] capitalize">
-							{buyer_address?.postCode} {buyer_address?.address} {buyer_address?.city}, {buyer_address?.state} {buyer_address?.country}.
+							{/* {buyer_address?.postCode} {buyer_address?.address} {buyer_address?.city}, {buyer_address?.state} {buyer_address?.country}. */}
 						</p>
 						{/* <span className="tracking-tight ">+234074653864</span> */}
 					</div>
@@ -85,7 +85,7 @@ const OrderDetails: FC = () => {
 					<div className="w-full max-w-[65%]">
 						<OrderDetailsTable />
 					</div>
-				{/* 	<div className="w-full max-w-[34%]">
+					{/* <div className="w-full max-w-[34%]">
 						<ScrollArea.Root className="ScrollAreaRoot w-full h-[72vh] bg-white overflow-auto rounded-xl border shadow-sm border-slate-300">
 							<ScrollArea.Viewport className="ScrollAreaViewport w-full h-full pb-6">
 								<div className="border-b pt-4 pb-3 px-6 border-slate-300 flex justify-start items-center text-lg font-semibold">
@@ -129,7 +129,7 @@ const OrderDetails: FC = () => {
 											Total Amount:
 										</h3>
 										<h3 className="text-sm text-[#777687] min-w-[50%] font-semibold">
-											$5756.95
+											&#x20A6;{orderBySessionId.reduce((acc,val)=> acc + val.total,0)}
 										</h3>
 									</div>
 								</div>

@@ -84,37 +84,37 @@ const ProductListingTable: FC = () => {
 					switch (cell.getValue()) {
 						case "Pending":
 							return (
-								<text className="flex justify-between items-center w-fit">
+								<span className="flex justify-between items-center w-fit">
 									<span className="p-1 rounded-full bg-amber-500 mr-1" />
 									<span className="text-amber-500">
 										Pending
 									</span>
-								</text>
+								</span>
 							);
 						case "Paid":
 							return (
-								<text className="flex justify-between items-center w-fit">
+								<span className="flex justify-between items-center w-fit">
 									<span className="p-1 rounded-full bg-lime-600 mr-1" />
 									<span className="text-lime-600">Paid</span>
-								</text>
+								</span>
 							);
 						case "Cancelled":
 							return (
-								<text className="flex justify-between items-center w-fit">
+								<span className="flex justify-between items-center w-fit">
 									<span className="p-1 rounded-full bg-red-500 mr-1" />
 									<span className="text-red-500">
 										Cancelled
 									</span>
-								</text>
+								</span>
 							);
 						case "Shipped":
 							return (
-								<text className="flex justify-between items-center w-fit">
+								<span className="flex justify-between items-center w-fit">
 									<span className="p-1 rounded-full bg-blue-500 mr-1" />
 									<span className="text-blue-500">
 										Shipped
 									</span>
-								</text>
+								</span>
 							);
 					}
 				},
@@ -122,7 +122,9 @@ const ProductListingTable: FC = () => {
 			}, */
 			{
 				accessorKey: "price",
-				cell: ({ cell }) => <>${cell.getValue()}</>,
+				cell: ({ cell }) => (
+					<>&#x20A6;{(cell.getValue() as number).toLocaleString()}</>
+				),
 				header: () => <span className="">Price</span>,
 			},
 			{

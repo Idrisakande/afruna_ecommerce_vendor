@@ -16,12 +16,15 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 import { RootState } from "@/types/store.type";
-import { T_updated_user_order } from "@/types/user.type";
+import { T_orderBySessionId, T_updated_user_order } from "@/types/user.type";
+import { formattedDate } from "@/utils/formatted_date";
 
 interface OrderDetailsTableProps {}
 
 export const OrderDetailsTable: FC<OrderDetailsTableProps> = ({}) => {
-	const {viewOrder} = useSelector((state:RootState)=>state.user)
+	const { viewOrder, orderBySessionId } = useSelector(
+		(state: RootState) => state.user,
+	);
 	/* const data = useMemo(()=> {
 		if (viewOrder){
 			let info = viewOrder as T_updated_user_order;
@@ -33,20 +36,20 @@ export const OrderDetailsTable: FC<OrderDetailsTableProps> = ({}) => {
 	// const [data, setData] = useState([...OrederDetailsData]);
 	const [sorting, setSorting] = useState<SortingState>([]);
 
-	const columns = useMemo<ColumnDef<IOrederDetails>[]>(
+	const columns = useMemo<ColumnDef<T_orderBySessionId>[]>(
 		() => [
 			{
-				accessorKey: "id",
-				cell: (info) => `#${info.getValue()}`,
+				accessorKey: "customId",
+				cell: (info) => `${info.getValue()}`,
 				header: () => (
 					<span className="text-sm text-[#7C7C7C]">ID</span>
 				),
 			},
 			{
-				accessorKey: "img",
-				cell: ({ cell }) => (
+				accessorKey: "productId",
+				cell: ({ row }) => (
 					<Image
-						src={cell.getValue() as string}
+						src={row.original.productId?.images[0]}
 						width={45}
 						height={45}
 						alt="order-image"
@@ -58,8 +61,8 @@ export const OrderDetailsTable: FC<OrderDetailsTableProps> = ({}) => {
 				),
 			},
 			{
-				accessorKey: "itemName",
-				cell: (cell) => cell.getValue(),
+				accessorKey: "name",
+				cell: ({ row }) => row.original.productId?.name,
 				header: () => (
 					<span className="text-sm text-[#7C7C7C]">item Name</span>
 				),
@@ -74,25 +77,25 @@ export const OrderDetailsTable: FC<OrderDetailsTableProps> = ({}) => {
 				),
 			},
 			{
-				accessorKey: "orderDate",
-				cell: (info) => info.getValue(),
+				accessorKey: "createdAt",
+				cell: (info) => formattedDate(info.getValue() as string),
 				header: () => (
 					<span className="text-sm text-[#7C7C7C]">Order Date</span>
 				),
 			},
 			{
-				accessorKey: "amount",
+				accessorKey: "total",
 				cell: (info) => info.getValue(),
 				header: () => (
 					<span className="text-sm text-[#7C7C7C]">Amount</span>
 				),
 			},
 		],
-		[]
+		[],
 	);
 
 	const table = useReactTable({
-		data:OrederDetailsData,
+		data:orderBySessionId,
 		columns,
 		state: {
 			rowSelection,
@@ -124,7 +127,7 @@ export const OrderDetailsTable: FC<OrderDetailsTableProps> = ({}) => {
 										{header &&
 											flexRender(
 												header.column.columnDef.header,
-												header.getContext()
+												header.getContext(),
 											)}
 									</th>
 								))}
@@ -146,7 +149,7 @@ export const OrderDetailsTable: FC<OrderDetailsTableProps> = ({}) => {
 											>
 												{flexRender(
 													cell.column.columnDef.cell,
-													cell.getContext()
+													cell.getContext(),
 												)}
 											</td>
 										);
@@ -173,29 +176,22 @@ export const OrderDetailsTable: FC<OrderDetailsTableProps> = ({}) => {
 							</h3>
 						</div>
 						<div className="flex flex-col gap-5 min-w-[50%] justify-start">
-							<span className="text-sm text-[#777687] font-semibold">
-								$2892.15
-							</span>
-							<span className="text-sm text-[#777687] font-semibold">
-								$235.15
-							</span>
-							<span className="text-sm text-[#777687] font-semibold">
-								$28.15
-							</span>
-							<span className="text-sm text-[#777687] font-semibold">
-								$2.15
-							</span>
+							{orderBySessionId.map((order,key) => (
+								<span key={key} className="text-sm text-[#777687] font-semibold">
+									&#x20A6;{order.total}
+								</span>
+							))}
 						</div>
 					</div>
 					<div className="max-w-[20rem] mt-6 pt-8 w-full border-t border-slate-300 gap-10 flex justify-between items-center">
 						<div className="flex flex-col min-w-[50%] gap-5 justify-start">
 							<h3 className="text-sm text-[#777687] font-semibold">
-								Total (USD):
+								Total (NGN):
 							</h3>
 						</div>
 						<div className="flex flex-col gap-5 min-w-[50%] justify-start">
 							<span className="text-sm text-[#777687] font-semibold">
-								$2892.15
+								&#x20A6;{orderBySessionId.reduce((acc,val)=>acc+val.total,0)}
 							</span>
 						</div>
 					</div>

@@ -28,8 +28,8 @@ export interface IProduct {
 	images: string[];
 	color: string;
 	coverPhoto: string;
-	size: "sm" | "md" | "lg" | "xl";
-	condition: "New" | "90% New" | "Refurbished";
+	size: string;
+	condition: string;
 	brand: string;
 	metaData: string[];
 	deliveryLocations: string[];

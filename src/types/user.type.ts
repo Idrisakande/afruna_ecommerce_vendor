@@ -10,9 +10,31 @@ export type T_InitialUserState = {
 		monthly: [];
 		yearly: [];
 	};
-	orders: T_order[] | T_user_order[] | T_updated_user_order[];
+	orders: T_order[];
+	orderBySessionId: T_orderBySessionId[];
 	reports: T_reports | undefined;
 	viewOrder: T_order | T_user_order | T_updated_user_order | undefined;
+};
+export type T_orderBySessionId = {
+	_id: string;
+	vendorId: string;
+	productId: {
+		_id: string;
+		name: string;
+		images: string[
+			
+		];
+	};
+	sessionId: string;
+	isPaid: boolean;
+	quantity: number;
+	total: number;
+	deliveryStatus: string;
+	isCanceled: boolean;
+	options: any[];
+	createdAt: string;
+	updatedAt: string;
+	customId: string;
 };
 export type T_User =
 	| {
@@ -42,11 +64,11 @@ export type T_review = {
 	_id: string;
 	productId: string;
 	userId: {
-		_id: string,
-		firstName: string,
-		lastName: string,
-		avatar: string
-	},
+		_id: string;
+		firstName: string;
+		lastName: string;
+		avatar: string;
+	};
 	comment: string;
 	createdAt: string;
 	rating: number;
@@ -78,23 +100,21 @@ export type T_user_order = {
 export type T_order = {
 	_id: string;
 	vendorId: string;
-	productId: string;
+	productId: {
+		_id: string;
+		name: string;
+		images: string[];
+	};
 	sessionId: string;
 	isPaid: boolean;
 	quantity: number;
 	total: number;
 	deliveryStatus: string;
 	isCanceled: boolean;
+	options: any[];
 	createdAt: string;
 	updatedAt: string;
 	customId: string;
-	deliveryAddress: {
-		address: string;
-		postCode: string;
-		city: string;
-		state: string;
-		country: string;
-	};
 };
 export type T_updated_order = {
 	_id: string;
@@ -129,8 +149,6 @@ export type T_reports = {
 	visitors: number;
 };
 
-
-
 export type T_convo = {
 	_id: string;
 	recipients: string[];
@@ -159,7 +177,7 @@ export type T_msg_alias = {
 	firstName: string;
 	lastName: string;
 	phoneNumber: string;
-	country:string;
+	country: string;
 	email: string;
 	password: string;
 	role: string;
@@ -169,4 +187,4 @@ export type T_msg_alias = {
 	createdAt: string;
 	updatedAt: string;
 	avatar: string;
-}
+};

@@ -77,8 +77,8 @@ export const InvoiceTable: FC<InvoiceTableProps> = ({}) => {
 			{
 				accessorKey: "amount",
 				cell: (info) => {
-					const amount = `#${info.getValue()}`;
-					return <p className="pr-16">{amount}</p>;
+					const amount = `${info.getValue()}`;
+					return <p className="pr-16">&#x20A6;{amount}</p>;
 				},
 				header: () => (
 					<span className="text-sm text-[#7C7C7C]">Amount</span>
@@ -122,7 +122,7 @@ export const InvoiceTable: FC<InvoiceTableProps> = ({}) => {
 									{header &&
 										flexRender(
 											header.column.columnDef.header,
-											header.getContext()
+											header.getContext(),
 										)}
 								</th>
 							))}
@@ -144,7 +144,7 @@ export const InvoiceTable: FC<InvoiceTableProps> = ({}) => {
 										>
 											{flexRender(
 												cell.column.columnDef.cell,
-												cell.getContext()
+												cell.getContext(),
 											)}
 										</td>
 									);
@@ -172,28 +172,28 @@ export const InvoiceTable: FC<InvoiceTableProps> = ({}) => {
 					</div>
 					<div className="flex flex-col gap-5 min-w-[50%] justify-start">
 						<span className="text-sm text-[#777687] font-semibold">
-							$2892.15
+							&#x20A6;2892.15
 						</span>
 						<span className="text-sm text-[#777687] font-semibold">
-							$235.15
+							&#x20A6;235.15
 						</span>
 						<span className="text-sm text-[#777687] font-semibold">
-							$28.15
+							&#x20A6;28.15
 						</span>
 						<span className="text-sm text-[#777687] font-semibold">
-							$2.15
+							&#x20A6;2.15
 						</span>
 					</div>
 				</div>
 				<div className="max-w-[23rem] mt-6 pt-8 w-full border-t border-slate-300 gap-10 flex justify-between items-center">
 					<div className="flex flex-col min-w-[50%] gap-5 justify-start">
 						<h3 className="text-sm text-[#777687] font-semibold">
-							Total (USD):
+							Total (NGN):
 						</h3>
 					</div>
 					<div className="flex flex-col gap-5 min-w-[50%] justify-start">
 						<span className="text-sm text-[#777687] font-semibold">
-							$2892.15
+							&#x20A6;2892.15
 						</span>
 					</div>
 				</div>

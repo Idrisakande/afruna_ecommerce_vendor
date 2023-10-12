@@ -18,9 +18,7 @@ class Products {
 		this.getCategories().then(
 			() => opt?.setIsloading && opt.setIsloading(false),
 		);
-		this.getProducts().then(
-			() => opt?.setIsloading && opt.setIsloading(false),
-		);
+		this.getProducts();
 	}
 	async createProduct(product: IProduct, opt: T_app_provider) {
 		const { setIsloading } = opt;
@@ -32,6 +30,7 @@ class Products {
 				},
 			});
 			toast.success("Product successfully created!");
+			this.getProducts();
 			return data;
 		} catch (error) {
 			handleAuthErrors(error as AxiosError<T_error_response>);

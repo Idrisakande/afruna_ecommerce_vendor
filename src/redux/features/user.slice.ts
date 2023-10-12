@@ -2,6 +2,7 @@ import {
 	T_InitialUserState,
 	T_User,
 	T_order,
+	T_orderBySessionId,
 	T_reports,
 	T_review,
 	T_updated_order,
@@ -25,6 +26,7 @@ const User = createSlice({
 			yearly: [],
 		},
 		orders: [],
+		orderBySessionId:[],
 		reports: undefined,
 		viewOrder: undefined
 	} as T_InitialUserState,
@@ -57,8 +59,12 @@ const User = createSlice({
 		updateYealyRevenueVsOrder(state, action: PayloadAction<[]>) {
 			state.revenue_vs_order.yearly = action.payload;
 		},
-		updateOrder(state, action: PayloadAction<T_order[] | T_user_order[]>) {
+		updateOrder(state, action: PayloadAction<T_order[]>) {
 			state.orders = action.payload;
+		},
+		updateOrderBySessionId(state, action: PayloadAction<T_orderBySessionId[]>) {
+			state.orderBySessionId = action.payload;
+			
 		},
 		updateReports(state, action: PayloadAction<T_reports>) {
 			state.reports = action.payload;
@@ -80,6 +86,7 @@ export const {
 	updateWeeklyRevenueVsOrder,
 	updateYealyRevenueVsOrder,
 	updateOrder,
+	updateOrderBySessionId,
 	updateReports,
 	setViewOrderData
 } = User.actions;

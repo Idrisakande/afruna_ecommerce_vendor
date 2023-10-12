@@ -85,7 +85,7 @@ const OrderInvoice: FC<OrderInvoiceProps> = ({}) => {
 									Total Amount
 								</h1>
 								<p className="text-[#0C0E3B] font-semibold ">
-									$3740.99
+									&#x20A6;3740.99
 								</p>
 							</div>
 						</div>

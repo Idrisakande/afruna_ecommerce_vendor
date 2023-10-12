@@ -240,13 +240,13 @@ export const CreateProduct: FC<{}> = memo(({}) => {
 							multiple
 						>
 							<div className="relative flex flex-col items-center text-slate-900">
-								<text className="relative">
+								<span className="relative">
 									<MdImage size={43} />
 									<MdAdd
 										size={18}
 										className="font-bold absolute top-[29px] left-[29px] bg-white rounded-full"
 									/>
-								</text>
+								</span>
 								<button className="my-2 p-2 rounded-[5px] bg-gradient-whitishblue text-white text-[12px] text-xs">
 									Select Photo
 								</button>
@@ -381,7 +381,7 @@ export const CreateProduct: FC<{}> = memo(({}) => {
 							getValue={(val) =>
 								setPrice(val as unknown as number)
 							}
-							headerTitle="Price (in USD)"
+							headerTitle="Price (in NGN)"
 							placeholder="0"
 							prefix
 							suffix

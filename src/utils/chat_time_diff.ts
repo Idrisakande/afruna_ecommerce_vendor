@@ -1,23 +1,29 @@
 export function getChatTimeDiff(createdAt: Date): string {
-    const now = new Date();
-    const timeDifference = now.getTime() - createdAt.getTime();
-    const seconds = Math.floor(timeDifference / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-  
-    switch (true) {
-      case days > 1:
-        return `${days} days ago`;
-      case days === 1:
-        return 'yesterday';
-      case hours > 1:
-        return `${hours} hours ago`;
-      case minutes > 1:
-        return `${minutes} minutes ago`;
-      default:
-        return `${seconds} seconds ago`;
-    }
-  }
-  
-  
+	const now = new Date();
+	const timeDifference = now.getTime() - createdAt.getTime();
+	const seconds = Math.floor(timeDifference / 1000);
+
+	if (seconds < 60) {
+		return `${seconds} s`;
+	}
+
+	const minutes = Math.floor(seconds / 60);
+
+	if (minutes < 60) {
+		return `${minutes}m`;
+	}
+
+	const hours = Math.floor(minutes / 60);
+
+	if (hours < 24) {
+		return `${hours}h`;
+	}
+
+	const days = Math.floor(hours / 24);
+
+	if (days < 7) {
+		return `${days}d`;
+	}
+
+	return createdAt.toDateString();
+}

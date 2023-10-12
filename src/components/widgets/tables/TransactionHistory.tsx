@@ -32,30 +32,30 @@ const TransactionHistory: FC<TransactionHistoryType> = () => {
 					switch (info.getValue()) {
 						case "Credited":
 							return (
-								<text className="flex justify-between items-center w-fit">
+								<span className="flex justify-between items-center w-fit">
 									<span className="p-1 rounded-full bg-lime-600 mr-1" />
 									<span className="text-lime-600">
 										Credited
 									</span>
-								</text>
+								</span>
 							);
 						case "Withdrawal":
 							return (
-								<text className="flex justify-between items-center w-fit">
+								<span className="flex justify-between items-center w-fit">
 									<span className="p-1 rounded-full bg-red-500 mr-1" />
 									<span className="text-red-500">
 										withdrawal
 									</span>
-								</text>
+								</span>
 							);
 						case "Listing fee":
 							return (
-								<text className="flex justify-between items-center w-fit">
+								<span className="flex justify-between items-center w-fit">
 									<span className="p-1 rounded-full bg-green-500 mr-1" />
 									<span className="text-green-500">
 										Listing fee
 									</span>
-								</text>
+								</span>
 							);
 					}
 				},
@@ -74,7 +74,7 @@ const TransactionHistory: FC<TransactionHistoryType> = () => {
 			{
 				accessorKey: "amount",
 				cell: ({ getValue }) => (
-					<>${(getValue() as number).toLocaleString()}</>
+					<>&#x20A6;{(getValue() as number).toLocaleString()}</>
 				),
 				header: () => <span>Amount</span>,
 			},
@@ -95,7 +95,9 @@ const TransactionHistory: FC<TransactionHistoryType> = () => {
 							<button
 								onClick={() =>
 									setData(
-										data.filter((_, id) => row.index !== id)
+										data.filter(
+											(_, id) => row.index !== id,
+										),
 									)
 								}
 								className={
@@ -109,7 +111,7 @@ const TransactionHistory: FC<TransactionHistoryType> = () => {
 				},
 			},
 		],
-		[data]
+		[data],
 	);
 	const table = useReactTable({
 		data,
@@ -135,16 +137,16 @@ const TransactionHistory: FC<TransactionHistoryType> = () => {
 								>
 									{header.index > 1 &&
 									header.id !== "actions" ? (
-										<text className="flex justify-between items-center w-fit">
+										<span className="flex justify-between items-center w-fit">
 											{flexRender(
 												header.column.columnDef.header,
-												header.getContext()
+												header.getContext(),
 											)}
-										</text>
+										</span>
 									) : (
 										flexRender(
 											header.column.columnDef.header,
-											header.getContext()
+											header.getContext(),
 										)
 									)}
 								</th>
@@ -166,7 +168,7 @@ const TransactionHistory: FC<TransactionHistoryType> = () => {
 									>
 										{flexRender(
 											cell.column.columnDef.cell,
-											cell.getContext()
+											cell.getContext(),
 										)}
 									</td>
 								);

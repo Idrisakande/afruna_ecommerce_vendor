@@ -128,7 +128,7 @@ export const EditModal: FC<EditModalProps> = ({
 			EditModel={EditModel}
 		>
 			{/* <div className=""> */}
-            {/* <div>texting</div> */}
+			{/* <div>texting</div> */}
 			<ScrollArea.Root className="ScrollAreaRoot px-6 w-full h-[81vh] overflow-hidden grow">
 				<ScrollArea.Viewport className="ScrollAreaViewport w-full h-full grow">
 					<div className=" bg-white w-full flex flex-col pb-10 gap-6 justify-start px-8 items-start">
@@ -212,7 +212,7 @@ export const EditModal: FC<EditModalProps> = ({
 								getValue={(val) =>
 									setPrice(val as unknown as number)
 								}
-								headerTitle="Price (in USD)"
+								headerTitle="Price (in NGN)"
 								placeholder="0"
 								prefix
 								suffix
@@ -259,8 +259,8 @@ export const EditModal: FC<EditModalProps> = ({
 								placeholder="Select brand"
 							/>
                             </div> */}
-							
-                            {/* <InputLabelNumber
+
+							{/* <InputLabelNumber
 								getValue={(val) =>
 									setQuantity(val as unknown as number)
 								}
@@ -319,7 +319,7 @@ export const EditModal: FC<EditModalProps> = ({
 				</ScrollArea.Scrollbar>
 				<ScrollArea.Corner className="bg-slate-100 hover:bg-slate-200" />
 			</ScrollArea.Root>
-            {/* </div> */}
+			{/* </div> */}
 		</Model>
 	);
 };

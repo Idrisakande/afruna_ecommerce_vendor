@@ -40,8 +40,10 @@ export const ProductItem: FC<IProductItem> = memo(
 					<Image src={item_img} alt={"ProductImage_"} width={100} />
 					<div className="flex self-start w-full items-center justify-between">
 						<p>
-							${price}
-							<s className="text-afruna-gray/30">${slashed_price}</s>
+							&#x20A6;{price}
+							<s className="text-afruna-gray/30">
+								&#x20A6;{slashed_price}
+							</s>
 						</p>
 						<span className="space-x-1 flex items-center">
 							{rating}
@@ -114,8 +116,10 @@ export const ProductItem: FC<IProductItem> = memo(
 					</div>
 				</header>
 				<footer className="flex mt-auto justify-between items-center space-y-2 p-1">
-					<span>${price}</span>
-					<s className="text-afruna-gray/30">${slashed_price}</s>
+					<span>&#x20A6;{price}</span>
+					<s className="text-afruna-gray/30">
+						&#x20A6;{slashed_price}
+					</s>
 				</footer>
 			</div>
 		);

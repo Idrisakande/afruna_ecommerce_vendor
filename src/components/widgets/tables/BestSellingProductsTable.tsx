@@ -16,23 +16,31 @@ import Image, { StaticImageData } from "next/image";
 import { IBestSellingProduct } from "@/interfaces/IBestSellingProduct";
 import { images } from "@/constants/images";
 import { products } from "@/constants/data";
+import { useSelector } from "react-redux";
+import { RootState } from "@/types/store.type";
+import { IProduct } from "@/interfaces/IProductItem";
+import { ResultsFallback } from "../ResultsFallback";
 
 export const BestSellingProductsTable = () => {
-	const [data, setData] = useState<IBestSellingProduct[]>(products);
-	const columns = useMemo<ColumnDef<IBestSellingProduct>[]>(
+	const {products } = useSelector((state: RootState) => state.products);
+	const [data, setData] = useState(products);
+	const columns = useMemo<ColumnDef<IProduct>[]>(
 		() => [
 			{
-				accessorKey: "id",
+				accessorKey: "customId",
 				header: () => <>Product Id</>,
 				cell: ({ getValue }) => <># {getValue()}</>,
 			},
 			{
-				accessorKey: "image",
+				accessorKey: "images",
 				header: () => <>Image</>,
-				cell: ({ getValue }) => (
+				cell: ({ row }) => (
 					<Image
+						priority
+						width={40}
+						height={40}
 						className="w-10"
-						src={getValue() as StaticImageData}
+						src={row.original.coverPhoto[0]??images.afruna_logo}
 						alt="product_iamge"
 					/>
 				),
@@ -46,25 +54,28 @@ export const BestSellingProductsTable = () => {
 				accessorKey: "price",
 				header: () => <>Price</>,
 				cell: ({ getValue }) => (
-					<>$ {(getValue() as number).toLocaleString("en-US")}</>
+					<>
+						&#x20A6;{" "}
+						{(getValue() as number).toLocaleString("en-US")}
+					</>
 				),
 			},
 			{
-				accessorKey: "total_sales",
+				accessorKey: "sold",
 				header: () => <>Total Sales</>,
 				cell: ({ getValue }) => (
 					<>{(getValue() as number).toLocaleString("en-US")}</>
 				),
 			},
 			{
-				accessorKey: "stock",
+				accessorKey: "quantity",
 				header: () => <>Stock</>,
 				cell: ({ getValue }) => (
 					<>{(getValue() as number).toLocaleString("en-US")}</>
 				),
 			},
 			{
-				accessorKey: "status",
+				accessorKey: "vendorId",
 				header: () => <>Status</>,
 				cell: ({ getValue }) => (
 					<div
@@ -104,7 +115,9 @@ export const BestSellingProductsTable = () => {
 							<button
 								onClick={() =>
 									setData(
-										data.filter((_, id) => row.index !== id)
+										data.filter(
+											(_, id) => row.index !== id,
+										),
 									)
 								}
 								className={
@@ -118,7 +131,7 @@ export const BestSellingProductsTable = () => {
 				},
 			},
 		],
-		[data]
+		[data],
 	);
 
 	const table = useReactTable({
@@ -205,9 +218,7 @@ export const BestSellingProductsTable = () => {
 					</tbody>
 				</table>
 			) : (
-				<div className="p-10 flex justify-center items-center">
-					<Image src={images.noResult} alt="NOT_FOUND" />
-				</div>
+				<ResultsFallback/>
 			)}
 		</Content>
 	);

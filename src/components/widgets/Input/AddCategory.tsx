@@ -67,13 +67,13 @@ export const AddCategory: FC<AddCategoryProps> = ({ isOpen, onClose }) => {
 								multiple
 							>
 								<div className="relative flex flex-col max-w-[20rem] items-center text-slate-900">
-									<text className="relative">
+									<span className="relative">
 										<MdImage size={43} />
 										<GoPlus
 											size={18}
 											className="font-bold absolute top-[29px] left-[29px] bg-white rounded-full"
 										/>
-									</text>
+									</span>
 									<button className="my-2 p-2 rounded-[5px] bg-gradient-whitishblue text-white text-sm">
 										Select Photo
 									</button>

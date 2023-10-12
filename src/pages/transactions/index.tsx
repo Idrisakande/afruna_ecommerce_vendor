@@ -219,9 +219,10 @@ const MiddleComponent: FC<{ value: number; title: string; afc?: boolean }> = ({
 	<div className="space-y-2">
 		<h1 className={"text-afruna-text/70 text-[14px]"}>{title}</h1>
 		<p className="text-xl font-semibold">
+			&#x20A6;
 			{afc
 				? `${value.toLocaleString()} AFC`
-				: `$${value.toLocaleString()}`}
+				: `${value.toLocaleString()}`}
 		</p>
 	</div>
 );

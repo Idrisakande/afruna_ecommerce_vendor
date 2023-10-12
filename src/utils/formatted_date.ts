@@ -1,5 +1,5 @@
 export const formattedDate = (date: string) => {
-	const currentDate = new Date();
+	const currentDate = new Date(date);
 	return new Intl.DateTimeFormat("en-US", {
 		month: "short",
 		day: "2-digit",

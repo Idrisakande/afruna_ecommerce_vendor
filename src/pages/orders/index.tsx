@@ -1,4 +1,4 @@
-import { memo, useCallback, useContext, useState } from "react";
+import { memo, useCallback, useContext, useEffect, useState } from "react";
 
 import {
 	IOrderContext,
@@ -6,9 +6,13 @@ import {
 	OrdersProvider,
 } from "@/contexts/OrdersProvider";
 import { OrderTable } from "@/components/widgets/tables/OrderTable";
+import Order from "@/services/order.service";
 // import { IOrederContext } from "@/interfaces/tables.interface";
 
 export default function Index() {
+	useEffect(() => {
+		const ordersServices = new Order();
+	},[])
 	return (
 		<OrdersProvider>
 			<main className="m-6 pb-20">

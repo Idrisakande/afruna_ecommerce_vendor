@@ -84,7 +84,7 @@ export const ProductList: FC<{}> = memo(({}) => {
 								((
 									item.price -
 									(item.discount / 100) * item.price
-								).toFixed(2) as unknown as number):(item.price)
+								).toLocaleString() as unknown as number):(item.price.toLocaleString()as unknown as number)
 							}
 							rated={item.ratedBy}
 							slashed_price={item.discount?item.price:0}

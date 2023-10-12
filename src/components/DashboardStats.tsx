@@ -6,10 +6,10 @@ import { T_DashboardStats } from "@/types/user.type";
 export const DashboardStats = memo(({listedProducts,canceledOrders,shippedOrders,totalOrders}:T_DashboardStats) => (
   <div className="grid grid-cols-4 gap-2 md:gap-4 my-10 snap-mandatory snap-y snap-center">
     {[
-      { title: "Listed Products", value: listedProducts },
-      { title: "Total Orders", value: totalOrders },
-      { title: "Shipped Orders", value: shippedOrders },
-      { title: "Cancelled Orders", value: canceledOrders },
+      { title: "Listed Products", value: listedProducts??0 },
+      { title: "Total Orders", value: totalOrders??0 },
+      { title: "Shipped Orders", value: shippedOrders??0 },
+      { title: "Cancelled Orders", value: canceledOrders??0 },
     ].map(({ title, value }, idx) => (
       <div
         key={idx}

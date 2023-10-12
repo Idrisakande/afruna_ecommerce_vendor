@@ -92,7 +92,7 @@ class Auth10 {
 	}
 	async googlesignin() {
 		try {
-			const { data } = await axios.get("/api/oAuthUrls");
+			const { data } = await axios.get("/api/oAuthUrls?url=localhost:3000");
 			const {
 				data: { googleLoginUrl },
 			} = data;

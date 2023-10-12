@@ -19,7 +19,7 @@ export function createPaginationWithCustomType<T>() {
 		const canGoBackward = !table.getCanPreviousPage();
 		const canGoForward = !table.getCanNextPage(); //if true negate it to avoid the disable-btn-atribut from be active so when it false it the btn becomes disable
 		return (
-			<div className="h-fit mt-2 absolute right-0 pb-20">
+			<div className="h-fit mt-2 absolute bottom-0 right-0 pb-10">
 				<div className="flex text-md text-afruna-blue items-center gap-2">
 					<button
 						className="w-7 h-7 bg-white rounded p-1"
@@ -37,6 +37,39 @@ export function createPaginationWithCustomType<T>() {
 					</button>
 					{pageCount > 3 && (
 						<>
+							<button
+								onClick={() =>
+									table.setPageIndex(pageIndex + 1)
+								}
+								className={`w-7 h-7 text-sm bg-white rounded p-1 ${
+									pageIndex === pageIndex + 1 &&
+									"bg-blue-950 text-white"
+								}`}
+							>
+								{pageIndex + 1}
+							</button>
+							<button
+								onClick={() =>
+									table.setPageIndex(pageIndex + 2)
+								}
+								className={`w-7 h-7 text-sm bg-white rounded p-1 ${
+									pageIndex === pageIndex + 2 &&
+									"bg-blue-950 text-white"
+								}`}
+							>
+								{pageIndex + 2}
+							</button>
+							<button
+								onClick={() =>
+									table.setPageIndex(pageIndex + 3)
+								}
+								className={`w-7 h-7 text-sm bg-white rounded p-1 ${
+									pageIndex === pageIndex + 3 &&
+									"bg-blue-950 text-white"
+								}`}
+							>
+								{pageIndex + 3}
+							</button>
 							<span
 								className={`w-7 h-7 text-sm bg-white rounded p-1`}
 							>
@@ -55,7 +88,7 @@ export function createPaginationWithCustomType<T>() {
 							</button>
 						</>
 					)}
-					{pageCount === 3 && (
+					{pageCount > 1 && (
 						<>
 							<button
 								onClick={() => table.setPageIndex(0)}
