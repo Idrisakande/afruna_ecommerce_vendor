@@ -1,7 +1,14 @@
 /* eslint-disable import/no-anonymous-default-export */
 /* eslint-disable react/display-name */
 import Image from "next/image";
-import { ReactNode, useContext, useEffect, useMemo, useState } from "react";
+import {
+	ReactNode,
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useState,
+} from "react";
 import { images } from "@/constants/images";
 import { ProductProvider, productcontext } from "@/contexts/ProductProvider";
 import { IProductContext } from "@/interfaces/IProductContext";
@@ -12,6 +19,9 @@ import { T_product_reviews } from "@/components/products/ProductReviews";
 import { FaCheck, FaDotCircle } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { RootState } from "@/types/store.type";
+import { IProduct } from "@/interfaces/IProductItem";
+import Products from "@/services/products.service";
+import store from "@/redux/store";
 
 const messages = [
 	{
@@ -39,69 +49,86 @@ const messages = [
 ];
 
 export default function () {
-    const RenderStatus = (): ReactNode => {
-        let render: JSX.Element;
-        switch (query.status) {
-            case "Rejected":
-                render = (
-                    <p
-                        className={
-                            "flex text-[12px] space-x-2 items-center  text-red-500/70"
-                        }
-                    >
-                        <MdCancel />
-                        <span>{query.status}</span>
-                    </p>
-                );
-                break;
-            case "Delivered":
-                render = (
-                    <p
-                        className={
-                            "flex text-[12px] space-x-2 items-center  text-green-500/70"
-                        }
-                    >
-                        <FaCheck />
-                        <span>{query.status}</span>
-                    </p>
-                );
-                break;
-            default:
-                render = (
-                    <p
-                        className={
-                            "flex space-x-2 text-[12px] items-center text-slate-500/70"
-                        }
-                    >
-                        <FaDotCircle />
-                        <span>{query.status}</span>
-                    </p>
-                );
-                break;
-        }
-        return render;
-    };
-    const [reply, setReply] = useState(false);
+	const RenderStatus = (): ReactNode => {
+		let render: JSX.Element;
+		switch (query.status) {
+			case "Rejected":
+				render = (
+					<p
+						className={
+							"flex text-[12px] space-x-2 items-center  text-red-500/70"
+						}
+					>
+						<MdCancel />
+						<span>{query.status}</span>
+					</p>
+				);
+				break;
+			case "Delivered":
+				render = (
+					<p
+						className={
+							"flex text-[12px] space-x-2 items-center  text-green-500/70"
+						}
+					>
+						<FaCheck />
+						<span>{query.status}</span>
+					</p>
+				);
+				break;
+			default:
+				render = (
+					<p
+						className={
+							"flex space-x-2 text-[12px] items-center text-slate-500/70"
+						}
+					>
+						<FaDotCircle />
+						<span>{query.status}</span>
+					</p>
+				);
+				break;
+		}
+		return render;
+	};
+	const [reply, setReply] = useState(false);
 	useEffect(() => {
-        const hiddenBTN = document.querySelector(
-            "button.bg-gradient-y-deepblue",
-            ) as HTMLButtonElement;
-            hiddenBTN.style.display = "none";
-        }, []);
-        const { query } = useRouter();
-    const { reviews,reviewers } = useSelector((state: RootState) => state.user);
+		const hiddenBTN = document.querySelector(
+			"button.bg-gradient-y-deepblue",
+		) as HTMLButtonElement;
+		hiddenBTN.style.display = "none";
+	}, []);
+	const { query } = useRouter();
+	const { reviews, reviewers } = useSelector(
+		(state: RootState) => state.user,
+	);
 
-    const match_reviews =  useMemo(()=> reviews?.filter(review=> review.productId === query.productId),[reviews, query.productId])
-    const with_bio_reviews = useMemo(() => {
-        const compile = [];
-        if (match_reviews?.length && reviewers?.length)
-            for (let match of match_reviews) {
-                for (let reviewer of reviewers) {
-                    match.userId._id === reviewer._id && compile.push({...match, email:reviewer.email, fullName: `${reviewer.firstName} ${reviewer.lastName}`, avatar:reviewer.avatar})
-                }
-            }
-        return compile
-    }, [reviewers, match_reviews]);
+	const match_reviews = useMemo(
+		() => reviews?.filter((review) => review.productId === query.id),
+		[reviews, query.productId],
+	);
+	const with_bio_reviews = useMemo(() => {
+		const compile = [];
+		if (match_reviews?.length && reviewers?.length)
+			for (let match of match_reviews) {
+				for (let reviewer of reviewers) {
+					match.userId._id === reviewer._id &&
+						compile.push({
+							...match,
+							email: reviewer.email,
+							fullName: `${reviewer.firstName} ${reviewer.lastName}`,
+							avatar: reviewer.avatar,
+						});
+				}
+			}
+		return compile;
+	}, [reviewers, match_reviews]);
+	const [product, setProduct] = useState<IProduct>();
+	useEffect(() => {
+		const { products } = store.store.getState().products;
+		const product = products.find((product) => product._id === query.id);
+		setProduct(product);
+	}, [query, store.store]);
 
 	return (
 		<ProductProvider>
@@ -110,15 +137,25 @@ export default function () {
 					<Image
 						height={40}
 						width={40}
-						src={query?.coverPhoto as string}
+						src={product?.coverPhoto[0]as string}
 						alt="productImage"
-						className="md:grid-span-1 h-44 w-44"
+						className="md:grid-span-1 border border-afruna-blue p-4 h-32 w-32"
 					/>
-					<div className="md:grid-span-3">
-						<p className=" text-afruna-gold/70"># {query?._id}</p>
-						<p className="text-afruna-blue/70">{query?.productName}</p>
-						<p className=										"text-afruna-gray/40 font-thin text-[10px]">{query?.categoryName}</p>
-						<RenderStatus />
+					<div className="md:grid-span-1 -ml-24 space-y-2">
+						<p className=" text-afruna-gold/70 text-lg">{product?.customId }</p>
+						<p className="text-afruna-blue text-lg">
+							{product?.name}
+						</p>
+						<p className="text-afruna-gray/70 leading-tight font-thin text-[12px]">
+							Brand: {product?.brand}
+						</p>
+						<p className="text-afruna-gray leading-tight font-thin text-[12px]">
+							Price: &#x20A6; {product?.price.toLocaleString()}
+						</p>
+						<p className="text-afruna-gray leading-tight font-thin text-[12px]">
+							Discount: {product?.discount.toFixed(2)} %
+						</p>
+						{/* <RenderStatus /> */}
 					</div>
 				</section>
 				<div className="messages grid grid-cols-6">
@@ -128,15 +165,17 @@ export default function () {
 							className="md:col-span-3 bg-slate-200/40 rounded-md p-2 m-2 h-32"
 						>
 							<section className="flex mb-3">
-                                <Image
-                                    height={40}
-                                    width={40}
-									src={review.avatar??images.afruna_logo}
+								<Image
+									height={40}
+									width={40}
+									src={review.avatar ?? images.afruna_logo}
 									alt="userImage"
 									className="h-10 w-10 object-center rounded-full"
 								/>
 								<div className="ml-2">
-									<p className="capitalize">{review.fullName}</p>
+									<p className="capitalize">
+										{review.fullName}
+									</p>
 									<p
 										className={
 											"flex space-x-[1px] items-center"
@@ -155,7 +194,11 @@ export default function () {
 												/>
 											))}
 									</p>
-									<p>{new Date(review.createdAt).toUTCString()}</p>
+									<p>
+										{new Date(
+											review.createdAt,
+										).toUTCString()}
+									</p>
 								</div>
 							</section>
 							<div>

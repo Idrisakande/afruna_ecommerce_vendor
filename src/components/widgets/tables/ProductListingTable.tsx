@@ -132,7 +132,7 @@ const ProductListingTable: FC = () => {
 				cell: ({ row }) => (
 					<div className="flex justify-start gap-3 items-center">
 						<Link
-							href={"/orders/details"}
+							href={"/products/"+row.original._id}
 							className="hover:scale-90 border-none transition duration-300"
 						>
 							<MdRemoveRedEye size={24} />
