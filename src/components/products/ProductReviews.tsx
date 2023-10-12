@@ -186,7 +186,7 @@ export const ProductReviews: FC<{}> = memo(({}) => {
 							<div className="md:col-span-1">
 								<button
 									onClick={() =>
-										router.push({pathname:"/products/" + review._id,query:review})}
+										router.push({pathname:"/products/" + review._id,query:review as unknown as string})}
 									className={
 										"text-afruna-gold/70 block tracking-tight font-semibold"
 									}

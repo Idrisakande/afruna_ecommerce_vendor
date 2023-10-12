@@ -25,7 +25,7 @@ class User {
 			 */
 			const product_reviews = [];
 			const reviews: T_review[] = [];
-			// const recent_reviewers = [];
+			const recent_reviewers = [];
 			const reviewers = [];
 			for (let i in products) {
 				const data = await this.getReveiwsByProductId(products[i]._id);
@@ -37,19 +37,19 @@ class User {
 				reviews.push(...product_reviews[i]); //extracting all child items for every iteration
 			}
 			const recent = recent_itemsUtil(reviews, 7) as T_review[]; //get the most recent last 7 days;
-			// for (let i in recent) {
-			// 	const uuid = recent[i].userId; //get recents user data base on the reviews;
-			// 	const user = await this.getUserById(uuid);
-			// 	recent_reviewers.push(user);
-			// }
-			// for (let i in reviews) {
-			// 	const uuid = reviews[i].userId;
-			// 	const user = await this.getUserById(uuid);
-			// 	reviewers.push(user);
-			// }
+			for (let i in recent) {
+				const uuid = recent[i].userId; //get recents user data base on the reviews;
+				const user = await this.getUserById(uuid._id);
+				recent_reviewers.push(user);
+			}
+			for (let i in reviews) {
+				const uuid = reviews[i].userId;
+				const user = await this.getUserById(uuid._id);
+				reviewers.push(user);
+			}
 
-			// this.store.dispatch(updateReviewers(reviewers));
-			// this.store.dispatch(updateRecentReviewers(recent_reviewers));
+			this.store.dispatch(updateReviewers(reviewers));
+			this.store.dispatch(updateRecentReviewers(recent_reviewers));
 			this.store.dispatch(updateReviews(recent));
 		} catch (error) {
 			handleAuthErrors(error as AxiosError<T_error_response>);

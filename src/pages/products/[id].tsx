@@ -97,7 +97,7 @@ export default function () {
         if (match_reviews?.length && reviewers?.length)
             for (let match of match_reviews) {
                 for (let reviewer of reviewers) {
-                    match.userId === reviewer._id && compile.push({...match, email:reviewer.email, fullName: `${reviewer.firstName} ${reviewer.lastName}`, avatar:reviewer.avatar})
+                    match.userId._id === reviewer._id && compile.push({...match, email:reviewer.email, fullName: `${reviewer.firstName} ${reviewer.lastName}`, avatar:reviewer.avatar})
                 }
             }
         return compile
