@@ -46,7 +46,7 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 	const [condition, setCondition] = useState<string>();
 	const [desc, setDescription] = useState<string>();
 	const [deliveryLocations, setdeliveryLocations] = useState<string[]>([]);
-	const [discount, setDiscount] = useState<number>();
+	const [discount, setDiscount] = useState<number>(0);
 	const [metaData, setMetadata] = useState<string[]>([]);
 	const [name, setName] = useState<string>();
 	const [price, setPrice] = useState<number>();
@@ -114,10 +114,6 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 		}
 		if (!files?.length) {
 			toast.warn("Product images required");
-			return;
-		}
-		if (!discount) {
-			toast.warn("Product discount required");
 			return;
 		}
 		if (!price || price <= 0) {
@@ -290,7 +286,7 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 						headerTitle="Categories"
 						placeholder="Select categories"
 						key={"Items"}
-						contentClassName="z-20"
+						contentClassName="z-20 max-h-[30vh] overflow-y-auto"
 						triggerClassName="flex text-sm space-x-1 items-center text-afruna-blue border border-afruna-gray/30 p-3 rounded-md"
 						getSelected={(val: string) => {
 							const cat = categories.find((i) => i.name === val);

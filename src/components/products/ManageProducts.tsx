@@ -32,10 +32,10 @@ export const ManageProducts: FC<{}> = memo(({}) => {
 	) as IProductContext;
 	const { products } = useSelector((state: RootState) => state.products);
 	const {searchInput,searchResult,setSearchInput,setTimePeriod} = useSearchProducts({ data: products, period: "all" });
+	const [actions, setActions] = useState(["actions", "Delete", "Edit"])
 
 	const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
 	const [showEditModal, setShowEditModal] = useState<boolean>(false);
-	const [confirmation, setConfirmation] = useState(false);
 	const [editConfirmation, setEditConfirmation] = useState(false);
 	useEffect(() => {
 		const hiddenBTN = document.querySelector(
@@ -44,40 +44,36 @@ export const ManageProducts: FC<{}> = memo(({}) => {
 		hiddenBTN.style.display = "flex";
 	}, []);
 
+	
 	const handleActions = useCallback(
 		(value: string) => {
 			if (manageItems && manageItems.length > 0) {
 				if (value.toLowerCase() === "delete") {
-				setShowDeleteModal(true)
+					setShowDeleteModal(true)
+					setActions(["action","Delete", "Edit"])
 			} else if (value.toLowerCase() === "edit") {
 				
 				setShowEditModal(true);
-			}
+				
+				} else {
+					
+					setActions(["action","Delete", "Edit"],)
+				}
 			}
 			return
 		},
 		[manageItems],
 	);
 	console.log(manageItems);
-	console.log(confirmation);
 	
 
 
-	const deleteproducts = useCallback( async () => {
-		const productsService = new Products();
-		if (manageItems) {
-			for (let item of manageItems) { 
-			productsService.deleteproduct(item._id);
-		}
-		}
-		return;
-		
-	}, [manageItems]);
+	
 
 	return (
 		<>
 			<PopupModal
-				comfirmCallback={setConfirmation}
+				products={manageItems}
 				isOpen={showDeleteModal}
 				onClose={() => setShowDeleteModal(false)}
 			/>
@@ -147,7 +143,7 @@ export const ManageProducts: FC<{}> = memo(({}) => {
 										position="popper"
 									>
 										<Select.Viewport>
-											{manageItems && manageItems.length >2? ["Actions","Edit"]: ["Actions","Delete","Edit"].map((date) => (
+											{actions.map((date) => (
 												<SelectItem 
 													key={date}
 													value={date}

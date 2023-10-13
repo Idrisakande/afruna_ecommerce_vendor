@@ -106,7 +106,7 @@ class Products {
 	}
 	private async getCategories() {
 		try {
-			const { data } = await axios.get("/api/categories", {
+			const { data } = await axios.get("/api/categories?limit=100", {
 				headers: {
 					Authorization: `Bearer ${Cookies.get("token")}`,
 				},
