@@ -1,78 +1,75 @@
-
 import { useState, useEffect } from "react";
 import { ETimePeriod } from "@/constants/enums";
-import { IProduct } from "@/interfaces/IProductItem";
-import { IUser } from "@/interfaces";
+import { IProduct } from "@/interfaces";
 
 
+type TData = IProduct;
 
-type TData = IUser | IProduct ;
-export default function useSearchFilter<T extends TData>({
-	data = [],
-	period,
+export default function useSearchProducts<T extends TData>({
+  data = [],
+  period,
 }: {
-	data: T[];
-	period?: string;
+  data: T[];
+  period?: string;
 }) {
-	const [searchInput, setSearchInput] = useState("");
-	const [timePeriod, setTimePeriod] = useState(period);
-	const [sortingType, setSortingType] = useState<"ascending" | "descending">(
-		"ascending"
-	);
-	const [searchResult, setSearchResult] = useState<T[]>([]);
+  const [searchInput, setSearchInput] = useState<string>("");
+  const [timePeriod, setTimePeriod] = useState<string | undefined>(period);
+  const [sortingType, setSortingType] = useState<"ascending" | "descending">(
+    "ascending"
+  );
+  const [searchResult, setSearchResult] = useState<T[]>([]);
 
-	useEffect(() => {
-		// Your main filtering logic
-		const filterData = () => {
-			// Filter by search input
-			const filterBySearchText = data.filter((item) => {
-				// Spread the item to include all fields
-				const allFields = { ...item };
+  useEffect(() => {
+    // Your main filtering logic
+    const filterData = () => {
+      // Filter by search input
+      const filterRecursive = (item: any, searchInput: string): boolean => {
+        for (const key in item) {
+          if (typeof item[key] === "object") {
+            if (filterRecursive(item[key], searchInput)) return true;
+          } else if (
+            typeof item[key] === "string" &&
+            item[key].toLowerCase().includes(searchInput.toLowerCase())
+          ) {
+            return true;
+          }
+        }
+        return false;
+      };
 
-				// Check if any field (that is a string) matches the search input
-				const matches = Object.values(allFields).some((field) => {
-					if (typeof field === "string") {
-						return field
-							.toLowerCase()
-							.includes(searchInput.toLowerCase());
-					}
-					return false; // Skip non-string fields
-				});
+      const filterBySearchTextResult = data.filter((item) =>
+        filterRecursive(item, searchInput)
+      );
 
-				return matches;
-			});
+      // Apply time period filtering if timePeriod is provided
+      let filteredData = filterBySearchTextResult;
+      if (timePeriod?.toLowerCase()) {
+        filteredData = filterDataByTimePeriod(filterBySearchTextResult, timePeriod);
+      }
 
-			// Apply time period filtering if timePeriod is provided
-			let filteredData = filterBySearchText;
-			if (timePeriod) {
-				filteredData = filterDataByTimePeriod(
-					filterBySearchText,
-					timePeriod
-				);
-			}
+      if (sortingType.toLowerCase()) {
+        // Sorting logic
+        const sortedData = sorting(filteredData, sortingType);
+        setSearchResult(sortedData);
+      } else {
+        setSearchResult(filteredData);
+      }
+    };
 
-			if (sortingType) {
-				// Sorting logic
-				const sortedData = sorting(filteredData, sortingType);
-				setSearchResult(sortedData);
-			} else {
-				setSearchResult(filteredData);
-			}
-		};
+    // Call filterData when searchInput, timePeriod, or sortingType changes
+    filterData();
+  }, [searchInput, timePeriod, period, sortingType, data]);
 
-		// Call filterData when searchInput, timePeriod, or sortingType changes
-		filterData();
-	}, [searchInput, timePeriod, period, sortingType, data]);
-
-	return {
-		searchInput,
-		setSearchInput,
-		setTimePeriod,
-		sortingType,
-		setSortingType,
-		searchResult,
-	};
+  return {
+    searchInput,
+    setSearchInput,
+    setTimePeriod,
+    sortingType,
+    setSortingType,
+    searchResult,
+  };
 }
+
 function filterDataByTimePeriod<T extends TData>(
 	data: T[],
 	timePeriod: string

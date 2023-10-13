@@ -15,12 +15,15 @@ import { T_app_provider } from "@/types/t";
 interface EditModalProps {
 	isOpen: boolean;
 	onClose: () => void;
-	//   onDelete: () => void;
+	comfirmCallback: (val: boolean) => void;
+	product?:IProduct
 }
 
 export const EditModal: FC<EditModalProps> = ({
 	isOpen,
 	onClose,
+	comfirmCallback,
+	product
 	//   onDelete
 }) => {
 	const EditModel = true;
@@ -30,18 +33,19 @@ export const EditModal: FC<EditModalProps> = ({
 		_id: "",
 		name: "",
 	});
-	// const [brand, setBrand] = useState<string>();
-	// const [color, setColor] = useState<string>();
-	// const [colors, setColors] = useState<string[]>([]);
-	// const [condition, setCondition] = useState<string>();
-	const [desc, setDescription] = useState<string>();
-	// const [deliveryLocations, setdeliveryLocations] = useState<string[]>([]);
-	// const [discount, setDiscount] = useState<number>();
+	const [brand, setBrand] = useState(product?.brand);
+	const [color, setColor] = useState<string>();
+	const [colors, setColors] = useState([product?.color]);
+	const [condition, setCondition] = useState(product?.condition);
+	const [desc, setDescription] = useState(product?.desc);
+	const [deliveryLocations, setdeliveryLocations] = useState(product?.deliveryLocations);
+	const [discount, setDiscount] = useState(product?.discount);
 	// const [metaData, setMetadata] = useState<string[]>([]);
 	// const [name, setName] = useState<string>();
 	// const [price, setPrice] = useState<number>();
-	// const [quantity, setQuantity] = useState<number>();
-	// const [size, setSizes] = useState<string[]>([]);
+	const [quantity, setQuantity] = useState(product?.quantity);
+	const [size, setSizes] = useState([product?.size]);
+	const [isLoading,setIsloading] = useState(false)
 
 	useEffect(() => {
 		const hiddenBTN = document.querySelector(
@@ -51,20 +55,25 @@ export const EditModal: FC<EditModalProps> = ({
 	}, []);
 
 	const handleSubmit = useCallback(async () => {
+
+		comfirmCallback(true);
+									onClose();
+
 		const data = {
 			// brand,
-			// condition,
+			condition,
 			desc,
-			// discount,
+			discount,
 			// name,
 			// price,
 			// quantity,
 			// size,
+			// color,
 			// categoryId: category._id,
 		};
 
 		// const gp_delivery_loc = groupData<string, {}>(
-		// 	deliveryLocations,
+		// 	deliveryLocations as string[],
 		// 	"deliveryLocations",
 		// );
 		// const gp_colors = groupData(colors, "color");
@@ -79,37 +88,36 @@ export const EditModal: FC<EditModalProps> = ({
 		// }
 
 		const productService = new Products();
-		productService.createProduct(formData as unknown as IProduct, {
-			setIsloading: opt.setIsloading,
-		});
+		productService.updateProduct(product?._id as string,formData,{isLoading,setIsloading})
+			
+		
 
 		/**
 		 *
 		 * @RESET all state
 		 */
-		// setBrand("");
-		// setColors([]);
-		// setCondition("");
+		setBrand("");
+		setColors([]);
+		setCondition("");
 		setDescription("");
-		// setDiscount(0);
+		setDiscount(0);
 		// setMetadata([]);
 		// setName("");
 		// setPrice(0);
-		// setQuantity(0);
-		// setSizes([]);
+		setQuantity(0);
+		setSizes([]);
 	}, [
-		// brand,
-		// colors,
-		// condition,
+		brand,
+		colors,
+		condition,
 		desc,
-		// discount,
+		discount,
 		// metaData,
 		// deliveryLocations,
 		// name,
 		// price,
-		// quantity,
+		quantity,
 		// size,
-		category._id,
 	]);
 
 	// const handleColorAddition = useCallback(() => {
@@ -131,7 +139,8 @@ export const EditModal: FC<EditModalProps> = ({
 			{/* <div>texting</div> */}
 			<ScrollArea.Root className="ScrollAreaRoot px-6 w-full h-[81vh] overflow-hidden grow">
 				<ScrollArea.Viewport className="ScrollAreaViewport w-full h-full grow">
-					<div className=" bg-white w-full flex flex-col pb-10 gap-6 justify-start px-8 items-start">
+					<div className=" bg-white w-full text-afruna-blue flex flex-col pb-10 gap-6 justify-start px-8 items-start">
+						<h1 className="font-bold text-xl">Product Name { product?.name}</h1>
 						<form className="flex gap-6 justify-start items-start flex-col w-full">
 							{/* <InputLabel
 								type="text"
@@ -259,15 +268,21 @@ export const EditModal: FC<EditModalProps> = ({
 								placeholder="Select brand"
 							/>
                             </div> */}
+							<div className="flex flex-col gap-2 place-items-start justify-start">
+								<label htmlFor="condition">Condition</label>
+									<input type="text" id="condition" className="p-3 border rounded-lg " placeholder="condition" onChange={(e)=> setCondition(e.target.value)} />
+							</div>
+							
+						
 
-							{/* <InputLabelNumber
+							<InputLabelNumber
 								getValue={(val) =>
-									setQuantity(val as unknown as number)
+									setDiscount(val as unknown as number)
 								}
-								headerTitle="Quantiy"
+								headerTitle="Discount"
 								placeholder="0"
 								suffix
-							/> */}
+							/>
 							<div className="flex flex-col w-full justify-start items-start">
 								<h3 className="mb-2 text-sm font-semibold">
 									Product Description
@@ -290,14 +305,17 @@ export const EditModal: FC<EditModalProps> = ({
 						>
 							<button
 								type="button"
-								onClick={onClose}
-								className={` border-slate-500 px-6 py-1 font-bold rounded-md border tracking-tight`}
+						onClick={() => {
+							comfirmCallback(false);
+							onClose();
+						}}
+						className={` border-slate-500 px-6 py-1 font-bold rounded-md border tracking-tight`}
 							>
 								Cancel
 							</button>
 							<button
-								//   onClick={onDelete}
 								type="button"
+								onClick={handleSubmit}
 								className="px-6 py-1 rounded-md text-white font-bold bg-gradient-to-b from-blue-400 to-blue-900 hover:bg-gradient-to-r hover:from-blue-500 hover:to-blue-800 transition duration-500 tracking-tight"
 							>
 								Edit

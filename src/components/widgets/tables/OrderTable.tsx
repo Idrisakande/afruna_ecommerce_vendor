@@ -1,4 +1,5 @@
 import { IOrder } from "@/interfaces/tables.interface";
+import * as Select from "@radix-ui/react-select";
 import {
 	ColumnDef,
 	SortingState,
@@ -23,35 +24,37 @@ import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import { MdRemoveRedEye, MdSearch } from "react-icons/md";
 import Image from "next/image";
 
-import { months, orderData } from "@/constants/data";
-import { InputLabel } from "../Input/InputLabel";
-import { SelectPicker } from "../SelectPicker";
+import { dateInterval, months, orderData, ordersStatus } from "@/constants/data";
 import { IOrderContext, OrdersContext } from "@/contexts/OrdersProvider";
 import { ResultsFallback } from "../ResultsFallback";
 import { formattedDate } from "@/utils/formatted_date";
 import { createPaginationWithCustomType } from "@/utils/createPaginationWithCustomType";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/types/store.type";
-import { T_order, T_updated_user_order, T_user_order } from "@/types/user.type";
-import { setViewOrderData } from "@/redux/features/user.slice";
+import { T_order} from "@/types/user.type";
 import Order from "@/services/order.service";
 import User from "@/services/user.service";
-import useSearchFilter from "@/hooks/useSearchFilter";
-// import useCustomSearch from "@/hooks/useCustomSearch";
+import { SelectItem } from "../SelectItem";
+import { ChevronDownIcon } from "@radix-ui/react-icons";
+import { GoSearch } from "react-icons/go";
+import useSearchOrders from "@/hooks/useSearchOrders";
 
 export const OrderTable: FC = memo(() => {
 	const { orders } = useSelector((state: RootState) => state.user);
 	const {
 		searchInput,
 		searchResult,
+		statusFilter,
+		sortingType,
 		setSearchInput,
 		setSortingType,
 		setTimePeriod,
-		sortingType,
-	} = useSearchFilter({ data: orders,period:"all" });
-
+		setStatusFilter,
+	} = useSearchOrders({ data: orders,period:"all" });
+	
 	const { selectedFilter } = useContext(OrdersContext) as IOrderContext;
-	const [data, setData] = useState(searchResult);
+	const [data, setData] = useState(orders);
+	
 	useMemo(() => {
 		if (selectedFilter.toLowerCase() === "all orders") {
 			setData(searchResult);
@@ -63,7 +66,7 @@ export const OrderTable: FC = memo(() => {
 			);
 			setData(matchedFilter);
 		}
-	}, [selectedFilter, searchResult]);
+	}, [selectedFilter,searchResult]);
 	const router = useRouter();
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const dispatch = useDispatch();
@@ -204,7 +207,7 @@ export const OrderTable: FC = memo(() => {
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
-		// debugTable: true,
+		debugTable: false,
 	});
 
 	
@@ -214,36 +217,75 @@ export const OrderTable: FC = memo(() => {
 				<header className="flex sticky top-0 justify-between items-center border-b border-slate-300 text-afruna-blue bg-white ">
 					<h1 className="p-3 font-bold ">Orders</h1>
 					<div className="flex justify-between items-center p-3 space-x-2">
-						<div>
-							<input
-								className="border p-3 rounded-lg"
-								type="search"
-								placeholder="Search"
-								onChange={(e) => setSearchInput(e.target.value)}
-							/>
-						</div>
-						{/* <SelectPicker
-							triggerClassName="relative top-[5px] flex w-24 justify-between items-center space-x-1 text-[12px] p-[11px] border border-afruna-gray/30 rounded-md"
-							placeholder="Months"
-							getSelected={(val) => console.log(val)}
-							items={months}
-						/> */}
-						<SelectPicker
-							triggerClassName="relative top-[5px] flex w-24 justify-between items-center space-x-1 text-[12px] p-[11px] border border-afruna-gray/30 rounded-md"
-							placeholder="Select"
-							getSelected={(val) => setTimePeriod(val as string)}
-							items={[
-								"all",
-								"this Month",
-								"3 Days",
-								"1 Week",
-								"2 Months",
-								"6 Months",
-							]}
-						/>
+						<fieldset className="xs:col-span-full lg:col-span-2 overflow-hidden text-[#777777] border border-slate-300 flex justify-between items-center rounded-xl">
+								<input
+									value={searchInput}
+									onChange={(e)=>setSearchInput(e.target.value)}
+									type="search"
+									placeholder="Search"
+									name="search"
+									className="w-full text-base p-3 outline-none focus:outline focus:outline-1 focus:outline-blue focus:bg-white"
+								/>
+								<GoSearch className="text-slate-200 w-16 text-2xl cursor-pointer" />
+							</fieldset>
+							<Select.Root onValueChange={setTimePeriod as (value: string) => void}>
+								<Select.Trigger className="flex items-center gap-2 p-3 border rounded-lg">
+									<Select.Value
+										placeholder={"Select range"}
+									/>
+									<Select.Icon>
+										<ChevronDownIcon />
+									</Select.Icon>
+								</Select.Trigger>
+								<Select.Portal>
+									<Select.Content
+										className="p-2 bg-white gap-2"
+										position="popper"
+									>
+										<Select.Viewport>
+											{dateInterval.map((date) => (
+												<SelectItem
+													key={date}
+													value={date}
+												>
+													{date}
+												</SelectItem>
+											))}
+										</Select.Viewport>
+									</Select.Content>
+								</Select.Portal>
+							</Select.Root>
+							<Select.Root onValueChange={setStatusFilter as (value: string) => void}>
+								<Select.Trigger className="flex items-center gap-2 p-3 border rounded-lg">
+									<Select.Value
+										placeholder={"Status"}
+									/>
+									<Select.Icon>
+										<ChevronDownIcon />
+									</Select.Icon>
+								</Select.Trigger>
+								<Select.Portal>
+									<Select.Content
+										className="p-2 bg-white gap-2"
+										position="popper"
+									>
+										<Select.Viewport>
+											{ordersStatus.map((date) => (
+												<SelectItem
+													key={date}
+													value={date}
+												>
+													{date}
+												</SelectItem>
+											))}
+										</Select.Viewport>
+									</Select.Content>
+								</Select.Portal>
+							</Select.Root>
+						
 					</div>
 				</header>
-				{!data.length ? (<ResultsFallback />) :
+				{ orders && orders.length > 0?
 					(<table className="w-screen lg:w-full px-8 relative">
 						<thead className=" sticky top-16 bg-white">
 							{table.getHeaderGroups().map((headerGroup) => (
@@ -315,7 +357,7 @@ export const OrderTable: FC = memo(() => {
 								);
 							})}
 						</tbody>
-					</table>)}
+					</table>):<ResultsFallback />}
 			</div>
 			{data && data.length > 0 && <Pagination table={table} />}
 		</main>

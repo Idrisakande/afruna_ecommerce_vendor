@@ -25,6 +25,7 @@ const User = createSlice({
 			weekly: [],
 			yearly: [],
 		},
+		usersWithReviews: [],
 		orders: [],
 		orderBySessionId:[],
 		reports: undefined,
@@ -37,6 +38,9 @@ const User = createSlice({
 		},
 		setUserBio(state, action: PayloadAction<T_User>) {
 			state.bio_data = action.payload;
+		},
+		updateUsersWithReviews(state, action: PayloadAction<(T_user & { reviews: T_review[] })[]>) {
+			state.usersWithReviews = action.payload;
 		},
 		updateReviews(state, action: PayloadAction<T_review[]>) {
 			state.reviews = action.payload;
@@ -88,6 +92,7 @@ export const {
 	updateOrder,
 	updateOrderBySessionId,
 	updateReports,
-	setViewOrderData
+	setViewOrderData,
+	updateUsersWithReviews
 } = User.actions;
 export default User.reducer;

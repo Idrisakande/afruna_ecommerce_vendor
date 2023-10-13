@@ -98,11 +98,11 @@ export const ReportStats = () => {
 					{ x: 17 },
 					{ x: 25 },
 				]}
-				stat_title=""
-				stat_value={0}
+				stat_title="Total Orders"
+				stat_value={reports?.visitors as unknown as number}
 				trend_direction="up"
 				trend_value={0}
-				key={"trending"}
+				key={"vfisitors"}
 			/>
 			<ReportCard
 				stat_data={[
@@ -122,11 +122,11 @@ export const ReportStats = () => {
 					{ x: 17 },
 					{ x: 25 },
 				]}
-				stat_title=""
-				stat_value={0}
+				stat_title="Total Revenue"
+				stat_value={reports?.visitors as unknown as number}
 				trend_direction="up"
 				trend_value={0}
-				key={"trending"}
+				key={"evisitors"}
 			/>
 			<ReportCard
 				stat_data={[
@@ -146,11 +146,11 @@ export const ReportStats = () => {
 					{ x: 17 },
 					{ x: 25 },
 				]}
-				stat_title=""
-				stat_value={0}
+				stat_title="Total Visitors"
+				stat_value={reports?.visitors as unknown as number}
 				trend_direction="up"
 				trend_value={0}
-				key={"trending"}
+				key={"visitors"}
 			/>
 		</div>
 	);
@@ -175,7 +175,7 @@ const ReportCard: FC<I_report_card> = memo(
 				</p>
 				<h3 className={"font-medium text-sm"}>
 					&#x20A6;
-					{stat_value.toLocaleString()}
+					{stat_value?.toLocaleString()}
 				</h3>
 
 				{trend_direction === "up" ? (

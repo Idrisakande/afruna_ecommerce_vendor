@@ -1,21 +1,26 @@
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 
 import {
 	setUserBio,
 	updateRecentReviewers,
 	updateReviewers,
 	updateReviews,
+	updateUsersWithReviews,
 } from "@/redux/features/user.slice";
 import store from "@/redux/store";
 import { T_error_response } from "@/types/auth.type";
 import { handleAuthErrors } from "@/utils/auth.util";
 import Cookies from "js-cookie";
-import { T_review } from "@/types/user.type";
+import { T_review, T_user } from "@/types/user.type";
 import recent_itemsUtil from "@/utils/recent_items.util";
 import { toast } from "react-toastify";
+import { usersWithReviews } from "@/utils/users_with_rewiews";
 
 class User {
 	private store = store.store;
+	constructor() {
+		this.getUsersWithReviews();
+	}
 	async getReviews() {
 		try {
 			const { products } = this.store.getState().products;
@@ -58,6 +63,28 @@ class User {
 	// async updatePassword(payload) {
 
 	// }
+
+	async getUsersWithReviews() {
+		const users = await this.getAllUsers();
+		if (users) {
+			const UWR = usersWithReviews(users, this.store.getState().user.reviews as T_review[]);
+			this.store.dispatch(updateUsersWithReviews(UWR));
+		}
+	}
+
+	async getAllUsers() {
+		try {
+			const { data } = await axios.get<AxiosResponse<T_user[]>>("/api/users?limit=100", {
+				headers: {
+					Authorization: `Bearer ${Cookies.get("token")}`,
+				}
+			});
+			return data.data;
+		} catch (error) {
+			
+			handleAuthErrors(error as AxiosError<T_error_response>);
+		}
+	}
 
 	private async getReveiwsByProductId(id: string) {
 		try {

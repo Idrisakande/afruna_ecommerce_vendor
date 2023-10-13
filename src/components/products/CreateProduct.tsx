@@ -29,8 +29,10 @@ import { objectToFormData } from "@/utils/obj_to_formdata.util";
 import { groupData } from "@/utils/grouped_field.util";
 import ItemLabelPicker from "../widgets/ItemLabelPicker";
 import { toast } from "react-toastify";
+import { useRouter } from "next/router";
 
-export const CreateProduct: FC<{}> = memo(({}) => {
+export const CreateProduct: FC<{}> = memo(({ }) => {
+	const router = useRouter()
 	const { tab } = useContext(productcontext) as IProductContext;
 	const opt = useContext(AppContext) as T_app_provider;
 	const { categories } = useSelector((state: RootState) => state.categories);
@@ -178,6 +180,8 @@ export const CreateProduct: FC<{}> = memo(({}) => {
 		const productService = new Products();
 		productService.createProduct(formData as unknown as IProduct, {
 			setIsloading: opt.setIsloading,
+		}).finally(() => {
+			router.push("/products")
 		});
 
 		/**

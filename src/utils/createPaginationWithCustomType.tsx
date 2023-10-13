@@ -88,12 +88,13 @@ export function createPaginationWithCustomType<T>() {
 							</button>
 						</>
 					)}
-					{pageCount > 1 && (
+					{pageCount > 1 && pageCount < 3 && (
 						<>
 							<button
 								onClick={() => table.setPageIndex(0)}
 								className={`w-7 h-7 text-sm bg-white rounded p-1 ${
-									pageIndex === 1 && "bg-blue-950 text-white"
+									pageIndex + 1 === 1 &&
+									"bg-blue-950 text-white"
 								}`}
 							>
 								1
@@ -101,21 +102,11 @@ export function createPaginationWithCustomType<T>() {
 							<button
 								onClick={() => table.setPageIndex(1)}
 								className={`w-7 h-7 text-sm bg-white rounded p-1 ${
-									pageIndex === 2 && "bg-blue-950 text-white"
-								}`}
-							>
-								2
-							</button>
-							<button
-								onClick={() =>
-									table.setPageIndex(pageCount - 1)
-								}
-								className={`w-7 h-7 text-sm bg-white rounded p-1 ${
-									pageIndex === pageCount &&
+									pageIndex + 2 === 2 &&
 									"bg-blue-950 text-white"
 								}`}
 							>
-								{pageCount}
+								2
 							</button>
 						</>
 					)}

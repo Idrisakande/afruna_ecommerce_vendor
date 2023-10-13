@@ -54,17 +54,25 @@ class Products {
 			handleAuthErrors(error as AxiosError<T_error_response>);
 		}
 	}
-	async updateProduct(id: string) {
+	async updateProduct(id: string, payload: any, opt: T_app_provider) {
+		const { setIsloading } = opt;
+		setIsloading && setIsloading(true);
 		try {
-			const { data } = await axios.put("/api/products/" + id, {
+			const { data } = await axios.put("/api/products/" + id,payload, {
 				headers: {
 					Authorization: `Bearer ${Cookies.get("token")}`,
 				},
 			});
+			
+			toast.info("Update successfully!");
 			this.getProducts();
-			toast.success("Product removed!");
+			return data.data;
 		} catch (error) {
 			handleAuthErrors(error as AxiosError<T_error_response>);
+			
+		
+		} finally {
+			setIsloading && setIsloading(true);
 		}
 	}
 	private async getProducts() {

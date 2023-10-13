@@ -17,6 +17,7 @@ import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import { RootState } from "@/types/store.type";
 import { IProduct } from "@/interfaces/IProductItem";
 import Products from "@/services/products.service";
+import { formattedDate } from "@/utils/formatted_date";
 
 type T_data = IProduct & { categoryName: string };
 const ProductListingTable: FC = () => {
@@ -70,13 +71,8 @@ const ProductListingTable: FC = () => {
 			},
 			{
 				accessorKey: "createdAt",
-				cell: (info) => {
-					let date = new Date(
-						info.getValue() as string,
-					).toUTCString();
-					return <>{date}</>;
-				},
-				header: () => <span className="">Order Date</span>,
+				cell: (info) => formattedDate(info.getValue() as string),
+				header: () => <span className="">Date</span>,
 			},
 			/* {
 				accessorKey: "status",

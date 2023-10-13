@@ -25,6 +25,16 @@ export const months = [
 	"November",
 	"December",
 ];
+export const sortType = ["ascending", "descending"];
+export const ordersStatus = ["shipped", "pending", "delivered", "returned", "processing"]
+export const dateInterval = [
+								"all",
+								"this Month",
+								"3 Days",
+								"1 Week",
+								"2 Months",
+								"6 Months",
+							]
 export const vendorDetails = [
 	{
 		numbers: 978,

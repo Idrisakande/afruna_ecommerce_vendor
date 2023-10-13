@@ -10,6 +10,7 @@ export type T_InitialUserState = {
 		monthly: [];
 		yearly: [];
 	};
+	usersWithReviews: (T_user & { reviews: T_review[] })[]
 	orders: T_order[];
 	orderBySessionId: T_orderBySessionId[];
 	reports: T_reports | undefined;
