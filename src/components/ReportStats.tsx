@@ -174,7 +174,8 @@ const ReportCard: FC<I_report_card> = memo(
 					{stat_title}
 				</p>
 				<h3 className={"font-medium text-sm"}>
-					&#x20A6;
+					
+					{stat_title !== "Total Visitors" && <>&#x20A6; {" " }</>}
 					{stat_value?.toLocaleString()}
 				</h3>
 
