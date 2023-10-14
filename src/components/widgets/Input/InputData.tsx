@@ -1,14 +1,17 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IInputMetadata } from "@/interfaces/inputs.interfaces";
+import { MdClose } from "react-icons/md";
 
-export function InputMetadata({
+export function InputData({
 	getMetadata,
 	headerTitle,
 	placeholder,
 }: IInputMetadata) {
 	const inputRef = useRef<HTMLInputElement>(null);
-	const [metadata, setMetadata] = useState<string[]>([]);
-	useMemo(() => getMetadata(metadata), [getMetadata, metadata]);
+	const [data, setData] = useState<string[]>([]);
+	 useEffect(() => {
+			getMetadata(data);
+		}, [data]);
 
 	return (
 		<div className="w-full">
@@ -20,32 +23,32 @@ export function InputMetadata({
 					className="w-full p-3 text-sm"
 					placeholder={placeholder}
 					onKeyDown={(e) => {
-						if (e.code === "Space" || e.code === "Enter") {
+						if (e.code === "Space" || e.code === "Enter" || e.key === "Enter") {
 							if (inputRef.current) {
 								let val = inputRef.current.value;
 								if (val.trim() !== "") {
-									setMetadata((prevData) => [
-										...prevData,
-										val,
-									]);
+									const uniquesData = new Set(data);
+									uniquesData.add(val);
+									setData(Array.from(uniquesData));
 								}
 								inputRef.current.value = "";
 							}
 						}
 					}}
 				/>
-				{metadata &&
-					metadata.map((metadatum, id) => (
+				{data &&
+					data.map((metadatum, id) => (
 						<mark
 							onClick={() =>
-								setMetadata(
-									metadata.filter((_, idx) => idx !== id),
+								setData(
+									data.filter((_, idx) => idx !== id),
 								)
 							}
 							key={id}
-							className="p-1 bg-teal-100 rounded-md m-1 rounded-tr-none rounded-bl-none"
+							className="p-1 group bg-gray-300/90 cursor-pointer rounded-md m-1 rounded-tr-none rounded-bl-none"
 						>
 							#{metadatum}
+							<MdClose className="hidden ml-4 group-hover:inline" />
 						</mark>
 					))}
 			</fieldset>
