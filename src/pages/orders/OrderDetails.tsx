@@ -16,7 +16,9 @@ import { T_updated_user_order } from "@/types/user.type";
 
 const OrderDetails: FC = () => {
 	const { query } = useRouter();
-	const {viewOrder,orderBySessionId} = useSelector((state:RootState)=> state.user)
+	const { viewOrder, orderBuyerInfo, orderBySessionId } = useSelector(
+		(state: RootState) => state.user,
+	);
 	const [updateStatusModelOpen, setUpdateStatusModelOpen] = useState(false);
 	// const buyer_address =  useMemo(()=> {
 	// 	if (viewOrder) {
@@ -24,24 +26,26 @@ const OrderDetails: FC = () => {
 	// 		return info.items[0].deliveryAddress ;
 	// 	}
 	// },[viewOrder])
-	
+
 	return (
 		<Main breadcrumbs={<Breadcrumbs />}>
 			<main className="m-7 pb-20">
 				<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:max-w-[96%] sm:mx-auto">
-					<h2 className="text-xl font-semibold">Order ID:{orderBySessionId[0].customId}</h2>
+					<h2 className="text-xl font-semibold">
+						Order ID:{orderBySessionId[0].customId}
+					</h2>
 					<div className="flex justify-start sm:justify-end items-center">
-					<button
-              onClick={() => setUpdateStatusModelOpen(true)}
-              className="px-8 py-3 text-white rounded font-semibold tracking-tight bg-gradient-y-deepblue
+						<button
+							onClick={() => setUpdateStatusModelOpen(true)}
+							className="px-8 py-3 text-white rounded font-semibold tracking-tight bg-gradient-y-deepblue
 "
-            >
-              Order Status
-            </button>
-            <UpdateStatus
-              isOpen={updateStatusModelOpen}
-              onClose={() => setUpdateStatusModelOpen(false)}
-            />
+						>
+							Order Status
+						</button>
+						<UpdateStatus
+							isOpen={updateStatusModelOpen}
+							onClose={() => setUpdateStatusModelOpen(false)}
+						/>
 						{/* <Link
 							href={"/orders/invoice"}
 							className="px-6 py-2 text-xs text-white bg-gradient-y-deepblue flex gap-1 justify-center items-center rounded"
@@ -52,15 +56,15 @@ const OrderDetails: FC = () => {
 					</div>
 				</div>
 				<div className="flex flex-col sm:flex-row lg:ml-3 gap-6 mt-8 justify-start sm:items-center">
-					<div className="py-4 px-6 text-xs bg-gradient-to-b from-green-500/40 to-green-100] rounded-md h-fit space-y-2 w-full max-w-[16rem]">
+					<div className="py-4 px-6 text-xs bg-gradient-green rounded-md h-[9rem] w-full max-w-[16rem]">
 						<h2 className="text-lg mb-2 font-semibold tracking-tight ">
 							Buyer Info
 						</h2>
 						<p className="text-[0.85rem] font-semibold mb-1 tracking-tight ">
-							Leo Paula Jaboati dexk
+							{orderBuyerInfo?.firstName} {orderBuyerInfo?.lastName}
 						</p>
-						<p className="tracking-tight mb-1">LeoPj@menu.comcom</p>
-						<span className="tracking-tight ">+234074653864</span>
+						{/* 	<p className="tracking-tight mb-1">LeoPj@menu.comcom</p>
+						<span className="tracking-tight ">+234074653864</span> */}
 					</div>
 					<div className="py-4 px-6 text-xs bg-gradient-to-b from-blue-500/40 to-blue-100] rounded-md h-fit space-y-2 w-full max-w-[16rem]">
 						<h2 className="text-lg mb-2 font-semibold tracking-tight ">

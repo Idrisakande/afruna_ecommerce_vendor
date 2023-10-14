@@ -143,7 +143,7 @@ function sorting<T extends TData>(
 ) {
 	return items.slice().sort((a, b) => {
 		// Create a copy using slice()
-		const multiplier = sortingType === "ascending" ? 1 : -1;
+		const multiplier = sortingType.toLowerCase() === "ascending" ? 1 : -1;
 		return (
 			multiplier *
 			(new Date(a.createdAt as string).getTime() - new Date(b.createdAt as string).getTime())

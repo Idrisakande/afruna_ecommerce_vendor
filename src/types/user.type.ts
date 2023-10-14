@@ -10,9 +10,11 @@ export type T_InitialUserState = {
 		monthly: [];
 		yearly: [];
 	};
-	usersWithReviews: (T_user & { reviews: T_review[] })[]
+	users: T_User[],
+	usersWithReviews: (T_User & { reviews: T_review[] })[];
 	orders: T_order[];
 	orderBySessionId: T_orderBySessionId[];
+	orderBuyerInfo: T_User | undefined;
 	reports: T_reports | undefined;
 	viewOrder: T_order | T_user_order | T_updated_user_order | undefined;
 };
@@ -22,9 +24,7 @@ export type T_orderBySessionId = {
 	productId: {
 		_id: string;
 		name: string;
-		images: string[
-			
-		];
+		images: string[];
 	};
 	sessionId: string;
 	isPaid: boolean;
@@ -51,6 +51,7 @@ export type T_User =
 			following: string;
 			createdAt: string;
 			updatedAt: string;
+			blocked?: boolean;
 	  }
 	| undefined;
 

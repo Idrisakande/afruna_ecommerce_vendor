@@ -32,6 +32,7 @@ export const ProductList: FC<{}> = memo(({}) => {
 	// 	AppContext,
 	// ) as T_app_provider;
 	const { products } = useSelector((state: RootState) => state.products);
+	
 
 	const {searchInput,searchResult,setSearchInput,setSortingType,setTimePeriod } = useSearchProducts({data: products,period: "all"});
 

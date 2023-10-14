@@ -38,9 +38,10 @@ import { SelectItem } from "../SelectItem";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 import { GoSearch } from "react-icons/go";
 import useSearchOrders from "@/hooks/useSearchOrders";
+import { updateOrderBuyerInfo } from "@/redux/features/user.slice";
 
 export const OrderTable: FC = memo(() => {
-	const { orders } = useSelector((state: RootState) => state.user);
+	const { orders,bio_data } = useSelector((state: RootState) => state.user);
 	const {
 		searchInput,
 		searchResult,
@@ -171,6 +172,7 @@ export const OrderTable: FC = memo(() => {
 				cell: ({ row }) => (
 					<div className="flex justify-start gap-3 items-center">
 						<button
+							
 							onClick={async () => {
 								const ordersServices = new Order();
 								ordersServices.getOrdersBySessionId(
@@ -181,6 +183,7 @@ export const OrderTable: FC = memo(() => {
 									await userServices.getUserById(
 										row.original.vendorId,
 									);
+								dispatch(updateOrderBuyerInfo(buyerInfo));
 								router.push("/orders/details");
 							}}
 							className="hover:scale-90 border-none transition duration-300"

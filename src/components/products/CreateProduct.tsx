@@ -1,5 +1,6 @@
 import {
 	FC,
+	ReactNode,
 	memo,
 	useCallback,
 	useContext,
@@ -11,13 +12,12 @@ import { Header } from "./Header";
 import { Content } from "./Content";
 import { IProductContext } from "@/interfaces/IProductContext";
 import { productcontext } from "@/contexts/ProductProvider";
-import { MdAdd, MdDelete, MdImage } from "react-icons/md";
+import { MdAdd, MdClose, MdDelete, MdImage } from "react-icons/md";
 import { Dropzone, ExtFile, FileMosaic } from "@files-ui/react";
 import { InputLabelNumber } from "../widgets/Input/InputLabelNumber";
 import CheckBoxLabel from "../widgets/CheckBoxLabel";
-import ColorSelector from "../widgets/ColorSelector";
 import { InputLabel } from "../widgets/Input/InputLabel";
-import { InputMetadata } from "../widgets/Input/InputMetadata";
+import { InputData } from "../widgets/Input/InputData";
 import Products from "@/services/products.service";
 import { AppContext } from "@/contexts/AppProvider";
 import { T_app_provider } from "@/types/t";
@@ -30,16 +30,18 @@ import { groupData } from "@/utils/grouped_field.util";
 import ItemLabelPicker from "../widgets/ItemLabelPicker";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
+import { T_Category } from "@/types/categories.type";
+import { getNonEmptyInputValues } from "@/utils/get_non_empty_input_values";
 
 export const CreateProduct: FC<{}> = memo(({ }) => {
-	const router = useRouter()
+	const { bio_data } = useSelector((state: RootState) => state.user);
+	console.log(bio_data);
+	
+	const router = useRouter();
 	const { tab } = useContext(productcontext) as IProductContext;
 	const opt = useContext(AppContext) as T_app_provider;
 	const { categories } = useSelector((state: RootState) => state.categories);
-	const [category, setCategory] = useState<{ _id: string; name: string }>({
-		_id: "",
-		name: "",
-	});
+	const [category, setCategory] = useState<T_Category>();
 	const [brand, setBrand] = useState<string>();
 	const [color, setColor] = useState<string>();
 	const [colors, setColors] = useState<string[]>([]);
@@ -52,8 +54,57 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 	const [price, setPrice] = useState<number>();
 	const [quantity, setQuantity] = useState<number>();
 	const [size, setSizes] = useState<string[]>([]);
-
 	const [files, setFiles] = useState<ExtFile[]>([]);
+	const [inputValues, setInputValues] = useState<{
+		[key: string]: string[];
+	}>({}); //values for all input
+	const [isAttributeModalOpen, setIsAttributeModalOpen] =
+		useState<boolean>(false);
+	// Handle changes in input values
+	const handleInputChange = useCallback(
+		(options: string[], name: string) => {
+			setInputValues({
+				...inputValues,
+				[name.toLowerCase()]: options,
+			});
+		},
+		[inputValues],
+	);
+
+	const handleSelectedCategory = useCallback(
+		(val: string) => {
+			const cat = categories.find((cat) => cat.name === val);
+			setCategory(cat as { _id: string; name: string });
+		},
+		[categories],
+	);
+
+	const renderAttributes = () => {
+		if (category && category.options && category.options.length > 0) {
+			return (
+				<div className="grid lg:grid-cols-2 gap-2">
+					{category.options.map((name, index) => {
+						return (
+							<InputData
+								headerTitle={name}
+								key={index + name}
+								placeholder={name}
+								getMetadata={(values) =>
+									handleInputChange(values, name)
+								}
+							/>
+						);
+					})}
+				</div>
+			);
+		} else {
+			return category ? (
+				<p>No options available for the selected category.</p>
+			) : (
+				<p>no category selected</p>
+			);
+		}
+	};
 
 	const updateFiles = useCallback((incommingFiles: ExtFile[]) => {
 		if (incommingFiles.length <= 10) {
@@ -86,9 +137,8 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 		) as HTMLButtonElement;
 		hiddenBTN.style.display = "flex";
 	}, []);
-
 	const handleSubmit = useCallback(async () => {
-		if (!category._id) {
+		if (category && !category._id) {
 			toast.warn("Product category required");
 			return;
 		}
@@ -150,51 +200,71 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 			quantity,
 			size,
 			coverPhoto: files[0].file,
-			categoryId: category._id,
+			categoryId: category?._id,
 		};
 
+		const nonEmptyInputValues = getNonEmptyInputValues(inputValues);
 		const gp_delivery_loc = groupData<string, {}>(
 			deliveryLocations,
 			"deliveryLocations",
 		);
+
 		const gp_meta = groupData<string, {}>(metaData, "metaData");
 		const gp_colors = groupData(colors, "color");
+		const transformedData = Object.entries(nonEmptyInputValues).reduce(
+			(accum, entry) => {
+				const [keys, values] = entry;
+				if (values.length) {
+					values.map((value, idx) => {
+						const id = `${keys}[${idx}]`;
+						accum[id] = value; //store new key value
+					});
+				}
+				return accum;
+			},
+			{} as { [key: string]: string },
+		);
 
-		const products = Object.assign(
+		const product = Object.assign(
 			{},
 			gp_colors,
 			gp_meta,
 			gp_delivery_loc,
 			data,
+			transformedData,
 		);
 
-		const formData = objectToFormData(products);
+		const formData = objectToFormData(product);
 		for (let i = 0; i < files.length; i++) {
 			formData.append("images", files[i].file as Blob);
 		}
 
 		const productService = new Products();
-		productService.createProduct(formData as unknown as IProduct, {
-			setIsloading: opt.setIsloading,
-		}).finally(() => {
-			router.push("/products")
-		});
-
-		/**
-		 *
-		 * @RESET all state
-		 */
-		setBrand("");
-		setColors([]);
-		setCondition("");
-		setDescription("");
-		setDiscount(0);
-		setMetadata([]);
-		setName("");
-		setPrice(0);
-		setQuantity(0);
-		setSizes([]);
-		setFiles([]);
+		productService
+			.createProduct(formData as unknown as IProduct, {
+				setIsloading: opt.setIsloading,
+				/**
+				 *
+				 * @RESET all state
+				 */
+			})
+			.finally(() => {
+				setBrand("");
+				setColors([]);
+				setCondition("");
+				setDescription("");
+				setDiscount(0);
+				setMetadata([]);
+				setName("");
+				setPrice(0);
+				setQuantity(0);
+				setSizes([]);
+				setFiles([]);
+				setInputValues({});
+				setIsAttributeModalOpen(false);
+				setCategory(undefined);
+				router.push("/products");
+			});
 	}, [
 		brand,
 		colors,
@@ -208,7 +278,8 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 		quantity,
 		size,
 		files,
-		category._id,
+		category?._id,
+		inputValues,
 	]);
 
 	const handleColorAddition = useCallback(() => {
@@ -216,6 +287,7 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 		const newColors = new Set([...colors, color]);
 		newColors.forEach((set) => COLORS.push(set as string));
 		setColors(COLORS);
+		setColor("")
 	}, [color, colors]);
 
 	if (opt.isLoading) {
@@ -280,18 +352,15 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 						)}
 					</div>
 				</div>
-				<div className="col-span-full md:col-span-7 p-10 space-y-4 ">
+				<div className="col-span-full md:col-span-7 p-10 space-y-4 transition-all duration-300">
 					<ItemLabelPicker
-						items={categories.map((i) => i.name)}
+						items={categories.map((cat) => cat.name)}
 						headerTitle="Categories"
 						placeholder="Select categories"
 						key={"Items"}
 						contentClassName="z-20 max-h-[30vh] overflow-y-auto"
 						triggerClassName="flex text-sm space-x-1 items-center text-afruna-blue border border-afruna-gray/30 p-3 rounded-md"
-						getSelected={(val: string) => {
-							const cat = categories.find((i) => i.name === val);
-							setCategory(cat as { _id: string; name: string });
-						}}
+						getSelected={handleSelectedCategory}
 					/>
 					<InputLabel
 						type="text"
@@ -315,12 +384,35 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 							<div className="flex flex-col gap-2 justify-start items-start place-items-start">
 								<label
 									htmlFor="color-picker"
-									className="mr-2 text-gray-700  flex flex-col justify-start items-start gap-3 w-fit"
+									className="mr-2 text-gray-700  flex flex-col justify-start items-start gap-3 w-full"
 								>
 									<h3 className="font-semibold text-sm">
 										Choose a color:
 									</h3>
-									<div className="flex justify-start items-start place-items-start space-x-4 h-fit w-fit ">
+									<div className="flex justify-between items-start place-items-start space-x-4 h-fit w-fit ">
+										<div className="flex flex-col gap-2">
+											<fieldset className="w-fit justify-start cursor-pointer">
+												<input
+													type="color"
+													id="color-picker"
+													className="appearance-none w-16 h-12"
+													onChange={(e) =>
+														setColor(e.target.value)
+													}
+												/>
+											</fieldset>
+											<div className="flex flex-wrap justify-start items-center gap-1">
+												{colors.map((color, idx) => (
+													<span
+														key={idx}
+														style={{
+															background: color,
+														}}
+														className={`h-6 w-8`}
+													/>
+												))}
+											</div>
+										</div>
 										<div className="flex gap-2 justify-start items-center">
 											{color && color.length > 0 ? (
 												<button
@@ -328,7 +420,7 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 														handleColorAddition
 													}
 													className={
-														"px-2 py-1 border border-afruna-blue rounded text-xs"
+														"p-3 border border-afruna-blue/70 rounded text-sm"
 													}
 												>
 													Add color
@@ -337,39 +429,21 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 											{colors.length ? (
 												<>
 													<button
-														onClick={() =>
-															setColors([])
-														}
+														onClick={() => {
+															setColors([]);
+															setColor("");
+														}}
 														className={
-															"px-2 py-1 border border-afruna-blue rounded text-xs"
+															"p-3 border border-afruna-gold/70 rounded text-sm"
 														}
 													>
-														Reset color
+														Reset colors
 													</button>
 												</>
 											) : null}
 										</div>
-										<fieldset className="w-fit justify-start cursor-pointer">
-											<input
-												type="color"
-												id="color-picker"
-												className="appearance-none w-8 h-8 "
-												onChange={(e) =>
-													setColor(e.target.value)
-												}
-											/>
-										</fieldset>
 									</div>
 								</label>
-								<div className="flex flex-wrap justify-start items-center gap-1">
-									{colors.map((color, idx) => (
-										<span
-											key={idx}
-											style={{ background: color }}
-											className={`h-6 w-8`}
-										/>
-									))}
-								</div>
 							</div>
 							<CheckBoxLabel
 								getselectedChecks={(checks) => setSizes(checks)}
@@ -431,12 +505,13 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 							placeholder="Select brand"
 						/>
 					</div>
-					<InputMetadata
+					{isAttributeModalOpen && renderAttributes()}
+					<InputData
 						getMetadata={(meta) => setMetadata(meta)}
 						headerTitle="Meta Data"
 						placeholder="keywords"
 					/>
-					<InputMetadata
+					<InputData
 						getMetadata={(locales) => setdeliveryLocations(locales)}
 						headerTitle="Delivery Locations"
 						placeholder="Locations"
@@ -467,12 +542,31 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 							/>
 						</fieldset>
 						<div className="flex justify-between items-center self-end mt-8 space-x-8">
-							<button className="px-4 py-3 text-[12px] font-semibold md:text-sm border-[1px] border-slate-300 rounded-md">
-								Add More Attributes
+							<button
+								onClick={() =>
+									setIsAttributeModalOpen((prev) => !prev)
+								}
+								className={` ${
+									isAttributeModalOpen && "border-gray-300"
+								} px-4 py-3 text-[12px] font-semibold md:text-sm border-[1px] border-afruna-blue rounded-md
+							`}
+							>
+								{isAttributeModalOpen
+									? "Hide"
+									: "Add More Attributes"}
 							</button>
 							<button
+								title={
+									bio_data?.blocked
+										? "You can not create product, contact your administrator"
+										: undefined
+								}
+								disabled={bio_data?.blocked}
 								onClick={handleSubmit}
-								className="px-6 py-3 text-[12px] font-semibold md:text-sm bg-gradient-y-deepblue hover:bg-gradient-whitishblue rounded-md text-white"
+								className={`${
+									bio_data?.blocked &&
+									"bg-slate-600 hover:bg-slate-600 cursor-not-allowed"
+								} px-6 py-3 text-[12px] font-semibold md:text-sm bg-gradient-y-deepblue hover:bg-gradient-whitishblue rounded-md text-white`}
 							>
 								List Now
 							</button>

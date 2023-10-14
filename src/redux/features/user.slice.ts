@@ -25,11 +25,13 @@ const User = createSlice({
 			weekly: [],
 			yearly: [],
 		},
+		users: [],
 		usersWithReviews: [],
 		orders: [],
-		orderBySessionId:[],
+		orderBySessionId: [],
+		orderBuyerInfo: undefined,
 		reports: undefined,
-		viewOrder: undefined
+		viewOrder: undefined,
 	} as T_InitialUserState,
 	name: "User",
 	reducers: {
@@ -39,7 +41,16 @@ const User = createSlice({
 		setUserBio(state, action: PayloadAction<T_User>) {
 			state.bio_data = action.payload;
 		},
-		updateUsersWithReviews(state, action: PayloadAction<(T_user & { reviews: T_review[] })[]>) {
+		updateUsers(
+			state,
+			action: PayloadAction<T_User[]>,
+		) {
+			state.users = action.payload;
+		},
+		updateUsersWithReviews(
+			state,
+			action: PayloadAction<(T_User & { reviews: T_review[] })[]>,
+		) {
 			state.usersWithReviews = action.payload;
 		},
 		updateReviews(state, action: PayloadAction<T_review[]>) {
@@ -66,16 +77,26 @@ const User = createSlice({
 		updateOrder(state, action: PayloadAction<T_order[]>) {
 			state.orders = action.payload;
 		},
-		updateOrderBySessionId(state, action: PayloadAction<T_orderBySessionId[]>) {
+		updateOrderBySessionId(
+			state,
+			action: PayloadAction<T_orderBySessionId[]>,
+		) {
 			state.orderBySessionId = action.payload;
-			
+		},
+		updateOrderBuyerInfo(state, action: PayloadAction<T_User>) {
+			state.orderBuyerInfo = action.payload;
 		},
 		updateReports(state, action: PayloadAction<T_reports>) {
 			state.reports = action.payload;
 		},
-		setViewOrderData(state, action:PayloadAction<T_order | T_user_order| T_updated_user_order>){
+		setViewOrderData(
+			state,
+			action: PayloadAction<
+				T_order | T_user_order | T_updated_user_order
+			>,
+		) {
 			state.viewOrder = action.payload;
-		}
+		},
 	},
 });
 
@@ -93,6 +114,8 @@ export const {
 	updateOrderBySessionId,
 	updateReports,
 	setViewOrderData,
-	updateUsersWithReviews
+	updateUsers,
+	updateUsersWithReviews,
+	updateOrderBuyerInfo
 } = User.actions;
 export default User.reducer;

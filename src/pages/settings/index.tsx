@@ -65,7 +65,9 @@ export default function Index() {
 	const handlePhoneSubmit = useCallback(() => {
 		if (isPhoneValid) {
 			const userServies = new User();
-userServies.updateMe({phoneNumber:phone}).then(()=>{setPhone("")})
+			userServies.updateMe({ phoneNumber: phone }).then(() => {
+				setPhone("");
+			});
 			return;
 		}
 		phoneValidationRef.current
@@ -98,7 +100,10 @@ userServies.updateMe({phoneNumber:phone}).then(()=>{setPhone("")})
 				toast.warn("New password require!");
 				return;
 			}
-			userServices.resetPassword({ password: data.password, oldPassword: data.oldPassword });
+			userServices.resetPassword({
+				password: data.password,
+				oldPassword: data.oldPassword,
+			});
 			setValue("password", "");
 			setValue("oldPpassword", "");
 		},
@@ -155,11 +160,16 @@ userServies.updateMe({phoneNumber:phone}).then(()=>{setPhone("")})
 								Upload a Photo
 							</button> */}
 							<FileInputButton
-								className="bg-gradient-deepBluebutton py-1 px-5 text-sm text-white rounded"
+								disabled={bio_data?.blocked}
+								className={`${
+									bio_data?.blocked && "cursor-not-allowed"
+								} bg-gradient-deepBluebutton py-1 px-5 text-sm text-white rounded`}
 								placeholder="Upload a Photo"
 								maxFiles={1}
 								onChange={handlePhotoChange}
-							/>
+							>
+								Upload a Photo
+							</FileInputButton>
 						</div>
 					</div>
 					<Accordion.Root
@@ -302,7 +312,18 @@ userServies.updateMe({phoneNumber:phone}).then(()=>{setPhone("")})
 										)} */}
 									</fieldset>
 									<div className="flex items-center justify-end mt-4 xs:mt-2">
-										<button className="text-sm font-medium bg-[#1F74A2] text-white px-4 py-2 flex justify-center items-center gap-2 bg-blue rounded-md outline-none transition duration-500 xs:px-6 xs:py-3">
+										<button
+											title={
+												bio_data?.blocked
+													? "blocked"
+													: undefined
+											}
+											disabled={bio_data?.blocked}
+											className={`${
+												bio_data?.blocked &&
+												"cursor-not-allowed"
+											} text-sm font-medium bg-[#1F74A2] text-white px-4 py-2 flex justify-center items-center gap-2 bg-blue rounded-md outline-none transition duration-500 xs:px-6 xs:py-3`}
+										>
 											Update Information
 										</button>
 									</div>
@@ -487,17 +508,36 @@ userServies.updateMe({phoneNumber:phone}).then(()=>{setPhone("")})
 									<div className="flex items-center justify-end mt-4 xs:mt-3">
 										<div className="flex gap-4">
 											<button
+												type="button"
 												onClick={handleSubmit(
-													handlePasswordChange as ()=> void,
+													handlePasswordChange as () => void,
 												)}
-												className="text-[0.9rem] font-semibold px-4 py-2 border border-[#1F74A2] flex justify-center items-center gap-2 rounded-md outline-none transition duration-500 xs:px-4 xs:py-2"
+												title={
+													bio_data?.blocked
+														? "blocked"
+														: undefined
+												}
+												disabled={bio_data?.blocked}
+												className={`${
+													bio_data?.blocked &&
+													"cursor-not-allowed"
+												} text-sm font-medium border border-afruna-blue  text-afruna-blue px-4 py-2 flex justify-center items-center gap-2 bg-blue rounded-md outline-none transition duration-500 xs:px-6 xs:py-3`}
 											>
 												Update Password
 											</button>
 											<button
-												onClick={handlePhoneSubmit}
-												className="text-[0.9rem] font-semibold px-4 py-2 border border-[#1F74A2] flex justify-center items-center gap-2 rounded-md outline-none transition duration-500 xs:px-4 xs:py-2"
 												type="button"
+												onClick={handlePhoneSubmit}
+												title={
+													bio_data?.blocked
+														? "blocked"
+														: undefined
+												}
+												disabled={bio_data?.blocked}
+												className={`${
+													bio_data?.blocked &&
+													"cursor-not-allowed"
+												} text-sm font-medium bg-[#1F74A2] text-white px-4 py-2 flex justify-center items-center gap-2 bg-blue rounded-md outline-none transition duration-500 xs:px-6 xs:py-3`}
 											>
 												Update Phone Number
 											</button>

@@ -41,7 +41,7 @@ const Index = () => {
 						middelComponent={
 							<MiddleComponent
 								title={"Available Balance"}
-								value={170225}
+								value={0}
 							/>
 						}
 						rightComponent={
@@ -56,7 +56,7 @@ const Index = () => {
 							<MiddleComponent
 								afc
 								title={"Afruna Coin"}
-								value={170225}
+								value={0}
 							/>
 						}
 						rightComponent={
@@ -73,7 +73,7 @@ const Index = () => {
 						middelComponent={
 							<MiddleComponent
 								title={"Pending Balance"}
-								value={225}
+								value={0}
 							/>
 						}
 						rightComponent={
@@ -219,10 +219,10 @@ const MiddleComponent: FC<{ value: number; title: string; afc?: boolean }> = ({
 	<div className="space-y-2">
 		<h1 className={"text-afruna-text/70 text-[14px]"}>{title}</h1>
 		<p className="text-xl font-semibold">
-			&#x20A6;
+			
 			{afc
 				? `${value.toLocaleString()} AFC`
-				: `${value.toLocaleString()}`}
+				: <>&#x20A6; {" "} {value.toLocaleString()}</>}
 		</p>
 	</div>
 );
