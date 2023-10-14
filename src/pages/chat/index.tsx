@@ -1,18 +1,14 @@
 import { Fab } from "react-tiny-fab";
-import 'react-tiny-fab/dist/styles.css';
+import "react-tiny-fab/dist/styles.css";
 import { useRouter } from "next/router";
 import React, { useEffect, useMemo, useState } from "react";
 import { Main } from "@/layouts/Main";
-import { IoSearchOutline } from "react-icons/io5";
-import * as ScrollArea from "@radix-ui/react-scroll-area";
-import { images } from "@/constants/images";
-import { conversations, reviews, users } from "@/constants/data";
 import { UsersList } from "@/components/UsersList";
 import { CurrentUserHeader } from "@/components/CurrentUserHeader";
 import { CurrentUsersConversations } from "@/components/CurrentUsersConversations";
 import { CoversationFooter } from "@/components/CoversationFooter";
 import Breadcrumbs from "@/components/widgets/Breadcrumbs";
-import { MdAdd, MdSearch } from "react-icons/md";
+import { MdAdd, MdArrowBack, MdSearch } from "react-icons/md";
 import { useSelector } from "react-redux";
 import { RootState } from "@/types/store.type";
 import Chat from "@/services/chat.service";
@@ -20,25 +16,38 @@ import { T_convo, T_msg_alias } from "@/types/user.type";
 import { getChatTimeDiff } from "@/utils/chat_time_diff";
 import withAuth10 from "@/hooks/withAuth10";
 import store from "@/redux/store";
-import Image from "next/image";
 import User from "@/services/user.service";
-
+import useSearchConvo from "@/hooks/useSearchConvo";
+import * as Avatar from "@radix-ui/react-avatar";
 export default withAuth10(function Index() {
 	const router = useRouter();
 	const { convo, messages } = useSelector((state: RootState) => state.chat);
-	const { bio_data,usersWithReviews } = useSelector((state: RootState) => state.user);
+	const { bio_data, usersWithReviews,users } = useSelector(
+		(state: RootState) => state.user,
+	);
 	useEffect(() => {
 		const _ = new Chat();
-		const ___ = new User(); 
+		const ___ = new User();
 	}, []);
-	const [activeChat,setActiveChat] = useState(messages);
+	const [activeChat, setActiveChat] = useState(messages);
 	const [activeChatHeader, setActiveChatHeader] = useState<T_convo>(convo[0]);
 	useEffect(() => {
 		setActiveChat(messages);
-	}, [convo])
+	}, [convo]);
+const { searchResult, setSearchInput } = useSearchConvo({ data: convo });
 
-	const moreUsers = useMemo(()=> usersWithReviews && usersWithReviews.filter((user => user._id !== activeChat[0]?.from._id)),[activeChat, usersWithReviews])
-	
+	const moreUsers = useMemo(
+		() =>
+			users &&
+			users.filter(
+				(user) => user?._id !== activeChat[0]?.from._id,
+			).filter((user)=> user?._id !== bio_data?._id),
+			// usersWithReviews &&
+			// usersWithReviews.filter(
+			// 	(user) => user._id !== activeChat[0]?.from._id,
+			// ),
+		[activeChat, usersWithReviews],
+	);
 
 	return (
 		<Main breadcrumbs={<Breadcrumbs />}>
@@ -49,6 +58,7 @@ export default withAuth10(function Index() {
 					</h2>
 					<div className="ml-4 mr-6 bg-white flex items-center border border-afruna-gray/30 rounded-md overflow-hidden">
 						<input
+							onChange={(e) => setSearchInput(e.target.value)}
 							type="text"
 							placeholder="Search Name, Id..."
 							className="w-full p-2 focus:outline-none placeholder:text-afruna-gray/30"
@@ -59,59 +69,146 @@ export default withAuth10(function Index() {
 					</div>
 					<div className="relative mt-1 pt-2">
 						<div className="relative flex flex-col gap-2 p-3 h-[45vh] overflow-x-hidden overflow-y-auto">
-							{convo
-								? convo.map((user) => (
+							{searchResult && searchResult.length > 0
+								? searchResult.map((user) => (
 										<UsersList
 											lastMessage={user.lastMessage}
-											setActiveChat={() => {
+											selectChat={() => {
 												const chatServices = new Chat();
 												chatServices.getMessage(
-													user._id,
+													user?._id,
 												);
 												chatServices.getConversations();
-												
-												const messages = store.store.getState().chat.messages;
+
+												const messages =
+													store.store.getState().chat
+														.messages;
 												setActiveChatHeader(user);
 												setActiveChat(messages);
-												// router.reload();const messages = store.store.getState().chat.messages;
 											}}
 											key={user._id}
-											name={bio_data?._id ===user._id?bio_data.lastName:user.alias}
-											number={user.unreadMessages}
+											name={user?.alias ?? ""}
+											number={user?.unreadMessages}
 											active={false}
-											img={bio_data?._id ===user._id?bio_data.avatar:user.aliasAvatar}
+											img={user?.aliasAvatar}
 											id={user.recipients[0]}
 										/>
 								  ))
 								: null}
-							
-							<Fab onClick={() => {
-								document.querySelector("ul.rtf")?.classList.replace("closed", "open")
-							}} mainButtonStyles={{background:"darkblue",bottom: -140, right: 0, position: "absolute"}} event="click" style={{position:"relative"}} icon={<MdAdd />}>
-								<div onClick={()=>{document.querySelector("ul.rtf")?.classList.replace("open", "closed")}} className="cursor-pointer bg-gray-300/70 rounded-lg p-1 w-[40vh] max-h-[40vh] h-fit overflow-y-auto">
-									{moreUsers && moreUsers.length > 0?moreUsers.map((userWithReview) => (
-										<button onClick={() => {
-											
-												setActiveChat([{
-	_id: "",
-	conversation: "",
-	to: {...userWithReview} as unknown as T_msg_alias,
-	from: {...bio_data} as T_msg_alias,
-	message: "",
-	attachment: [],
-	seen: [],
-	createdAt: "",
-	updatedAt: "",
-												}])
-											document.querySelector("ul.rtf")?.classList.replace("open", "closed")
-											
-										}} key={userWithReview?._id} className="flex items-center place-items-center gap-2 hover:bg-gray-300/90 w-full rounded-lg">
-											<Image width={30} height={30} className="rounded-full w-12 h-12 object-fill" alt={userWithReview?.email} src={userWithReview?.avatar ?? images.afruna_logo} priority />
-											<span>{userWithReview?.firstName} {userWithReview?.lastName }</span>
-										</button>
-
-									)):<>empty member!</>}
-</div>
+							<Fab
+								//openinig the fab
+								onClick={() => {
+									document
+										.querySelector("ul.rtf")
+										?.classList.replace("closed", "open");
+								}}
+								mainButtonStyles={{
+									background: "darkblue",
+									bottom: 0,
+									top: 100,
+									right: 0,
+									padding: 20,
+									position: "absolute",
+								}}
+								event="click"
+								style={{
+									position: "relative",
+									bottom: 180,
+									width: "content-fit",
+									height: "content-fit",
+								}}
+								icon={<MdAdd />}
+							>
+								<div
+									onClick={() => {
+										document
+											.querySelector("ul.rtf")
+											?.classList.replace(
+												"open",
+												"closed",
+											);
+									}}
+									className="cursor-pointer relative top-0 py-4 bg-gray-300/90 backdrop:blur-lg rounded-lg p-1 w-[40vh] max-h-[40vh] h-fit overflow-y-auto"
+								>
+									<button className="p-2">
+										<MdArrowBack />
+									</button>
+									{moreUsers && moreUsers.length > 0 ? (
+										moreUsers
+											.filter(
+												(unBlockedUser) =>
+													unBlockedUser?.blocked ===
+													false,
+											)
+											.map((user) => (
+												<button
+													onClick={() => {
+														setActiveChatHeader({
+															_id: "",
+															alias: `${user?.firstName} ${user?.lastName}`,
+															aliasAvatar:
+																user?.avatar as string,
+															createdAt:
+																Date.now().toLocaleString(),
+															updatedAt: "",
+															lastMessage: "",
+															recipients: [],
+															unreadMessages: 0,
+														});
+														setActiveChat([
+															{
+																_id: "",
+																conversation:
+																	"",
+																to: {
+																	...user,
+																} as unknown as T_msg_alias,
+																from: {
+																	...bio_data,
+																} as unknown as T_msg_alias,
+																message: "",
+																attachment: [],
+																seen: [],
+																createdAt: "",
+																updatedAt: "",
+															},
+														]);
+														document
+															.querySelector(
+																"ul.rtf",
+															)
+															?.classList.replace(
+																"open",
+																"closed",
+															);
+													}}
+													key={user?._id}
+													className="flex items-center place-items-center gap-2 hover:bg-gray-300/90 w-full rounded-lg"
+												>
+													<Avatar.Root>
+														<Avatar.Image
+															className="object-cover rounded-full text-afruna-blue p-1 w-12 h-12"
+															src={user?.avatar}
+														/>
+														<Avatar.Fallback className="text-afruna-blue p-1 w-12 h-12 justify-center rounded-full bg-afruna-blue/20 flex uppercase items-center">
+															{user?.firstName.at(
+																0,
+															)}
+															{user?.lastName.at(
+																0,
+															)}
+														</Avatar.Fallback>
+													</Avatar.Root>
+													<span>
+														{user?.firstName}{" "}
+														{user?.lastName}
+													</span>
+												</button>
+											))
+									) : (
+										<>empty member!</>
+									)}
+								</div>
 							</Fab>
 						</div>
 					</div>
