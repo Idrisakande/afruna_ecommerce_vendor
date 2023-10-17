@@ -31,7 +31,8 @@ class Chat {
 			// Reverse the order of chat messages to show the last one at the top
 			const messages: T_msg[] = data.data.slice().reverse();
 			this.getConversations();
-			this.store.dispatch(updateMessages(messages));
+			// this.store.dispatch(updateMessages(messages));
+			return messages;
 		} catch (error) {
 			handleAuthErrors(error as AxiosError<T_error_response>);
 		}

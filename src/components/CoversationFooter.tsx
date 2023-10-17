@@ -26,6 +26,7 @@ export const CoversationFooter: FC<CoversationFooterProps> = ({ to, id }) => {
 		formState: { errors },
 	} = useForm<MessageInput>();
 	const { bio_data } = useSelector((state: RootState) => state.user);
+console.log("to", to);
 
 	const onSubmit: SubmitHandler<MessageInput> = useCallback(
 		async (data) => {
