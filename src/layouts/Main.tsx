@@ -97,7 +97,7 @@ export const Main: FC<MainProps> = ({
 							className="sticky top-0 left-0 right-0 h-20"
 						/>
 					) : (
-						<header className="sticky top-0 z-20 flex justify-between items-center bg-white h-20">
+						<header className="print:hidden sticky top-0 z-20 flex justify-between items-center bg-white h-20">
 							<div className="max-w-[91.5%] mx-auto w-full flex justify-between items-center">
 								{breadcrumbs}
 								{asideComponent && asideComponent}
