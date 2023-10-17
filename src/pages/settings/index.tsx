@@ -20,7 +20,8 @@ import get_countryUtil from "@/utils/get_country.util";
 import User from "@/services/user.service";
 import { ExtFile, FileInputButton } from "@files-ui/react";
 import { toast } from "react-toastify";
-export default function Index() {
+import withAuth10 from "@/hooks/withAuth10";
+export default withAuth10(function Index() {
 	const { bio_data } = useSelector((state: RootState) => state.user);
 	const {
 		register,
@@ -119,7 +120,7 @@ export default function Index() {
 				const [key, value] = entries[i as unknown as number];
 				if (value && key !== "oldPassword" && key !== "password") {
 					// update
-					formdata.append(key, value as any);
+					formdata.append(key, value as string);
 				}
 			}
 			function isFormDataEmpty(data: FormData) {
@@ -128,10 +129,13 @@ export default function Index() {
 				}
 				return true; // If no entries are found, it's empty
 			}
-			if (!isFormDataEmpty(formdata) || country.Name.length) {
+			if (!isFormDataEmpty(formdata) && country.Name.length > 0) {
 				//if country is selected add it to the formdata and make an update
 				formdata.append("country", country.Name);
 				userServices.updateMe(formdata);
+			} else {
+				userServices.updateMe(formdata);
+				
 			}
 		},
 		[country],
@@ -552,3 +556,4 @@ export default function Index() {
 		</>
 	);
 }
+)

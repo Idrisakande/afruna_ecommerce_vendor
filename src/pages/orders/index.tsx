@@ -7,9 +7,10 @@ import {
 } from "@/contexts/OrdersProvider";
 import { OrderTable } from "@/components/widgets/tables/OrderTable";
 import Order from "@/services/order.service";
+import withAuth10 from "@/hooks/withAuth10";
 // import { IOrederContext } from "@/interfaces/tables.interface";
 
-export default function Index() {
+export default withAuth10(function Index() {
 	useEffect(() => {
 		const ordersServices = new Order();
 	},[])
@@ -21,7 +22,7 @@ export default function Index() {
 			</main>
 		</OrdersProvider>
 	);
-}
+})
 const OrdersFilter = memo(() => {
 	const { selectedFilter, handleActiveFilter } = useContext(
 		OrdersContext,

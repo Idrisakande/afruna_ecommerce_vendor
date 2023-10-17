@@ -1,7 +1,7 @@
 import { Fab } from "react-tiny-fab";
 import "react-tiny-fab/dist/styles.css";
 import { useRouter } from "next/router";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Main } from "@/layouts/Main";
 import { UsersList } from "@/components/UsersList";
 import { CurrentUserHeader } from "@/components/CurrentUserHeader";
@@ -12,7 +12,7 @@ import { MdAdd, MdArrowBack, MdSearch } from "react-icons/md";
 import { useSelector } from "react-redux";
 import { RootState } from "@/types/store.type";
 import Chat from "@/services/chat.service";
-import { T_convo, T_msg_alias } from "@/types/user.type";
+import { T_convo, T_msg, T_msg_alias } from "@/types/user.type";
 import { getChatTimeDiff } from "@/utils/chat_time_diff";
 import withAuth10 from "@/hooks/withAuth10";
 import store from "@/redux/store";
@@ -22,32 +22,40 @@ import * as Avatar from "@radix-ui/react-avatar";
 export default withAuth10(function Index() {
 	const router = useRouter();
 	const { convo, messages } = useSelector((state: RootState) => state.chat);
-	const { bio_data, usersWithReviews,users } = useSelector(
+	const { bio_data, usersWithReviews, users } = useSelector(
 		(state: RootState) => state.user,
 	);
-	useEffect(() => {
-		const _ = new Chat();
-		const ___ = new User();
-	}, []);
-	const [activeChat, setActiveChat] = useState(messages);
+	const [activeChat, setActiveChat] = useState<T_msg[]>([]);
 	const [activeChatHeader, setActiveChatHeader] = useState<T_convo>(convo[0]);
 	useEffect(() => {
-		setActiveChat(messages);
-	}, [convo]);
-const { searchResult, setSearchInput } = useSearchConvo({ data: convo });
+		const ___ = new User();
+		const _ = new Chat();
+	}, []);
 
-	const moreUsers = useMemo(
-		() =>
-			users &&
-			users.filter(
-				(user) => user?._id !== activeChat[0]?.from._id,
-			).filter((user)=> user?._id !== bio_data?._id),
-			// usersWithReviews &&
-			// usersWithReviews.filter(
-			// 	(user) => user._id !== activeChat[0]?.from._id,
-			// ),
-		[activeChat, usersWithReviews],
-	);
+	const getMessages = useCallback(async (id: string) => {
+		const _ = new Chat();
+		const messages = await _.getMessage(id);
+		setActiveChat(messages as T_msg[]);
+	}, []);
+	const { searchResult, setSearchInput } = useSearchConvo({ data: convo });
+
+	// const moreUsers = useMemo(
+	// 	() =>
+	// 		users &&
+	// 		users.filter(
+	// 			(user) => user?._id !== activeChat[0]?.from._id,
+	// 		).filter((user)=> user?._id !== bio_data?._id),
+	// 		// usersWithReviews &&
+	// 		// usersWithReviews.filter(
+	// 		// 	(user) => user._id !== activeChat[0]?.from._id,
+	// 		// ),
+	// 	[activeChat, usersWithReviews],
+	// );
+
+	console.log("=== convo ===");
+	console.log(convo);
+	console.log("=== messages ===");
+	console.log(activeChat);
 
 	return (
 		<Main breadcrumbs={<Breadcrumbs />}>
@@ -67,150 +75,181 @@ const { searchResult, setSearchInput } = useSearchConvo({ data: convo });
 							<MdSearch className="text-2xl" />
 						</div>
 					</div>
-					<div className="relative mt-1 pt-2">
-						<div className="relative flex flex-col gap-2 p-3 h-[45vh] overflow-x-hidden overflow-y-auto">
+					<div className="mt-1 relative pt-2">
+						<div className="flex relative flex-col gap-2 p-3 h-[45vh] overflow-x-hidden overflow-y-auto">
 							{searchResult && searchResult.length > 0
-								? searchResult.map((user) => (
+								? searchResult.map((convo) => (
 										<UsersList
-											lastMessage={user.lastMessage}
+											lastMessage={convo.lastMessage}
 											selectChat={() => {
 												const chatServices = new Chat();
 												chatServices.getMessage(
-													user?._id,
+													convo?._id,
 												);
-												chatServices.getConversations();
-
-												const messages =
-													store.store.getState().chat
-														.messages;
-												setActiveChatHeader(user);
-												setActiveChat(messages);
+												// const messages =
+												// 	store.store.getState().chat
+												// 		.messages;
+												setActiveChatHeader(convo);
+												getMessages(convo._id)
 											}}
-											key={user._id}
-											name={user?.alias ?? ""}
-											number={user?.unreadMessages}
+											key={convo?._id}
+											name={convo?.alias ?? ""}
+											number={convo?.unreadMessages}
 											active={false}
-											img={user?.aliasAvatar}
-											id={user.recipients[0]}
+											img={convo?.aliasAvatar}
+											id={convo?._id}
 										/>
 								  ))
 								: null}
-							<Fab
-								//openinig the fab
+						</div>
+						<Fab
+							//openinig the fab
+							onClick={() => {
+								document
+									.querySelector("ul.rtf")
+									?.classList.replace("closed", "open");
+							}}
+							mainButtonStyles={{
+								background: "darkblue",
+								bottom: 0,
+								top: 100,
+								right: 0,
+								padding: 20,
+								position: "absolute",
+							}}
+							event="click"
+							style={{
+								position: "relative",
+								bottom: 180,
+								width: "content-fit",
+								height: "content-fit",
+							}}
+							icon={<MdAdd />}
+						>
+							<div
 								onClick={() => {
 									document
 										.querySelector("ul.rtf")
-										?.classList.replace("closed", "open");
+										?.classList.replace("open", "closed");
 								}}
-								mainButtonStyles={{
-									background: "darkblue",
-									bottom: 0,
-									top: 100,
-									right: 0,
-									padding: 20,
-									position: "absolute",
-								}}
-								event="click"
-								style={{
-									position: "relative",
-									bottom: 180,
-									width: "content-fit",
-									height: "content-fit",
-								}}
-								icon={<MdAdd />}
+								className="cursor-pointer relative top-0 py-4 bg-gray-300/90 backdrop:blur-lg rounded-lg p-1 w-[40vh] max-h-[40vh] h-fit overflow-y-auto"
 							>
-								<div
-									onClick={() => {
-										document
-											.querySelector("ul.rtf")
-											?.classList.replace(
-												"open",
-												"closed",
-											);
-									}}
-									className="cursor-pointer relative top-0 py-4 bg-gray-300/90 backdrop:blur-lg rounded-lg p-1 w-[40vh] max-h-[40vh] h-fit overflow-y-auto"
-								>
-									<button className="p-2">
-										<MdArrowBack />
-									</button>
-									{moreUsers && moreUsers.length > 0 ? (
-										moreUsers
-											.filter(
-												(unBlockedUser) =>
-													unBlockedUser?.blocked ===
-													false,
-											)
-											.map((user) => (
-												<button
-													onClick={() => {
-														setActiveChatHeader({
+								<button className="p-2">
+									<MdArrowBack />
+								</button>
+								{users && users.length > 0 ? (
+									users
+										.filter(
+											(unBlockedUser) =>
+												unBlockedUser?.blocked ===
+												false,
+										)
+										.map((user) =>user &&( (
+											<button
+												onClick={() => {
+													setActiveChatHeader({
+														_id: "",
+														alias: `${user?.firstName} ${user?.lastName}`,
+														aliasAvatar:
+															user?.avatar as string,
+														createdAt:
+															Date.now().toLocaleString(),
+														updatedAt: "",
+														lastMessage: "",
+														recipients: [],
+														unreadMessages: 0,
+													});
+													if (bio_data) {
+													setActiveChat([
+														{
 															_id: "",
-															alias: `${user?.firstName} ${user?.lastName}`,
-															aliasAvatar:
-																user?.avatar as string,
-															createdAt:
-																Date.now().toLocaleString(),
-															updatedAt: "",
-															lastMessage: "",
-															recipients: [],
-															unreadMessages: 0,
-														});
-														setActiveChat([
-															{
-																_id: "",
-																conversation:
+															conversation: "",
+															to: {
+																_id: user._id,
+																addresses: [],
+																avatar: user?.avatar,
+																country:
+																	user?.country,
+																createdAt:
+																	user.createdAt,
+																email: user?.email,
+																firstName:
+																	user.firstName,
+																isVendor: false,
+																lastName:
+																	user.lastName,
+																password: "",
+																phoneNumber:
+																	user.phoneNumber,
+																role: user.role,
+																updatedAt:
+																	user.updatedAt,
+																verificationToken:
 																	"",
-																to: {
-																	...user,
-																} as unknown as T_msg_alias,
-																from: {
-																	...bio_data,
-																} as unknown as T_msg_alias,
-																message: "",
-																attachment: [],
-																seen: [],
-																createdAt: "",
-																updatedAt: "",
 															},
-														]);
-														document
-															.querySelector(
-																"ul.rtf",
-															)
-															?.classList.replace(
-																"open",
-																"closed",
-															);
-													}}
-													key={user?._id}
-													className="flex items-center place-items-center gap-2 hover:bg-gray-300/90 w-full rounded-lg"
-												>
-													<Avatar.Root>
-														<Avatar.Image
-															className="object-cover rounded-full text-afruna-blue p-1 w-12 h-12"
-															src={user?.avatar}
-														/>
-														<Avatar.Fallback className="text-afruna-blue p-1 w-12 h-12 justify-center rounded-full bg-afruna-blue/20 flex uppercase items-center">
-															{user?.firstName.at(
-																0,
-															)}
-															{user?.lastName.at(
-																0,
-															)}
-														</Avatar.Fallback>
-													</Avatar.Root>
-													<span>
-														{user?.firstName}{" "}
-														{user?.lastName}
-													</span>
-												</button>
-											))
-									) : (
-										<>empty member!</>
-									)}
-								</div>
-							</Fab>
-						</div>
+															from: {
+																_id: bio_data._id,
+																addresses: [],
+																avatar: bio_data.avatar,
+																country:
+																	bio_data.country,
+																createdAt:
+																	bio_data.createdAt,
+																email: bio_data.email,
+																firstName:
+																	bio_data.firstName,
+																isVendor: false,
+																lastName:
+																	bio_data.lastName,
+																password: "",
+																phoneNumber:
+																	bio_data.phoneNumber,
+																role: bio_data.role,
+																updatedAt:
+																	bio_data.updatedAt,
+																verificationToken:
+																	"",
+															},
+															message: "",
+															attachment: [],
+															seen: [],
+															createdAt: "",
+															updatedAt: "",
+														},
+													]);	
+													}
+													
+													document
+														.querySelector("ul.rtf")
+														?.classList.replace(
+															"open",
+															"closed",
+														);
+												}}
+												key={user?._id}
+												className="flex items-center place-items-center gap-2 hover:bg-gray-300/90 w-full rounded-lg"
+											>
+												<Avatar.Root>
+													<Avatar.Image
+														className="object-cover rounded-full text-afruna-blue p-1 w-12 h-12"
+														src={user?.avatar}
+													/>
+													<Avatar.Fallback className="text-afruna-blue p-1 w-12 h-12 justify-center rounded-full bg-afruna-blue/20 flex uppercase items-center">
+														{user?.firstName.at(0)}
+														{user?.lastName.at(0)}
+													</Avatar.Fallback>
+												</Avatar.Root>
+												<span>
+													{user?.firstName}{" "}
+													{user?.lastName}
+												</span>
+											</button>
+										)))
+								) : (
+									<>empty member!</>
+								)}
+							</div>
+						</Fab>
 					</div>
 				</div>
 				{activeChat.length ? (

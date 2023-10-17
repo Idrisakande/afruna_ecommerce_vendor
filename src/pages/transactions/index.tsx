@@ -15,6 +15,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/types/store.type";
 import PageLoarder from "@/components/widgets/PageLoarder";
 import Transactions from "@/services/transactions.service";
+import withAuth10 from "@/hooks/withAuth10";
 
 const Index = () => {
 	const router = useRouter();
@@ -227,4 +228,4 @@ const MiddleComponent: FC<{ value: number; title: string; afc?: boolean }> = ({
 	</div>
 );
 
-export default Index;
+export default withAuth10(Index);
