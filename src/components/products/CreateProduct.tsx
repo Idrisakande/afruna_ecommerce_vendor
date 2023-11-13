@@ -12,7 +12,7 @@ import { Header } from "./Header";
 import { Content } from "./Content";
 import { IProductContext } from "@/interfaces/IProductContext";
 import { productcontext } from "@/contexts/ProductProvider";
-import { MdAdd, MdClose, MdDelete, MdImage } from "react-icons/md";
+import { MdAdd, MdCancel, MdClose, MdDelete, MdImage } from "react-icons/md";
 import { Dropzone, ExtFile, FileMosaic } from "@files-ui/react";
 import { InputLabelNumber } from "../widgets/Input/InputLabelNumber";
 import CheckBoxLabel from "../widgets/CheckBoxLabel";
@@ -33,10 +33,10 @@ import { useRouter } from "next/router";
 import { T_Category } from "@/types/categories.type";
 import { getNonEmptyInputValues } from "@/utils/get_non_empty_input_values";
 
-export const CreateProduct: FC<{}> = memo(({ }) => {
+export const CreateProduct: FC<{}> = memo(({}) => {
 	const { bio_data } = useSelector((state: RootState) => state.user);
 	console.log(bio_data);
-	
+
 	const router = useRouter();
 	const { tab } = useContext(productcontext) as IProductContext;
 	const opt = useContext(AppContext) as T_app_provider;
@@ -58,8 +58,39 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 	const [inputValues, setInputValues] = useState<{
 		[key: string]: string[];
 	}>({}); //values for all input
+	interface IVariant {
+		[key: string]: string | number;
+	}
+
+	const [productVariants, setProductVariants] = useState<IVariant[]>([]);
+
 	const [isAttributeModalOpen, setIsAttributeModalOpen] =
 		useState<boolean>(false);
+	//add more variant for the product
+	const addProductVariants = useCallback(() => {
+		if (category && category.options) {
+			const newVariant = category.options.reduce(
+				(acc: IVariant, option) => {
+					acc[option] = ""; // Initialize with empty values for category options
+					return acc;
+				},
+				{ quantity: 0 },
+			);
+			setProductVariants((prevVariants) => [...prevVariants, newVariant]);
+		}
+		return;
+	}, [category]);
+
+	// Function to handle user input for product variants
+	const handleVariantChange = (
+		index: number,
+		field: string,
+		value: string,
+	) => {
+		const updatedVariant = [...productVariants]; //get a copy array of the variants;
+		updatedVariant[index][field] = value;
+		setProductVariants(updatedVariant);
+	};
 	// Handle changes in input values
 	const handleInputChange = useCallback(
 		(options: string[], name: string) => {
@@ -71,15 +102,19 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 		[inputValues],
 	);
 
-	const handleSelectedCategory = useCallback(
+	const handleSelectCategory = useCallback(
 		(val: string) => {
-			const cat = categories.find((cat) => cat.name === val);
-			setCategory(cat as { _id: string; name: string });
+		  const cat = categories.find((i) => i.name === val);
+		  setCategory(cat as { _id: string; name: string });
+		  //reset product variant when new category is selecteed
+		  if (category && category.name !== val) {
+			setProductVariants([]);
+		  }
 		},
-		[categories],
-	);
+		[categories, category]
+	  );
 
-	const renderAttributes = () => {
+	/* const renderAttributes = () => {
 		if (category && category.options && category.options.length > 0) {
 			return (
 				<div className="grid lg:grid-cols-2 gap-2">
@@ -104,7 +139,7 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 				<p>no category selected</p>
 			);
 		}
-	};
+	}; */
 
 	const updateFiles = useCallback((incommingFiles: ExtFile[]) => {
 		if (incommingFiles.length <= 10) {
@@ -170,10 +205,10 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 			toast.warn("Product price must be provided!");
 			return;
 		}
-		if (!quantity) {
-			toast.warn("Product quantity must be provided!");
+		if (!quantity || quantity === 0) {
+			toast.warn("Product quantity required! Proceed by adding attribute(s).");
 			return;
-		}
+		  }
 		if (!brand?.length) {
 			toast.warn("Product brand required");
 			return;
@@ -238,7 +273,7 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 		for (let i = 0; i < files.length; i++) {
 			formData.append("images", files[i].file as Blob);
 		}
-
+		formData.append("options", JSON.stringify(productVariants));
 		const productService = new Products();
 		productService
 			.createProduct(formData as unknown as IProduct, {
@@ -263,6 +298,7 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 				setInputValues({});
 				setIsAttributeModalOpen(false);
 				setCategory(undefined);
+				setProductVariants([]);
 				router.push("/products");
 			});
 	}, [
@@ -280,6 +316,7 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 		files,
 		category?._id,
 		inputValues,
+		productVariants,
 	]);
 
 	const handleColorAddition = useCallback(() => {
@@ -287,9 +324,18 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 		const newColors = new Set([...colors, color]);
 		newColors.forEach((set) => COLORS.push(set as string));
 		setColors(COLORS);
-		setColor("")
+		setColor("");
 	}, [color, colors]);
 
+	useEffect(() => {
+		const totalQauantity = productVariants.reduce(
+			(accum, value) => accum + parseInt(value.quantity as string),
+			0,
+		);
+		console.log(totalQauantity);
+
+		setQuantity(totalQauantity);
+	}, [productVariants]);
 	if (opt.isLoading) {
 		return <PageLoader />;
 	}
@@ -360,7 +406,7 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 						key={"Items"}
 						contentClassName="z-20 max-h-[30vh] overflow-y-auto"
 						triggerClassName="flex text-sm space-x-1 items-center text-afruna-blue border border-afruna-gray/30 p-3 rounded-md"
-						getSelected={handleSelectedCategory}
+						getSelected={handleSelectCategory}
 					/>
 					<InputLabel
 						type="text"
@@ -468,14 +514,14 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 							placeholder="0"
 							suffix
 						/>
-						<InputLabelNumber
+						{/* <InputLabelNumber
 							getValue={(val) =>
 								setQuantity(val as unknown as number)
 							}
 							headerTitle="Quantiy"
 							placeholder="0"
 							suffix
-						/>
+						/> */}
 						<ItemLabelPicker
 							items={[
 								"New",
@@ -505,7 +551,67 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 							placeholder="Select brand"
 						/>
 					</div>
-					{isAttributeModalOpen && renderAttributes()}
+					{/* {isAttributeModalOpen && renderAttributes()} */}
+					{/* set attributes */}
+					{categories && category && productVariants.length > 0
+						? productVariants.map((variant, index) => (
+								<div key={index} className="gap-2">
+									<div className="flex gap-1 items-center">
+										<h1 className="font-bold text-sm">
+											Variant {index + 1}
+										</h1>
+										{/* remove variant */}
+										<button
+											onClick={() => {
+												const newVariants =
+													productVariants.filter(
+														(_, idx) =>
+															index !== idx,
+													);
+												setProductVariants(newVariants);
+											}}
+										>
+											<MdCancel />
+										</button>
+									</div>
+									<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 border rounded-lg p-2">
+										{Object.entries(variant).map(
+											([option, value], idx) => (
+												<input
+													type={
+														option === "quantity" ||
+														option.toLocaleLowerCase() ===
+															"discount"
+															? "number"
+															: "text"
+													}
+													className="p-1 rounded-md border"
+													key={idx}
+													placeholder={option}
+													onChange={(e) =>
+														handleVariantChange(
+															index,
+															option,
+															e.target.value,
+														)
+													}
+												/>
+											),
+										)}
+									</div>
+								</div>
+						  ))
+						: null}
+					<div className="grid grid-rows-2">
+						<h1>Total Quantity</h1>
+						<input
+							type="number"
+							className="p-1 rounded-md border"
+							placeholder="0"
+							value={quantity}
+							disabled
+						/>
+					</div>
 					<InputData
 						getMetadata={(meta) => setMetadata(meta)}
 						headerTitle="Meta Data"
@@ -542,7 +648,7 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 							/>
 						</fieldset>
 						<div className="flex justify-between items-center self-end mt-8 space-x-8">
-							<button
+							{/* <button
 								onClick={() =>
 									setIsAttributeModalOpen((prev) => !prev)
 								}
@@ -554,6 +660,12 @@ export const CreateProduct: FC<{}> = memo(({ }) => {
 								{isAttributeModalOpen
 									? "Hide"
 									: "Add More Attributes"}
+							</button> */}
+							<button
+								onClick={addProductVariants}
+								className=" px-4 py-3 text-[12px] font-semibold md:text-sm border-[1px] border-afruna-blue rounded-md"
+							>
+								Add Attribuites
 							</button>
 							<button
 								title={

@@ -21,9 +21,10 @@ export const ProductItem: FC<IProductItem> = memo(
 		discount,
 		checkbox,
 		handleSelect,
+		onClick
 	}) => {
 		return published ? (
-			<div className="relative flex flex-col hover:bg-afruna-gray/10 bg-afruna-gray/5 backdrop-blur-sm rounded-md shadow-sm text-[12px] md:text-xs p-3">
+			<div onClick={onClick} className="relative flex flex-col hover:bg-afruna-gray/10 bg-afruna-gray/5 backdrop-blur-sm rounded-md shadow-sm text-[12px] md:text-xs p-3 hover:cursor-pointer">
 				{checkbox && (
 					<input
 						type="checkbox"

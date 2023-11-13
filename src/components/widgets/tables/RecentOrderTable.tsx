@@ -32,7 +32,7 @@ const RecentOrderTable: FC = () => {
 	const router = useRouter();
 	const { orders } = useSelector((state: RootState) => state.user);
 	const recent_orders = useMemo(() => {
-		return recent_itemsUtil(orders, 30) as T_order[];
+		return recent_itemsUtil(orders, 30).slice(0,9) as T_order[];
 	}, [orders]);
 	const dispatch = useDispatch();
 	const [sorting, setSorting] = useState<SortingState>([]);

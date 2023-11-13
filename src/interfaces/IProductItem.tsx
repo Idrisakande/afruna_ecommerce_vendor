@@ -16,6 +16,7 @@ export interface IProductItem {
 	discount?: number;
 	checkbox?: boolean;
 	handleSelect?: () => void;
+	onClick?: () => void;
 }
 export interface IProduct {
 	_id: string;

@@ -122,6 +122,9 @@ export const ProductList: FC<{}> = memo(({}) => {
 				{searchResult.length ? (
 					searchResult.map((item, _) => (
 						<ProductItem
+						onClick={()=> {
+							window.location.href = `/product/${item._id}`;
+						}}
 							key={_}
 							item_img={item.coverPhoto[0] ?? ""}
 							item_name={item.name}

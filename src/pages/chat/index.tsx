@@ -25,6 +25,7 @@ export default withAuth10(function Index() {
 	const { bio_data, usersWithReviews, users } = useSelector(
 		(state: RootState) => state.user,
 	);
+	const [to, setTo]= useState<string>();
 	const [activeChat, setActiveChat] = useState<T_msg[]>([]);
 	const [activeChatHeader, setActiveChatHeader] = useState<T_convo>(convo[0]);
 	useEffect(() => {
@@ -52,11 +53,6 @@ export default withAuth10(function Index() {
 	// 	[activeChat, usersWithReviews],
 	// );
 
-	console.log("=== convo ===");
-	console.log(convo);
-	console.log("=== messages ===");
-	console.log(activeChat);
-
 	return (
 		<Main breadcrumbs={<Breadcrumbs />}>
 			<main className="p-2 px-8 pt-5 flex gap-5">
@@ -82,15 +78,20 @@ export default withAuth10(function Index() {
 										<UsersList
 											lastMessage={convo.lastMessage}
 											selectChat={() => {
-												const chatServices = new Chat();
-												chatServices.getMessage(
-													convo?._id,
-												);
-												// const messages =
-												// 	store.store.getState().chat
-												// 		.messages;
-												setActiveChatHeader(convo);
-												getMessages(convo._id)
+											if (bio_data){
+												const foundAt = convo.recipients.indexOf(bio_data._id); // get the index of the sender
+												const receiver = convo.recipients[foundAt > 0 ?0:1];
+												setTo(receiver);
+											}
+													const chatServices = new Chat();
+													chatServices.getMessage(
+														convo?._id,
+													);
+													// const messages =
+													// 	store.store.getState().chat
+													// 		.messages;
+													setActiveChatHeader(convo);
+													getMessages(convo._id);
 											}}
 											key={convo?._id}
 											name={convo?.alias ?? ""}
@@ -142,21 +143,22 @@ export default withAuth10(function Index() {
 										.filter(
 											(unBlockedUser) =>
 												unBlockedUser?.blocked ===
-												false,
+												false && unBlockedUser.role === "vendor" && unBlockedUser._id !== bio_data?._id,
 										)
 										.map((user) =>user &&( (
 											<button
 												onClick={() => {
+													setTo(user._id);// set receiver id
 													setActiveChatHeader({
-														_id: "",
-														alias: `${user?.firstName} ${user?.lastName}`,
+														_id: user._id,
+														alias: `${user.firstName} ${user.lastName}`,
 														aliasAvatar:
-															user?.avatar as string,
+															user.avatar as string,
 														createdAt:
 															Date.now().toLocaleString(),
 														updatedAt: "",
 														lastMessage: "",
-														recipients: [],
+														recipients: [user._id, (bio_data?._id as unknown as string)],
 														unreadMessages: 0,
 													});
 													if (bio_data) {
@@ -281,7 +283,7 @@ export default withAuth10(function Index() {
 								))}
 							</div>
 						</div>
-						<CoversationFooter to={activeChat[0]?.to?._id} />
+						<CoversationFooter to={to} />
 					</div>
 				) : null}
 			</main>
