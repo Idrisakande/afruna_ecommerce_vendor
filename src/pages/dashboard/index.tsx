@@ -20,6 +20,7 @@ import { T_DashboardStats } from "@/types/user.type";
 import PageLoarder from "@/components/widgets/PageLoarder";
 import User from "@/services/user.service";
 import Products from "@/services/products.service";
+import withAuth from "@/hooks/withAuth";
 const Index = () => {
 	const [isloading, setIsloading] = useState(true);
 	const [dashboardStats, setDashboardStats] = useState<T_DashboardStats>({
@@ -73,4 +74,4 @@ const Index = () => {
 		</Main>
 	);
 };
-export default withAuth10(Index);
+export default withAuth(Index);

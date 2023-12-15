@@ -44,6 +44,7 @@ class Auth10 {
 				});
 				return;
 			}
+			Cookies.set("token", data.data.token)
 			dispatch(setAuth10(true));
 			dispatch(setToken(data.data.token));
 			dispatch(setUserBio(user as T_User));

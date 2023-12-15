@@ -3,6 +3,7 @@ import Image, { StaticImageData } from "next/image";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { RxChevronDown, RxChevronUp } from "react-icons/rx";
 import { images } from "@/constants/images";
+import { verifyImageUrl } from "@/utils/verify_image_url";
 
 export const HeaderDropdown = ({
 	children,
@@ -11,7 +12,7 @@ export const HeaderDropdown = ({
 	title,
 }: {
 	children: React.ReactNode;
-	profileSrc?: StaticImageData | string;
+	profileSrc:   string|StaticImageData;
 	title: string;
 	subtitle?: string;
 }) => {
@@ -21,7 +22,7 @@ export const HeaderDropdown = ({
 			<DropdownMenu.Trigger className="hover:cursor-pointer " asChild>
 				<div className="flex justify-between items-center min-w-[40%] gap-2">
 					<Image
-						src={profileSrc ?? images.profileImg}
+						src={verifyImageUrl(profileSrc as string)}
 						width={50}
 						height={50}
 						alt="profile_image"

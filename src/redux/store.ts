@@ -9,7 +9,8 @@ import categoriesReducer from "./features/categories.slice";
 import productsReducer from "./features/products.slice";
 import userReducer from "./features/user.slice";
 import transactionsReducer from "./features/transactions.slice";
-
+import utilReducer from './features/app/utils_slice'
+import transactionReducer from './features/app/transaction_slice'
 // local storage configuration
 const config = {
 	key: "root",
@@ -24,6 +25,8 @@ const rootReducer = combineReducers({
 	transactions: transactionsReducer,
 	user: userReducer,
 	chat:chatReducer,
+	util: utilReducer,
+	transaction: transactionReducer,
 });
 
 const persistedReducer = persistReducer(config, rootReducer);

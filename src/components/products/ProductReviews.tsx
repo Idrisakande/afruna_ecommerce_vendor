@@ -19,6 +19,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/types/store.type";
 import { T_review } from "@/types/user.type";
 import { formattedDate } from "@/utils/formatted_date";
+import { verifyImageUrl } from "@/utils/verify_image_url";
 type T_extend = {
 	categoryName: string;
 	status: string;
@@ -132,7 +133,7 @@ export const ProductReviews: FC<{}> = memo(({}) => {
 								width={40}
 								priority
 								alt={"Product_Image"}
-								src={review.coverPhoto[0]}
+								src={verifyImageUrl(review.coverPhoto[0])}
 								className={
 									"md:col-span-1 w-44 h-44 object-cover"
 								}

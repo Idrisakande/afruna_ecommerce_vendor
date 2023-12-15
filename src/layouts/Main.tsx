@@ -7,6 +7,7 @@ import { SelectPicker } from "@/components/widgets/SelectPicker";
 import { images } from "@/constants/images";
 import Auth10 from "@/services/auth.service";
 import { RootState } from "@/types/store.type";
+import { verifyImageUrl } from "@/utils/verify_image_url";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -49,7 +50,7 @@ export const Main: FC<MainProps> = ({
 							triggerClassName="flex text-xs space-x-1 items-center text-afruna-blue"
 						/>
 						{/* <NotificationPopup /> */}
-						<HeaderDropdown profileSrc={bio_data.avatar} title={`${bio_data.firstName} ${bio_data.lastName}`} subtitle={bio_data.role} >
+						<HeaderDropdown profileSrc={verifyImageUrl(bio_data.avatar)} title={`${bio_data.firstName} ${bio_data.lastName}`} subtitle={bio_data.role} >
 							<header className="w-full flex justify-between items-center border-b border-dotted p-2 py-4 text-slate-500 font-medium">
 								<span>{bio_data.followers} Followers</span>
 								<span>{bio_data.following} Followings</span>

@@ -26,6 +26,7 @@ import { RxChevronDown, RxChevronUp } from "react-icons/rx";
 import classNames from "classnames";
 import { IProducts } from "@/interfaces/tables.interface";
 import { ProuctsData } from "@/constants/data";
+import { verifyImageUrl } from "@/utils/verify_image_url";
 
 const ProductsTable = () => {
   const [rowSelection, setRowSelection] = useState({});
@@ -63,7 +64,7 @@ const ProductsTable = () => {
         cell: ({ row }) => (
           <div key={row.id} className="flex gap-4 items-center ml-8">
             <Image
-              src={row.original.productImg}
+              src={verifyImageUrl(row.original.productImg as string)}
               alt={row.original.productName}
               width={45}
               height={45}

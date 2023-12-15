@@ -20,6 +20,7 @@ import { RootState } from "@/types/store.type";
 import { useSelector } from "react-redux";
 import { T_orderBySessionId } from "@/types/user.type";
 import { formattedDate } from "@/utils/formatted_date";
+import { verifyImageUrl } from "@/utils/verify_image_url";
 interface InvoiceTableProps {}
 
 export const InvoiceTable: FC<InvoiceTableProps> = ({}) => {
@@ -47,7 +48,7 @@ export const InvoiceTable: FC<InvoiceTableProps> = ({}) => {
 				accessorKey: "img",
 				cell: ({ row }) => (
 					<Image
-						src={row.original.productId?.images[0]}
+						src={verifyImageUrl(row.original.productId?.images[0])}
 						width={45}
 						height={45}
 						priority

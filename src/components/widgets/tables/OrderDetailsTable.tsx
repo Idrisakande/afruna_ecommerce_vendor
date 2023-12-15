@@ -18,6 +18,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/types/store.type";
 import { T_orderBySessionId, T_updated_user_order } from "@/types/user.type";
 import { formattedDate } from "@/utils/formatted_date";
+import { verifyImageUrl } from "@/utils/verify_image_url";
 
 interface OrderDetailsTableProps {}
 
@@ -49,7 +50,7 @@ export const OrderDetailsTable: FC<OrderDetailsTableProps> = ({}) => {
 				accessorKey: "productId",
 				cell: ({ row }) => (
 					<Image
-						src={row.original.productId?.images[0]}
+						src={verifyImageUrl(row.original.productId?.images[0])}
 						width={45}
 						height={45}
 						alt="order-image"

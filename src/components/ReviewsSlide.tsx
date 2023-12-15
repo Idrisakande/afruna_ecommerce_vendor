@@ -7,6 +7,7 @@ import { MdStar } from "react-icons/md";
 import { RootState } from "@/types/store.type";
 import { images } from "@/constants/images";
 import { ResultsFallback } from "./widgets/ResultsFallback";
+import { verifyImageUrl } from "@/utils/verify_image_url";
 
 export const ReviewsSlide = () => {
 	const [currentIndex, setCurrentIndex] = useState(0);
@@ -52,7 +53,7 @@ export const ReviewsSlide = () => {
 				<Image
 					width={50}
 					height={50}
-					src={reviews[currentIndex].userId.avatar??images.afruna_logo}
+					src={verifyImageUrl(reviews[currentIndex].userId.avatar)??images.afruna_logo}
 					// src={recent_reviewers[currentIndex]?.avatar??images.afruna_logo}
 					alt="review image"
 					className="rounded-full h-12  w-12 object-center"

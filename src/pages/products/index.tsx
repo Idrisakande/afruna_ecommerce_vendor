@@ -11,6 +11,7 @@ import { CreateProduct } from "@/components/products/CreateProduct";
 import { IProductContext } from "@/interfaces/IProductContext";
 import { ProductReviews } from "@/components/products/ProductReviews";
 import withAuth10 from "@/hooks/withAuth10";
+import withAuth from "@/hooks/withAuth";
 
 const TABS = [
 	"Product Listing",
@@ -27,7 +28,7 @@ const Index = () => {
 	);
 };
 
-export default withAuth10(Index);
+export default withAuth(Index);
 
 const CurrentProductTab = memo(() => {
 	const { tab, handleTabSelect } = useContext(

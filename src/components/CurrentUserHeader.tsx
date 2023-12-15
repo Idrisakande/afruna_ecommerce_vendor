@@ -3,6 +3,7 @@ import { FC } from "react";
 import { HiPhone } from "react-icons/hi";
 import { IoAlertCircle } from "react-icons/io5";
 import * as Avatar from "@radix-ui/react-avatar";
+import { verifyImageUrl } from "@/utils/verify_image_url";
 interface CurrentUserHeaderProps {
   active: boolean;
   id: string|undefined;
@@ -22,7 +23,7 @@ export const CurrentUserHeader: FC<CurrentUserHeaderProps> = ({
 				<Avatar.Root>
 					<Avatar.Image
 						className="object-cover rounded-full text-afruna-blue p-1 w-12 h-12"
-						src={img}
+						src={verifyImageUrl(img as string) as string}
 					/>
 					<Avatar.Fallback className="text-afruna-blue p-1 w-12 h-12 justify-center rounded-full bg-afruna-blue/20 flex uppercase items-center">
 						{name?.at(0)??"A"}

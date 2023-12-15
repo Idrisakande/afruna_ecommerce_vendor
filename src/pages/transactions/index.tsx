@@ -16,17 +16,159 @@ import { RootState } from "@/types/store.type";
 import PageLoarder from "@/components/widgets/PageLoarder";
 import Transactions from "@/services/transactions.service";
 import withAuth10 from "@/hooks/withAuth10";
+import withAuth from "@/hooks/withAuth";
+import Transaction from "@/services/transactions.service";
+import { useSearchParams } from "next/navigation";
+import { toast } from "react-toastify";
+import { IConfirmankDetails, ISetBankDetails } from "@/interfaces/ITransaction";
+import * as Dialog from "@radix-ui/react-dialog";
+import * as Select from "@radix-ui/react-select";
+import {
+	ChevronDownIcon,
+	ChevronUpIcon,
+	Cross2Icon,
+} from "@radix-ui/react-icons";
+import { SelectItem } from "@/components/widgets/SelectItem";
 
+const transationApis = new Transaction();
 const Index = () => {
 	const router = useRouter();
 	const [showAFCModel, setShowAFCModel] = useState(false);
 	const [showPendingModel, setShowPendingModel] = useState(false);
-	const { transactions } = useSelector((state: RootState) => state.transactions)
+
 	useEffect(() => {
 		const _ = new Transactions();
-	},[])
-	if (!transactions) return <PageLoarder />
-	return  (
+	}, []);
+	/* handle modal */
+	const [openModalOnConfirm, setOpenModalOnConfirm] = useState(false);
+	const [openModalOnWithdrawal, setOpenModalOnWithdrawal] = useState(false);
+	const [bankDetails, setBankDetails] = useState<IConfirmankDetails>({
+		bankCode: "",
+		accountNumber: "",
+	});
+	const [witdrawalDetail, setWithdrawalDetail] = useState({
+		amount: 0,
+		accountId: "",
+	});
+	const [confirmedDetails, setConfirmedDetails] = useState({
+		account_name: "",
+		account_number: "",
+		bank_id: 0,
+	});
+
+	const transactions = useSelector(
+		(state: RootState) => state.transaction.transactions,
+	);
+	const banks = useSelector((state: RootState) => state.transaction.banks);
+	const userWallet = useSelector(
+		(state: RootState) => state.transaction.wallet,
+	);
+	const totalPages = useSelector((state: RootState) => state.util.totalPages);
+
+	const searchParams = useSearchParams();
+	let page = searchParams.get("page") as string;
+	const [open, setOpen] = useState(false);
+	if (page === null) page = "1";
+
+	const handleBankChange = (bank: any) => {
+		setBankDetails({ ...bankDetails, bankCode: bank });
+	};
+
+	const handleChange = (e: any) => {
+		const { name, value } = e.target;
+		setBankDetails({ ...bankDetails, [name]: value });
+	};
+	const handleWithdrawalDetailChange = (e: any) => {
+		const { name, value } = e.target;
+		setWithdrawalDetail({ ...witdrawalDetail, [name]: value });
+	};
+	const handleAccountChange = (account: any) => {
+		setWithdrawalDetail({ ...witdrawalDetail, accountId: account });
+	};
+	const confirmBankUpdate = () => {
+		let bankName = banks.find((bank) => bank.code === bankDetails.bankCode)
+			?.name;
+		let payload: ISetBankDetails = {
+			accountName: confirmedDetails.account_name,
+			accountNumber: confirmedDetails.account_number,
+			bankCode: bankDetails.bankCode,
+			bankName,
+		};
+
+		transationApis.setBankDetails(payload).then((data) => {
+			if (data?.success == true) {
+				toast.success("Bank details updated");
+				cancelBankUpdate();
+				cancelConfirmBankUpdate();
+				transationApis.getWalletDetails();
+			}
+		});
+	};
+
+	const cancelConfirmBankUpdate = () => {
+		// closeModal()
+	};
+	const cancelBankUpdate = () => {
+		setOpenModalOnConfirm(false);
+	};
+
+	const confirmBankDetails = (data: IConfirmankDetails) => {
+		if (bankDetails.bankCode === "") {
+			toast.error("Please provide a bank");
+			return;
+		}
+		if (bankDetails.accountNumber === "") {
+			toast.error("Please provide an account number");
+			return;
+		}
+		const confirmationDetails = transationApis.confirmBankDetails(data);
+		confirmationDetails
+			.then((value) => {
+				if (value?.success == true) {
+					setOpenModalOnConfirm(value.success);
+					setConfirmedDetails({
+						account_name: value.data.account_name,
+						account_number: value.data.account_number,
+						bank_id: value.data.bank_id,
+					});
+				}
+			})
+			.catch((error) => {});
+	};
+
+	const cancelWithdrawal = () => {
+		setOpenModalOnWithdrawal(false);
+	};
+
+	const placeWithdrawal = () => {
+		if (witdrawalDetail.amount > userWallet.balance) {
+			toast.error("Amount can not be larger than balance");
+			return;
+		}
+
+		if (witdrawalDetail.amount === 0) {
+			toast.error("Enter amount");
+			return;
+		}
+
+		let payload = {
+			amount: witdrawalDetail.amount,
+			accountId: userWallet.accounts[0]._id,
+		};
+
+		transationApis.withdraw(payload).then((data) => {
+			toast.success("Withdrawal placed");
+		});
+	};
+	console.log(banks);
+
+	useEffect(() => {
+		transationApis.getWalletDetails();
+		transationApis.getTransactions(Number(page));
+		transationApis.getBanks();
+	}, [page]);
+	if (!transactions) return <PageLoarder />;
+	return (
 		<Main breadcrumbs={<Breadcrumbs />}>
 			<main className="relative my-8 m-12 pb-20">
 				<div className="grid grid-cols-7 gap-4">
@@ -42,11 +184,14 @@ const Index = () => {
 						middelComponent={
 							<MiddleComponent
 								title={"Available Balance"}
-								value={0}
+								value={userWallet.balance ?? 0}
 							/>
 						}
 						rightComponent={
-							<button className="md:w-24 text-center rounded-sm bg-gradient-whitishblue p-2 text-white text-[12px]">
+							<button
+								onClick={() => setOpen(true)}
+								className="md:w-24 text-center rounded-sm bg-gradient-whitishblue p-2 text-white text-[12px]"
+							>
 								Withdraw
 							</button>
 						}
@@ -87,12 +232,98 @@ const Index = () => {
 						}
 					/>
 				</div>
+				<Dialog.Root modal open={open}>
+					<Dialog.Portal>
+						<Dialog.Overlay
+							onClick={() => setOpen(false)}
+							className="bg-black fixed w-screen h-screen"
+						/>
+						<Dialog.Content className="bg-white left-1/2 top-[40%] absolute h-fit -translate-x-[50%] -translate-y-[40%] p-3 rounded-md w-1/2 z-30 transition-all shadow-lg">
+							<Select.Root onValueChange={()=> {}}>
+								<Select.Trigger
+									className="flex items-center gap-3"
+									aria-label="Banks"
+								>
+									<Select.Value className="p-1" placeholder="Select your bank" />
+									<Select.Icon className="SelectIcon">
+										<ChevronDownIcon />
+									</Select.Icon>
+								</Select.Trigger>
+								<Select.Portal>
+									<Select.Content className="bg-white z-30 p-3 rounded-sm w-fit h-[40vh]">
+										<Select.ScrollUpButton className="SelectScrollButton">
+											<ChevronUpIcon />
+										</Select.ScrollUpButton>
+										<Select.Viewport className="SelectViewport">
+											<Select.Group>
+												<Select.Label className="SelectLabel">
+													Available Banks
+												</Select.Label>
+												{banks.map((bk) => (
+													<SelectItem
+														key={bk.id}
+														value={bk.id}
+													>
+														{bk.name}
+													</SelectItem>
+												))}
+											</Select.Group>
+										</Select.Viewport>
+										<Select.ScrollDownButton className="SelectScrollButton">
+											<ChevronDownIcon />
+										</Select.ScrollDownButton>
+									</Select.Content>
+								</Select.Portal>
+							</Select.Root>
+							<form className="grid my-3 gap-1 lg:grid-cols-2 w-full grid-cols-auto">
+								<fieldset>
+									<input className="p-2 outline-none focus-within:border-afruna-blue/70 border border-afruna-base/70 rounded-md" type="number" placeholder="Account Number" maxLength={10} />
+								</fieldset>
+								<fieldset>
+									<input className="p-2 outline-none focus-within:border-afruna-blue/70 border border-afruna-base/70 rounded-md" type="number" placeholder="Amount" />
+								</fieldset>
+							</form>
+
+							<div className="flex justify-end items-end gap-3">
+							<Dialog.Close asChild>
+								<button
+									onClick={() => setOpen(false)}
+									className="border border-red-400 text-afruna-blue/90 hover:text-afruna-blue rounded-md p-3 place-self-end text-xs text-center"
+									aria-label="Close"
+								>
+									Cancel
+								</button>
+							</Dialog.Close>
+							<Dialog.Close asChild>
+								<button
+									onClick={() => setOpen(false)}
+									className="border border-green-400 text-afruna-blue/90 hover:text-afruna-blue rounded-md p-3 place-self-end text-xs text-center"
+									aria-label="Close"
+								>
+									Confirm
+								</button>
+							</Dialog.Close>
+							</div>
+						</Dialog.Content>
+					</Dialog.Portal>
+				</Dialog.Root>
 				<Content>
 					<Header
 						key={"transaction history"}
 						headerTitle={"Transaction history"}
 					/>
-{transactions.length?(					<TransactionHistory />):(<div className="flex flex-col justify-center items-center h-1/2"><Image height={100} src={images.noResult} alt="no_result" /><h1>No transactional data</h1></div>)}
+					{transactions.length ? (
+						<TransactionHistory />
+					) : (
+						<div className="flex flex-col justify-center items-center h-1/2">
+							<Image
+								height={100}
+								src={images.noResult}
+								alt="no_result"
+							/>
+							<h1>No transactional data</h1>
+						</div>
+					)}
 				</Content>
 				<div
 					className={`${
@@ -155,7 +386,7 @@ const Index = () => {
 											${price}
 										</button>
 									</div>
-								)
+								),
 							)}
 						</div>
 					</form>
@@ -191,7 +422,7 @@ const Index = () => {
 			</main>
 			{/* popover coin */}
 		</Main>
-	)
+	);
 };
 
 const TransactionStat: FC<{
@@ -204,7 +435,7 @@ const TransactionStat: FC<{
 	<div
 		className={classNames(
 			"rounded-md border text-afruna-blue border-afruna-gray/5 p-3 flex justify-around space-x-0 items-center w-full bg-white",
-			className
+			className,
 		)}
 	>
 		{leftComponent && leftComponent}
@@ -220,12 +451,13 @@ const MiddleComponent: FC<{ value: number; title: string; afc?: boolean }> = ({
 	<div className="space-y-2">
 		<h1 className={"text-afruna-text/70 text-[14px]"}>{title}</h1>
 		<p className="text-xl font-semibold">
-			
-			{afc
-				? `${value.toLocaleString()} AFC`
-				: <>&#x20A6; {" "} {value.toLocaleString()}</>}
+			{afc ? (
+				`${value.toLocaleString()} AFC`
+			) : (
+				<>&#x20A6; {value.toLocaleString()}</>
+			)}
 		</p>
 	</div>
 );
 
-export default withAuth10(Index);
+export default withAuth(Index);

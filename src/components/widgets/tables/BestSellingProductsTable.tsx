@@ -27,6 +27,7 @@ import { ChevronDownIcon } from "@radix-ui/react-icons";
 import { SelectItem } from "../SelectItem";
 import Products from "@/services/products.service";
 import Link from "next/link";
+import { verifyImageUrl } from "@/utils/verify_image_url";
 
 export const BestSellingProductsTable = () => {
 	useLayoutEffect(() => {
@@ -52,7 +53,7 @@ export const BestSellingProductsTable = () => {
 						width={40}
 						height={40}
 						className="w-10"
-						src={row.original.coverPhoto[0]??images.afruna_logo}
+						src={verifyImageUrl(row.original.coverPhoto[0])??images.afruna_logo}
 						alt="product_iamge"
 					/>
 				),

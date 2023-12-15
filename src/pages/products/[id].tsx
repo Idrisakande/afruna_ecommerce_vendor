@@ -23,6 +23,7 @@ import { IProduct } from "@/interfaces/IProductItem";
 import Products from "@/services/products.service";
 import store from "@/redux/store";
 import { formattedDate } from "@/utils/formatted_date";
+import { verifyImageUrl } from "@/utils/verify_image_url";
 
 const messages = [
 	{
@@ -85,7 +86,7 @@ export default function () {
 						priority
 						height={40}
 						width={40}
-						src={prod?.coverPhoto[0] as string}
+						src={verifyImageUrl(prod?.coverPhoto[0] as string)}
 						alt="productImage"
 						className="md:grid-span-1 border border-afruna-blue h-32 w-32"
 					/>

@@ -1,6 +1,6 @@
-import { imgs } from "@/constants/images";
+import {images} from "../constants/images"
 
-export function verifyImageUrl(stringUrl?: string) {
+export function verifyImageUrl(stringUrl: string) {
   if (stringUrl && stringUrl.length > 0) {
     // The provided stringUrl is valid.
     // Check if it includes a protocol (http:// or https://).
@@ -14,6 +14,6 @@ export function verifyImageUrl(stringUrl?: string) {
   } else {
     // The provided stringUrl is empty or not provided at all.
     // Return a relative image path instead.
-    return imgs.anonyUser;
+    return images.afruna_logo;
   }
 }

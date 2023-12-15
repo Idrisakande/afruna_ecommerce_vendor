@@ -39,6 +39,7 @@ import { ChevronDownIcon } from "@radix-ui/react-icons";
 import { GoSearch } from "react-icons/go";
 import useSearchOrders from "@/hooks/useSearchOrders";
 import { updateOrderBuyerInfo } from "@/redux/features/user.slice";
+import { verifyImageUrl } from "@/utils/verify_image_url";
 
 export const OrderTable: FC = memo(() => {
 	const { orders,bio_data } = useSelector((state: RootState) => state.user);
@@ -88,7 +89,7 @@ export const OrderTable: FC = memo(() => {
 					return (
 						<Image
 							className="w-12 h-12 object-fill rounded-md border-[1px] shadow-sm"
-							src={row.original.productId?.images[0]}
+							src={verifyImageUrl(row.original.productId?.images[0])}
 							width={40}
 							height={40}
 							alt="item Image"

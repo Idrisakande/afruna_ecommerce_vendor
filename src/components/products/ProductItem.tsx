@@ -4,6 +4,7 @@ import { MdStar, MdStarHalf } from "react-icons/md";
 import Image from "next/image";
 import { IProductItem } from "@/interfaces/IProductItem";
 import { images } from "@/constants/images";
+import { verifyImageUrl } from "@/utils/verify_image_url";
 
 export const ProductItem: FC<IProductItem> = memo(
 	({
@@ -38,7 +39,7 @@ export const ProductItem: FC<IProductItem> = memo(
 					</span>
 				) : null}
 				<header className="flex flex-col items-center space-y-2 p-1">
-					<Image src={item_img} alt={"ProductImage_"} width={100} />
+					<Image src={verifyImageUrl(item_img as string)} alt={"ProductImage_"} width={100} />
 					<div className="flex self-start w-full items-center justify-between">
 						<p>
 							&#x20A6;{price}
@@ -93,7 +94,7 @@ export const ProductItem: FC<IProductItem> = memo(
 				) : null}
 				<header className="flex flex-col my-auto items-center space-y-2 p-1">
 					<Image
-						src={item_img ?? "https://picsum.photos/200/300"}
+						src={verifyImageUrl(item_img as string)}
 						alt={"ProductImage_"}
 						width={100}
 						height={100}

@@ -8,9 +8,10 @@ import {
 import { OrderTable } from "@/components/widgets/tables/OrderTable";
 import Order from "@/services/order.service";
 import withAuth10 from "@/hooks/withAuth10";
+import withAuth from "@/hooks/withAuth";
 // import { IOrederContext } from "@/interfaces/tables.interface";
 
-export default withAuth10(function Index() {
+export default withAuth(function Index() {
 	useEffect(() => {
 		const ordersServices = new Order();
 	},[])

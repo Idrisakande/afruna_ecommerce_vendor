@@ -1,13 +1,15 @@
 "use client";
 
+import { updateMessages } from "@/redux/features/chat.slice";
 import Chat from "@/services/chat.service";
 import { RootState } from "@/types/store.type";
+import { T_msg } from "@/types/user.type";
 import { getMessage } from "@reduxjs/toolkit/dist/actionCreatorInvariantMiddleware";
 import { FC, useCallback } from "react";
 import { useForm, SubmitHandler, FieldValues } from "react-hook-form";
 import { IoPaperPlane } from "react-icons/io5";
 import { MdAttachFile } from "react-icons/md";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 interface MessageInput {
 	message: string;
@@ -26,7 +28,7 @@ export const CoversationFooter: FC<CoversationFooterProps> = ({ to, id }) => {
 		formState: { errors },
 	} = useForm<MessageInput>();
 	const { bio_data } = useSelector((state: RootState) => state.user);
-
+	const dispatch = useDispatch();
 	const onSubmit: SubmitHandler<MessageInput> = useCallback(
 		async (data) => {
 			const chatServices = new Chat();
@@ -34,7 +36,8 @@ export const CoversationFooter: FC<CoversationFooterProps> = ({ to, id }) => {
 				message: string;
 				to: string;
 			});
-
+			// const message = await chatServices.getMessage(id as string);
+			// dispatch(updateMessages(message as T_msg[]));
 			reset();
 		},
 		[to],

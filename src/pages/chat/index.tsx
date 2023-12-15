@@ -9,35 +9,42 @@ import { CurrentUsersConversations } from "@/components/CurrentUsersConversation
 import { CoversationFooter } from "@/components/CoversationFooter";
 import Breadcrumbs from "@/components/widgets/Breadcrumbs";
 import { MdAdd, MdArrowBack, MdSearch } from "react-icons/md";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/types/store.type";
 import Chat from "@/services/chat.service";
-import { T_convo, T_msg, T_msg_alias } from "@/types/user.type";
+import { T_convo, T_msg } from "@/types/user.type";
 import { getChatTimeDiff } from "@/utils/chat_time_diff";
 import withAuth10 from "@/hooks/withAuth10";
-import store from "@/redux/store";
 import User from "@/services/user.service";
 import useSearchConvo from "@/hooks/useSearchConvo";
 import * as Avatar from "@radix-ui/react-avatar";
-export default withAuth10(function Index() {
+import { verifyImageUrl } from "@/utils/verify_image_url";
+import withAuth from "@/hooks/withAuth";
+import { images } from "@/constants/images";
+import { updateMessages } from "@/redux/features/chat.slice";
+export default withAuth(function Index() {
 	const router = useRouter();
 	const { convo, messages } = useSelector((state: RootState) => state.chat);
-	const { bio_data, usersWithReviews, users } = useSelector(
-		(state: RootState) => state.user,
-	);
-	const [to, setTo]= useState<string>();
-	const [activeChat, setActiveChat] = useState<T_msg[]>([]);
+	const { bio_data, users } = useSelector((state: RootState) => state.user);
+	const [to, setTo] = useState<string>();
+	const [activeChat, setActiveChat] = useState<T_msg[]>(messages);
 	const [activeChatHeader, setActiveChatHeader] = useState<T_convo>(convo[0]);
 	useEffect(() => {
 		const ___ = new User();
 		const _ = new Chat();
 	}, []);
-
-	const getMessages = useCallback(async (id: string) => {
-		const _ = new Chat();
-		const messages = await _.getMessage(id);
-		setActiveChat(messages as T_msg[]);
-	}, []);
+	const dispatch = useDispatch();
+	const getMessages = useCallback(
+		async (id: string) => {
+			const _ = new Chat();
+			const messages = await _.getMessage(id);
+			dispatch(updateMessages(messages as T_msg[]));
+			console.log("msg");
+			console.log(messages);
+			
+		},
+		[dispatch],
+	);
 	const { searchResult, setSearchInput } = useSearchConvo({ data: convo });
 
 	// const moreUsers = useMemo(
@@ -78,20 +85,26 @@ export default withAuth10(function Index() {
 										<UsersList
 											lastMessage={convo.lastMessage}
 											selectChat={() => {
-											if (bio_data){
-												const foundAt = convo.recipients.indexOf(bio_data._id); // get the index of the sender
-												const receiver = convo.recipients[foundAt > 0 ?0:1];
-												setTo(receiver);
-											}
-													const chatServices = new Chat();
-													chatServices.getMessage(
-														convo?._id,
-													);
-													// const messages =
-													// 	store.store.getState().chat
-													// 		.messages;
-													setActiveChatHeader(convo);
-													getMessages(convo._id);
+												if (bio_data) {
+													const foundAt =
+														convo.recipients.indexOf(
+															bio_data._id,
+														); // get the index of the sender
+													const receiver =
+														convo.recipients[
+															foundAt > 0 ? 0 : 1
+														];
+													setTo(receiver);
+												}
+												const chatServices = new Chat();
+												chatServices.getMessage(
+													convo?._id,
+												);
+												// const messages =
+												// 	store.store.getState().chat
+												// 		.messages;
+												setActiveChatHeader(convo);
+												getMessages(convo._id);
 											}}
 											key={convo?._id}
 											name={convo?.alias ?? ""}
@@ -143,110 +156,142 @@ export default withAuth10(function Index() {
 										.filter(
 											(unBlockedUser) =>
 												unBlockedUser?.blocked ===
-												false && unBlockedUser.role === "vendor" && unBlockedUser._id !== bio_data?._id,
+													false &&
+												unBlockedUser.role ===
+													"vendor" &&
+												unBlockedUser._id !==
+													bio_data?._id,
 										)
-										.map((user) =>user &&( (
-											<button
-												onClick={() => {
-													setTo(user._id);// set receiver id
-													setActiveChatHeader({
-														_id: user._id,
-														alias: `${user.firstName} ${user.lastName}`,
-														aliasAvatar:
-															user.avatar as string,
-														createdAt:
-															Date.now().toLocaleString(),
-														updatedAt: "",
-														lastMessage: "",
-														recipients: [user._id, (bio_data?._id as unknown as string)],
-														unreadMessages: 0,
-													});
-													if (bio_data) {
-													setActiveChat([
-														{
-															_id: "",
-															conversation: "",
-															to: {
-																_id: user._id,
-																addresses: [],
-																avatar: user?.avatar,
-																country:
-																	user?.country,
-																createdAt:
-																	user.createdAt,
-																email: user?.email,
-																firstName:
-																	user.firstName,
-																isVendor: false,
-																lastName:
-																	user.lastName,
-																password: "",
-																phoneNumber:
-																	user.phoneNumber,
-																role: user.role,
-																updatedAt:
-																	user.updatedAt,
-																verificationToken:
-																	"",
-															},
-															from: {
-																_id: bio_data._id,
-																addresses: [],
-																avatar: bio_data.avatar,
-																country:
-																	bio_data.country,
-																createdAt:
-																	bio_data.createdAt,
-																email: bio_data.email,
-																firstName:
-																	bio_data.firstName,
-																isVendor: false,
-																lastName:
-																	bio_data.lastName,
-																password: "",
-																phoneNumber:
-																	bio_data.phoneNumber,
-																role: bio_data.role,
-																updatedAt:
-																	bio_data.updatedAt,
-																verificationToken:
-																	"",
-															},
-															message: "",
-															attachment: [],
-															seen: [],
-															createdAt: "",
-															updatedAt: "",
-														},
-													]);	
-													}
-													
-													document
-														.querySelector("ul.rtf")
-														?.classList.replace(
-															"open",
-															"closed",
-														);
-												}}
-												key={user?._id}
-												className="flex items-center place-items-center gap-2 hover:bg-gray-300/90 w-full rounded-lg"
-											>
-												<Avatar.Root>
-													<Avatar.Image
-														className="object-cover rounded-full text-afruna-blue p-1 w-12 h-12"
-														src={user?.avatar}
-													/>
-													<Avatar.Fallback className="text-afruna-blue p-1 w-12 h-12 justify-center rounded-full bg-afruna-blue/20 flex uppercase items-center">
-														{user?.firstName.at(0)}
-														{user?.lastName.at(0)}
-													</Avatar.Fallback>
-												</Avatar.Root>
-												<span>
-													{user?.firstName}{" "}
-													{user?.lastName}
-												</span>
-											</button>
-										)))
+										.map(
+											(user) =>
+												user && (
+													<button
+														onClick={() => {
+															setTo(user._id); // set receiver id
+															setActiveChatHeader(
+																{
+																	_id: user._id,
+																	alias: `${user.firstName} ${user.lastName}`,
+																	aliasAvatar:
+																		user.avatar as string,
+																	createdAt:
+																		Date.now().toLocaleString(),
+																	updatedAt:
+																		"",
+																	lastMessage:
+																		"",
+																	recipients:
+																		[
+																			user._id,
+																			bio_data?._id as unknown as string,
+																		],
+																	unreadMessages: 0,
+																},
+															);
+															if (bio_data) {
+																setActiveChat([
+																	{
+																		_id: "",
+																		conversation:
+																			"",
+																		to: {
+																			_id: user._id,
+																			addresses:
+																				[],
+																			avatar: user?.avatar,
+																			country:
+																				user?.country,
+																			createdAt:
+																				user.createdAt,
+																			email: user?.email,
+																			firstName:
+																				user.firstName,
+																			isVendor:
+																				false,
+																			lastName:
+																				user.lastName,
+																			password:
+																				"",
+																			phoneNumber:
+																				user.phoneNumber,
+																			role: user.role,
+																			updatedAt:
+																				user.updatedAt,
+																			verificationToken:
+																				"",
+																		},
+																		from: {
+																			_id: bio_data._id,
+																			addresses:
+																				[],
+																			avatar: bio_data.avatar,
+																			country:
+																				bio_data.country,
+																			createdAt:
+																				bio_data.createdAt,
+																			email: bio_data.email,
+																			firstName:
+																				bio_data.firstName,
+																			isVendor:
+																				false,
+																			lastName:
+																				bio_data.lastName,
+																			password:
+																				"",
+																			phoneNumber:
+																				bio_data.phoneNumber,
+																			role: bio_data.role,
+																			updatedAt:
+																				bio_data.updatedAt,
+																			verificationToken:
+																				"",
+																		},
+																		message:
+																			"",
+																		attachment:
+																			[],
+																		seen: [],
+																		createdAt:
+																			"",
+																		updatedAt:
+																			"",
+																	},
+																]);
+															}
+
+															document
+																.querySelector(
+																	"ul.rtf",
+																)
+																?.classList.replace(
+																	"open",
+																	"closed",
+																);
+														}}
+														key={user?._id}
+														className="flex items-center place-items-center gap-2 hover:bg-gray-300/90 w-full rounded-lg"
+													>
+														<Avatar.Root>
+															<Avatar.Image
+																className="object-cover rounded-full text-afruna-blue p-1 w-12 h-12"
+																src={user?.avatar as string}
+															/>
+															<Avatar.Fallback className="text-afruna-blue p-1 w-12 h-12 justify-center rounded-full bg-afruna-blue/20 flex uppercase items-center">
+																{user?.firstName.at(
+																	0,
+																)}
+																{user?.lastName.at(
+																	0,
+																)}
+															</Avatar.Fallback>
+														</Avatar.Root>
+														<span>
+															{user?.firstName}{" "}
+															{user?.lastName}
+														</span>
+													</button>
+												),
+										)
 								) : (
 									<>empty member!</>
 								)}
@@ -254,7 +299,7 @@ export default withAuth10(function Index() {
 						</Fab>
 					</div>
 				</div>
-				{activeChat.length ? (
+				{messages.length ? (
 					<div className=" min-w-[68%] xl:max-h-[70vh] overflow-hidden flex flex-col bg-white border border-text-afruna-gray/30 rounded-2xl">
 						<div className="h-24 px-8 border-b border-text-afruna-gray/30 flex justify-center items-center">
 							<CurrentUserHeader
@@ -266,7 +311,7 @@ export default withAuth10(function Index() {
 						</div>
 						<div>
 							<div className="flex flex-col gap-1 pt-2 px-4 h-[40vh] overflow-x-hidden overflow-y-auto">
-								{activeChat.map((chat) => (
+								{messages.map((chat) => (
 									<CurrentUsersConversations
 										key={chat?._id}
 										img={chat?.from.avatar}
@@ -283,7 +328,10 @@ export default withAuth10(function Index() {
 								))}
 							</div>
 						</div>
-						<CoversationFooter to={to} />
+						<CoversationFooter
+							id={activeChat[0].conversation}
+							to={to}
+						/>
 					</div>
 				) : null}
 			</main>

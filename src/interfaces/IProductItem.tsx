@@ -4,7 +4,7 @@ import { ChangeEvent, ReactElement } from "react";
 export interface IProductItem {
 	published?: boolean;
 	date?: Date | string | null;
-	item_img: string|StaticImageData;
+	item_img?: string;
 	item_name: string;
 	rated: number;
 	rating?: number;

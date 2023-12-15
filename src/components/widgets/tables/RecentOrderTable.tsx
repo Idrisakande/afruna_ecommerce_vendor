@@ -27,6 +27,7 @@ import { RootState } from "@/types/store.type";
 import { setViewOrderData } from "@/redux/features/user.slice";
 import { ResultsFallback } from "../ResultsFallback";
 import User from "@/services/user.service";
+import { verifyImageUrl } from "@/utils/verify_image_url";
 
 const RecentOrderTable: FC = () => {
 	const router = useRouter();
@@ -52,7 +53,7 @@ const RecentOrderTable: FC = () => {
 					return (
 						<Image
 							className="w-12 h-12 object-fill rounded-md border-[1px] shadow-sm"
-							src={row.original.productId?.images[0]}
+							src={verifyImageUrl(row.original.productId?.images[0])}
 							width={40}
 							height={40}
 							priority

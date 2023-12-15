@@ -21,7 +21,9 @@ import User from "@/services/user.service";
 import { ExtFile, FileInputButton } from "@files-ui/react";
 import { toast } from "react-toastify";
 import withAuth10 from "@/hooks/withAuth10";
-export default withAuth10(function Index() {
+import { verifyImageUrl } from "@/utils/verify_image_url";
+import withAuth from "@/hooks/withAuth";
+export default withAuth(function Index() {
 	const { bio_data } = useSelector((state: RootState) => state.user);
 	const {
 		register,
@@ -154,7 +156,7 @@ export default withAuth10(function Index() {
 						<Image
 							height={50}
 							width={50}
-							src={bio_data?.avatar ?? images.afruna_logo}
+							src={verifyImageUrl(bio_data?.avatar as string)}
 							alt="Image"
 							priority
 							className=" absolute z-20 -top-28 left-4 w-32 h-32 object-fill rounded-full"
