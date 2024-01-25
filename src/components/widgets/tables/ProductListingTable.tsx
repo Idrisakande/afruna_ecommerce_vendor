@@ -17,6 +17,7 @@ import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import { RootState } from "@/types/store.type";
 import { IProduct } from "@/interfaces/IProductItem";
 import Products from "@/services/products.service";
+import { formattedDate } from "@/utils/formatted_date";
 
 type T_data = IProduct & { categoryName: string };
 const ProductListingTable: FC = () => {
@@ -70,13 +71,8 @@ const ProductListingTable: FC = () => {
 			},
 			{
 				accessorKey: "createdAt",
-				cell: (info) => {
-					let date = new Date(
-						info.getValue() as string,
-					).toUTCString();
-					return <>{date}</>;
-				},
-				header: () => <span className="">Order Date</span>,
+				cell: (info) => formattedDate(info.getValue() as string),
+				header: () => <span className="">Date</span>,
 			},
 			/* {
 				accessorKey: "status",
@@ -84,37 +80,37 @@ const ProductListingTable: FC = () => {
 					switch (cell.getValue()) {
 						case "Pending":
 							return (
-								<text className="flex justify-between items-center w-fit">
+								<span className="flex justify-between items-center w-fit">
 									<span className="p-1 rounded-full bg-amber-500 mr-1" />
 									<span className="text-amber-500">
 										Pending
 									</span>
-								</text>
+								</span>
 							);
 						case "Paid":
 							return (
-								<text className="flex justify-between items-center w-fit">
+								<span className="flex justify-between items-center w-fit">
 									<span className="p-1 rounded-full bg-lime-600 mr-1" />
 									<span className="text-lime-600">Paid</span>
-								</text>
+								</span>
 							);
 						case "Cancelled":
 							return (
-								<text className="flex justify-between items-center w-fit">
+								<span className="flex justify-between items-center w-fit">
 									<span className="p-1 rounded-full bg-red-500 mr-1" />
 									<span className="text-red-500">
 										Cancelled
 									</span>
-								</text>
+								</span>
 							);
 						case "Shipped":
 							return (
-								<text className="flex justify-between items-center w-fit">
+								<span className="flex justify-between items-center w-fit">
 									<span className="p-1 rounded-full bg-blue-500 mr-1" />
 									<span className="text-blue-500">
 										Shipped
 									</span>
-								</text>
+								</span>
 							);
 					}
 				},
@@ -122,7 +118,9 @@ const ProductListingTable: FC = () => {
 			}, */
 			{
 				accessorKey: "price",
-				cell: ({ cell }) => <>${cell.getValue()}</>,
+				cell: ({ cell }) => (
+					<>&#x20A6;{(cell.getValue() as number).toLocaleString()}</>
+				),
 				header: () => <span className="">Price</span>,
 			},
 			{
@@ -130,7 +128,7 @@ const ProductListingTable: FC = () => {
 				cell: ({ row }) => (
 					<div className="flex justify-start gap-3 items-center">
 						<Link
-							href={"/orders/details"}
+							href={"/products/"+row.original._id}
 							className="hover:scale-90 border-none transition duration-300"
 						>
 							<MdRemoveRedEye size={24} />

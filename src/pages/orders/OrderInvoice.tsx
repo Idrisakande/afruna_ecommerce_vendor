@@ -8,13 +8,24 @@ import { FC } from "react";
 import { BsPrinter } from "react-icons/bs";
 import { HiOutlineDownload } from "react-icons/hi";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
+import { RootState } from "@/types/store.type";
+import { useSelector } from "react-redux";
+import { formattedDate } from "@/utils/formatted_date";
+import { usePDF } from "react-to-pdf";
 
 interface OrderInvoiceProps {}
 
-const OrderInvoice: FC<OrderInvoiceProps> = ({}) => {
+const OrderInvoice: FC<OrderInvoiceProps> = ({ }) => {
+	const { viewOrder, orderBuyerInfo, orderBySessionId } = useSelector(
+		(state: RootState) => state.user,
+	);
+	const { targetRef, toPDF } = usePDF({
+		filename: new Date().getTime().toString().concat(`-order-invoice`),
+		resolution: 1.5,
+	});
 	return (
 		<Main breadcrumbs={<Breadcrumbs />}>
-			<main className="m-7 pb-28">
+			<main ref={targetRef} className="m-7 pb-28">
 				<div className="flex items-center justify-start max-w-[96%] mx-auto">
 					<h2 className="text-xl font-semibold">Invoice</h2>
 				</div>
@@ -49,13 +60,13 @@ const OrderInvoice: FC<OrderInvoiceProps> = ({}) => {
 								tempor incididunt ut labore et dolore mag
 							</p>
 						</div>
-						<div className=" border-t border-b border-slate-300 my-8 py-6 px-14 flex justify-between items-center">
+						<div className="border-t border-b border-slate-300 grid xs:grid-cols-2 md:grid-cols-4 gap-1 px-14 py-3">
 							<div className="flex flex-col gap-2">
 								<h1 className="text-[#A3A3B1] text-2xl">
 									Order ID
 								</h1>
 								<p className="text-[#0C0E3B] font-semibold ">
-									#3764883463287
+									{orderBySessionId[0].sessionId}
 								</p>
 							</div>
 							<div className="flex flex-col gap-2">
@@ -63,10 +74,7 @@ const OrderInvoice: FC<OrderInvoiceProps> = ({}) => {
 									Date
 								</h1>
 								<p className="text-[#0C0E3B] font-semibold ">
-									23 May, 2023{" "}
-									<span className="text-sm text-[#A3A3B1]">
-										07:15PM
-									</span>
+									{formattedDate(orderBySessionId[0].createdAt)}
 								</p>
 							</div>
 							<div className="flex flex-col gap-2 justify-start items-start">
@@ -76,7 +84,7 @@ const OrderInvoice: FC<OrderInvoiceProps> = ({}) => {
 								<div className="flex bg-green-100 justify-start p-1 items-center">
 									<div className="w-2 h-2 rounded-full bg-green-700" />
 									<p className="text-xs text-green-500 ml-1">
-										Paid
+										{orderBySessionId[0].isPaid}
 									</p>
 								</div>
 							</div>
@@ -85,7 +93,11 @@ const OrderInvoice: FC<OrderInvoiceProps> = ({}) => {
 									Total Amount
 								</h1>
 								<p className="text-[#0C0E3B] font-semibold ">
-									$3740.99
+									&#x20A6;
+									{orderBySessionId.reduce(
+										(acc, val) => acc + val.total,
+										0,
+									)}
 								</p>
 							</div>
 						</div>
@@ -111,12 +123,12 @@ const OrderInvoice: FC<OrderInvoiceProps> = ({}) => {
 							ex ea commodo consequat. Duis aute irure dolor in
 							reprehenderit in voluptate velit esse
 						</div>
-						<div className="flex mb-4 text-white justify-end items-center gap-8 max-w-[83%] mx-auto">
-							<button className="px-6 p-2 flex gap-2 justify-center items-center bg-gradient-lightGreenGradient rounded-md">
+						<div className="print:hidden flex mb-4 text-white justify-end items-center gap-8 max-w-[83%] mx-auto">
+							<button onClick={print} className="px-6 p-2 flex gap-2 justify-center items-center bg-gradient-lightGreenGradient rounded-md">
 								<BsPrinter />
 								<span>Print</span>
 							</button>
-							<button className="px-6 p-2 text-white bg-gradient-lightBluebutton rounded-md flex items-center justify-center gap-2">
+							<button onClick={()=> toPDF()} className="px-6 p-2 text-white bg-gradient-lightBluebutton rounded-md flex items-center justify-center gap-2">
 								<HiOutlineDownload />
 								<span>Download</span>
 							</button>

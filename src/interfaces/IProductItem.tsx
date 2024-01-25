@@ -4,7 +4,7 @@ import { ChangeEvent, ReactElement } from "react";
 export interface IProductItem {
 	published?: boolean;
 	date?: Date | string | null;
-	item_img: string|StaticImageData;
+	item_img?: string;
 	item_name: string;
 	rated: number;
 	rating?: number;
@@ -16,6 +16,7 @@ export interface IProductItem {
 	discount?: number;
 	checkbox?: boolean;
 	handleSelect?: () => void;
+	onClick?: () => void;
 }
 export interface IProduct {
 	_id: string;
@@ -28,8 +29,8 @@ export interface IProduct {
 	images: string[];
 	color: string;
 	coverPhoto: string;
-	size: "sm" | "md" | "lg" | "xl";
-	condition: "New" | "90% New" | "Refurbished";
+	size: string;
+	condition: string;
 	brand: string;
 	metaData: string[];
 	deliveryLocations: string[];

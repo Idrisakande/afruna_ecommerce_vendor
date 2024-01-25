@@ -19,7 +19,7 @@ export function InputLabel({
 	const inputRef = useRef<HTMLInputElement>(null);
 	useMemo(() => getValue(input), [getValue, input]);
 	return (
-		<fieldset>
+		<fieldset className="flex justify-start items-start flex-col w-full">
 			<h3 className="my-1 text-sm font-semibold">{headerTitle}</h3>
 			<div className="w-full flex justify-between space-x-1 items-center border-[1px] border-slate-300 p-3 rounded-md">
 				{inputprefixIcon && inputprefixIcon}

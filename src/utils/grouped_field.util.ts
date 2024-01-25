@@ -3,5 +3,5 @@ export function groupData<T, A>(data: T[], key: string, accum?: A) {
 		const id = `${key}[${idx}]`;
 		acc[id] = word;
 		return acc;
-	}, accum??{});
+	}, {});
 }

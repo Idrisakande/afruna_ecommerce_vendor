@@ -20,7 +20,10 @@ import get_countryUtil from "@/utils/get_country.util";
 import User from "@/services/user.service";
 import { ExtFile, FileInputButton } from "@files-ui/react";
 import { toast } from "react-toastify";
-export default function Index() {
+import withAuth10 from "@/hooks/withAuth10";
+import { verifyImageUrl } from "@/utils/verify_image_url";
+import withAuth from "@/hooks/withAuth";
+export default withAuth(function Index() {
 	const { bio_data } = useSelector((state: RootState) => state.user);
 	const {
 		register,
@@ -65,7 +68,9 @@ export default function Index() {
 	const handlePhoneSubmit = useCallback(() => {
 		if (isPhoneValid) {
 			const userServies = new User();
-userServies.updateMe({phoneNumber:phone}).then(()=>{setPhone("")})
+			userServies.updateMe({ phoneNumber: phone }).then(() => {
+				setPhone("");
+			});
 			return;
 		}
 		phoneValidationRef.current
@@ -98,7 +103,10 @@ userServies.updateMe({phoneNumber:phone}).then(()=>{setPhone("")})
 				toast.warn("New password require!");
 				return;
 			}
-			userServices.resetPassword({ password: data.password, oldPassword: data.oldPassword });
+			userServices.resetPassword({
+				password: data.password,
+				oldPassword: data.oldPassword,
+			});
 			setValue("password", "");
 			setValue("oldPpassword", "");
 		},
@@ -114,7 +122,7 @@ userServies.updateMe({phoneNumber:phone}).then(()=>{setPhone("")})
 				const [key, value] = entries[i as unknown as number];
 				if (value && key !== "oldPassword" && key !== "password") {
 					// update
-					formdata.append(key, value as any);
+					formdata.append(key, value as string);
 				}
 			}
 			function isFormDataEmpty(data: FormData) {
@@ -123,10 +131,13 @@ userServies.updateMe({phoneNumber:phone}).then(()=>{setPhone("")})
 				}
 				return true; // If no entries are found, it's empty
 			}
-			if (!isFormDataEmpty(formdata) || country.Name.length) {
+			if (!isFormDataEmpty(formdata) && country.Name.length > 0) {
 				//if country is selected add it to the formdata and make an update
 				formdata.append("country", country.Name);
 				userServices.updateMe(formdata);
+			} else {
+				userServices.updateMe(formdata);
+				
 			}
 		},
 		[country],
@@ -145,7 +156,7 @@ userServies.updateMe({phoneNumber:phone}).then(()=>{setPhone("")})
 						<Image
 							height={50}
 							width={50}
-							src={bio_data?.avatar ?? images.afruna_logo}
+							src={verifyImageUrl(bio_data?.avatar as string)}
 							alt="Image"
 							priority
 							className=" absolute z-20 -top-28 left-4 w-32 h-32 object-fill rounded-full"
@@ -155,11 +166,16 @@ userServies.updateMe({phoneNumber:phone}).then(()=>{setPhone("")})
 								Upload a Photo
 							</button> */}
 							<FileInputButton
-								className="bg-gradient-deepBluebutton py-1 px-5 text-sm text-white rounded"
+								disabled={bio_data?.blocked}
+								className={`${
+									bio_data?.blocked && "cursor-not-allowed"
+								} bg-gradient-deepBluebutton py-1 px-5 text-sm text-white rounded`}
 								placeholder="Upload a Photo"
 								maxFiles={1}
 								onChange={handlePhotoChange}
-							/>
+							>
+								Upload a Photo
+							</FileInputButton>
 						</div>
 					</div>
 					<Accordion.Root
@@ -302,7 +318,18 @@ userServies.updateMe({phoneNumber:phone}).then(()=>{setPhone("")})
 										)} */}
 									</fieldset>
 									<div className="flex items-center justify-end mt-4 xs:mt-2">
-										<button className="text-sm font-medium bg-[#1F74A2] text-white px-4 py-2 flex justify-center items-center gap-2 bg-blue rounded-md outline-none transition duration-500 xs:px-6 xs:py-3">
+										<button
+											title={
+												bio_data?.blocked
+													? "blocked"
+													: undefined
+											}
+											disabled={bio_data?.blocked}
+											className={`${
+												bio_data?.blocked &&
+												"cursor-not-allowed"
+											} text-sm font-medium bg-[#1F74A2] text-white px-4 py-2 flex justify-center items-center gap-2 bg-blue rounded-md outline-none transition duration-500 xs:px-6 xs:py-3`}
+										>
 											Update Information
 										</button>
 									</div>
@@ -487,17 +514,36 @@ userServies.updateMe({phoneNumber:phone}).then(()=>{setPhone("")})
 									<div className="flex items-center justify-end mt-4 xs:mt-3">
 										<div className="flex gap-4">
 											<button
+												type="button"
 												onClick={handleSubmit(
-													handlePasswordChange as ()=> void,
+													handlePasswordChange as () => void,
 												)}
-												className="text-[0.9rem] font-semibold px-4 py-2 border border-[#1F74A2] flex justify-center items-center gap-2 rounded-md outline-none transition duration-500 xs:px-4 xs:py-2"
+												title={
+													bio_data?.blocked
+														? "blocked"
+														: undefined
+												}
+												disabled={bio_data?.blocked}
+												className={`${
+													bio_data?.blocked &&
+													"cursor-not-allowed"
+												} text-sm font-medium border border-afruna-blue  text-afruna-blue px-4 py-2 flex justify-center items-center gap-2 bg-blue rounded-md outline-none transition duration-500 xs:px-6 xs:py-3`}
 											>
 												Update Password
 											</button>
 											<button
-												onClick={handlePhoneSubmit}
-												className="text-[0.9rem] font-semibold px-4 py-2 border border-[#1F74A2] flex justify-center items-center gap-2 rounded-md outline-none transition duration-500 xs:px-4 xs:py-2"
 												type="button"
+												onClick={handlePhoneSubmit}
+												title={
+													bio_data?.blocked
+														? "blocked"
+														: undefined
+												}
+												disabled={bio_data?.blocked}
+												className={`${
+													bio_data?.blocked &&
+													"cursor-not-allowed"
+												} text-sm font-medium bg-[#1F74A2] text-white px-4 py-2 flex justify-center items-center gap-2 bg-blue rounded-md outline-none transition duration-500 xs:px-6 xs:py-3`}
 											>
 												Update Phone Number
 											</button>
@@ -512,3 +558,4 @@ userServies.updateMe({phoneNumber:phone}).then(()=>{setPhone("")})
 		</>
 	);
 }
+)

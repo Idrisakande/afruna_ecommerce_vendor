@@ -7,11 +7,12 @@ import 'react-toastify/dist/ReactToastify.css';
 import "@/styles/globals.css";
 import redux from "@/redux/store";
 import AppProvider from "@/contexts/AppProvider";
+import PageLoarder from "@/components/widgets/PageLoarder";
 
 export default function App({ Component, pageProps }: AppProps) {
 	return (
 		<Provider store={redux.store}>
-			<PersistGate loading={null} persistor={redux.persitor}>
+			<PersistGate loading={<PageLoarder />} persistor={redux.persitor}>
 				<AppProvider>
 					<ToastContainer />
 					<Component {...pageProps} />

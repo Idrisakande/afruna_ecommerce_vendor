@@ -1,4 +1,5 @@
 import { images } from "@/constants/images";
+import { verifyImageUrl } from "@/utils/verify_image_url";
 import Image, { StaticImageData } from "next/image";
 import { FC, memo } from "react";
 
@@ -15,7 +16,7 @@ export const Avatar: FC<AvatarProps> = memo(({ img, active, isOwn, convo }) => {
       <Image
       height={40}
       width={40}
-      src={img??images.afruna_logo}
+      src={ verifyImageUrl(img as string)}
       alt="image"
         priority
         className={`${convo ? "w-8 h-8" : "w-12 h-12"} rounded-full ${

@@ -22,8 +22,20 @@ const nextConfig = {
 				pathname: "/**",
 			},
 			{
+				protocol: "http",
+				hostname: "nyc3.digitaloceanspaces.com",
+				port: "",
+				pathname: "/**",
+			},
+			{
 				protocol: "https",
 				hostname: "afruna-bucket.nyc3.digitaloceanspaces.com",
+				port: "",
+				pathname: "/**",
+			},
+			{
+				protocol: "https",
+				hostname: "nyc3.digitaloceanspaces.com",
 				port: "",
 				pathname: "/**",
 			},

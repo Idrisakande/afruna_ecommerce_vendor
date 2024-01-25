@@ -7,9 +7,11 @@ import { T_app_provider } from "@/types/t";
 import { handleAuthErrors } from "@/utils/auth.util";
 import Cookies from "js-cookie";
 import { updateCategories } from "@/redux/features/categories.slice";
-import { updateProducts } from "@/redux/features/products.slice";
+import { updateProdouctsWithReviews, updateProducts } from "@/redux/features/products.slice";
 import { T_error_response } from "@/types/auth.type";
 import { toast } from "react-toastify";
+import { productsWithReviews } from "@/utils/products_with_reviews";
+import { T_review } from "@/types/user.type";
 
 class Products {
 	protected store = store.store;
@@ -18,9 +20,8 @@ class Products {
 		this.getCategories().then(
 			() => opt?.setIsloading && opt.setIsloading(false),
 		);
-		this.getProducts().then(
-			() => opt?.setIsloading && opt.setIsloading(false),
-		);
+		this.getProducts();
+		this.getProductsWithReviews();
 	}
 	async createProduct(product: IProduct, opt: T_app_provider) {
 		const { setIsloading } = opt;
@@ -32,6 +33,7 @@ class Products {
 				},
 			});
 			toast.success("Product successfully created!");
+			this.getProducts();
 			return data;
 		} catch (error) {
 			handleAuthErrors(error as AxiosError<T_error_response>);
@@ -50,6 +52,27 @@ class Products {
 			toast.success("Product removed!");
 		} catch (error) {
 			handleAuthErrors(error as AxiosError<T_error_response>);
+		}
+	}
+	async updateProduct(id: string, payload: any, opt: T_app_provider) {
+		const { setIsloading } = opt;
+		setIsloading && setIsloading(true);
+		try {
+			const { data } = await axios.put("/api/products/" + id,payload, {
+				headers: {
+					Authorization: `Bearer ${Cookies.get("token")}`,
+				},
+			});
+			
+			toast.info("Update successfully!");
+			this.getProducts();
+			return data.data;
+		} catch (error) {
+			handleAuthErrors(error as AxiosError<T_error_response>);
+			
+		
+		} finally {
+			setIsloading && setIsloading(true);
 		}
 	}
 	private async getProducts() {
@@ -74,9 +97,16 @@ class Products {
 			handleAuthErrors(error as AxiosError<T_error_response>);
 		}
 	}
+	getProductsWithReviews() {
+		const products = this.store.getState().products.products;
+		const reviews = this.store.getState().user.reviews as T_review[];
+		const PWR = productsWithReviews(products, reviews);
+		this.store.dispatch(updateProdouctsWithReviews(PWR));
+		return PWR;
+	}
 	private async getCategories() {
 		try {
-			const { data } = await axios.get("/api/categories", {
+			const { data } = await axios.get("/api/categories?limit=100", {
 				headers: {
 					Authorization: `Bearer ${Cookies.get("token")}`,
 				},

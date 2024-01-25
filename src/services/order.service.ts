@@ -1,4 +1,4 @@
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 
 import store from "@/redux/store";
 import { handleAuthErrors } from "@/utils/auth.util";
@@ -8,17 +8,20 @@ import {
 	updateDailyRevenueVsOrder,
 	updateMonthlyRevenueVsOrder,
 	updateOrder,
+	updateOrderBySessionId,
 	updateWeeklyRevenueVsOrder,
 	updateYealyRevenueVsOrder,
 } from "@/redux/features/user.slice";
 import {
 	T_order,
+	T_orderBySessionId,
 	T_updated_order,
 	T_updated_user_order,
 	T_user_order,
 } from "@/types/user.type";
 import recent_itemsUtil from "@/utils/recent_items.util";
 import { T_store } from "@/types/store.type";
+import { IOrder } from "@/interfaces/tables.interface";
 
 class Order {
 	protected store!: T_store;
@@ -28,7 +31,7 @@ class Order {
 		this.getMonthlyRevenueVsOrder();
 		this.getWeeklyRevenueVsOrder();
 		this.getYearlyRevenueVsOrder();
-		this.getOrdersByUsers();
+		this.getOrders();
 	}
 
 	async getOrderStats() {
@@ -89,88 +92,34 @@ class Order {
 			handleAuthErrors(error as AxiosError<T_error_response>);
 		}
 	}
-	private async getOrdersByVendor() {
+	async getOrdersBySessionId(id:string) {
 		try {
-			const { data } = await axios.get("/api/orders?role=vendor", {
+			const { data } = await axios.get<AxiosResponse<T_orderBySessionId[]>>("/api/orders/"+id, {
 				headers: {
 					Authorization: `Bearer ${Cookies.get("token")}`,
 				},
 			});
-			const orders: T_order[] = data.data;
-			/* const newOrders: T_updated_order[] = [];
-			if (!orders.length) {
-				this.store.dispatch(updateOrder(orders));
-			} else {
-				const { products } = this.store.getState().products;
-				for (let i of orders) {
-					for (let j of products) {
-						if (i.productId === j._id) {
-							newOrders.push({
-								...i,
-								coverPhoto: j.coverPhoto,
-								productName: j.name,
-							});
-						}
-					}
-				}
-			} */
+			this.store.dispatch(updateOrderBySessionId(data.data));
+		} catch (error) {
+			handleAuthErrors(error as AxiosError<T_error_response>);
+		}
+	
+	}
+	async getOrders() {
+		try {
+			const { data } = await axios.get<AxiosResponse<T_order[]>>("/api/orders", {
+				headers: {
+					Authorization: `Bearer ${Cookies.get("token")}`,
+				},
+			});
+			const orders: T_order[] = data.data.filter(order => order.productId !== null);
+console.log(orders);
 
 			this.store.dispatch(updateOrder(orders));
 		} catch (error) {
 			handleAuthErrors(error as AxiosError<T_error_response>);
 		}
 	}
-	private async getOrdersByUsers() {
-		try {
-			const { data } = await axios.get("/api/orders?role=user", {
-				headers: {
-					Authorization: `Bearer ${Cookies.get("token")}`,
-				},
-			});
-			const orders: T_user_order[] = data.data;
-			
-			const updatedOrders: T_updated_user_order[] = [];
-			if (!orders.length) {
-				this.store.dispatch(updateOrder(orders));
-			} else {
-				const { products } = this.store.getState().products;
-				for (let i of orders) {
-					for (let _i_ of i.items) {
-						for (let j of products) {
-							if (_i_.productId == j._id) {
-								updatedOrders.push({
-									...i,
-									items: [...i.items],
-									coverPhoto: j.coverPhoto[0],
-									productName: j.name,
-								});
-							}
-						}
-					}
-				}
-				this.store.dispatch(updateOrder(updatedOrders));
-			}
-			// const newOrders = [];
-			// if (!orders.length) {
-			// 	this.store.dispatch(updateOrder(orders));
-			// } else {
-			// 	const { products } = this.store.getState().products;
-			// 	for (let i of orders) {
-			// 		for (let j of products) {
-			// 			if (i.productId === j._id) {
-			// 				newOrders.push({
-			// 					...i,
-			// 					coverPhoto: j.coverPhoto,
-			// 					productName: j.name,
-			// 				});
-			// 			}
-			// 		}
-			// }
-			// this.store.dispatch(updateOrder(orders));
-			// 	}
-		} catch (error) {
-			handleAuthErrors(error as AxiosError<T_error_response>);
-		}
-	}
+	
 }
 export default Order;

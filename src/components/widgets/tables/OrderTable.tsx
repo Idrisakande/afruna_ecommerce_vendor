@@ -1,4 +1,5 @@
 import { IOrder } from "@/interfaces/tables.interface";
+import * as Select from "@radix-ui/react-select";
 import {
 	ColumnDef,
 	SortingState,
@@ -9,67 +10,70 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
-import { FC, memo, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import {
+	FC,
+	memo,
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useState,
+} from "react";
 import { useRouter } from "next/router";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import { MdRemoveRedEye, MdSearch } from "react-icons/md";
 import Image from "next/image";
 
-import { months, orderData } from "@/constants/data";
-import { InputLabel } from "../Input/InputLabel";
-import { SelectPicker } from "../SelectPicker";
+import { dateInterval, months, orderData, ordersStatus } from "@/constants/data";
 import { IOrderContext, OrdersContext } from "@/contexts/OrdersProvider";
 import { ResultsFallback } from "../ResultsFallback";
 import { formattedDate } from "@/utils/formatted_date";
 import { createPaginationWithCustomType } from "@/utils/createPaginationWithCustomType";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/types/store.type";
-import { T_order, T_updated_user_order, T_user_order } from "@/types/user.type";
-import { setViewOrderData } from "@/redux/features/user.slice";
-import useCustomSearch from "@/hooks/useCustomSearch";
+import { T_order} from "@/types/user.type";
+import Order from "@/services/order.service";
+import User from "@/services/user.service";
+import { SelectItem } from "../SelectItem";
+import { ChevronDownIcon } from "@radix-ui/react-icons";
+import { GoSearch } from "react-icons/go";
+import useSearchOrders from "@/hooks/useSearchOrders";
+import { updateOrderBuyerInfo } from "@/redux/features/user.slice";
+import { verifyImageUrl } from "@/utils/verify_image_url";
 
 export const OrderTable: FC = memo(() => {
-	const router = useRouter();
-	const { selectedFilter } = useContext(OrdersContext) as IOrderContext;
-	const [sorting, setSorting] = useState<SortingState>([]);
-	const { orders } = useSelector((state: RootState) => state.user);
-	const [data, setData] = useState(orders);
-	const dispatch = useDispatch();
-	useEffect(() => {
-		if (selectedFilter === "All Orders") {
-			setData(orders);
-		} else {
-			const orders_cast = orders as T_user_order[];
-			const newData = orders_cast.filter(
-				(datum) => datum.items[0].deliveryStatus === selectedFilter,
-			);
-			setData(newData);
-		}
-	}, [selectedFilter]);
-
+	const { orders,bio_data } = useSelector((state: RootState) => state.user);
 	const {
-		filteredItems,
-		updateDateFilter,
-		updateMonthFilter,
-		updateSearchTerm,
-	} = useCustomSearch<T_user_order>(data);
-	const handleSearch = useCallback((val: string) => {
-		// console.log(val); 
-		
-		updateSearchTerm(val);
-		if (val === undefined || val === '' ) {
-			setData(data);
-		} /* else {
-			setData(filteredItems);
-		} */
-	}, [filteredItems]);
-	console.log(filteredItems);
-	// const handleMonthFilter  = useCallback((val: any) => updateMonthFilter(""), [data]);
-	// const handleDateFilter  = useCallback((val: any) => updateDateFilter(""), [data]);
+		searchInput,
+		searchResult,
+		statusFilter,
+		sortingType,
+		setSearchInput,
+		setSortingType,
+		setTimePeriod,
+		setStatusFilter,
+	} = useSearchOrders({ data: orders,period:"all" });
+	
+	const { selectedFilter } = useContext(OrdersContext) as IOrderContext;
+	const [data, setData] = useState(orders);
+	
+	useMemo(() => {
+		if (selectedFilter.toLowerCase() === "all orders") {
+			setData(searchResult);
+		} else {
+			const matchedFilter = searchResult.filter(
+				(order) =>
+					order.deliveryStatus.toLowerCase() ===
+					selectedFilter.toLowerCase(),
+			);
+			setData(matchedFilter);
+		}
+	}, [selectedFilter,searchResult]);
+	const router = useRouter();
+	const [sorting, setSorting] = useState<SortingState>([]);
+	const dispatch = useDispatch();
 
-	const columns = useMemo<
-		ColumnDef<T_order | T_user_order | T_updated_user_order>[]
-	>(
+	const columns = useMemo<ColumnDef<T_order>[]>(
 		() => [
 			{
 				accessorKey: "customId",
@@ -80,13 +84,12 @@ export const OrderTable: FC = memo(() => {
 				header: () => <span className="">ID</span>,
 			},
 			{
-				accessorKey: "coverPhoto",
-				cell: (info) => {
-					let image = info.getValue() as string;
+				accessorKey: "productId",
+				cell: ({ row }) => {
 					return (
 						<Image
 							className="w-12 h-12 object-fill rounded-md border-[1px] shadow-sm"
-							src={image}
+							src={verifyImageUrl(row.original.productId?.images[0])}
 							width={40}
 							height={40}
 							alt="item Image"
@@ -96,63 +99,63 @@ export const OrderTable: FC = memo(() => {
 				header: () => <span className="">Image</span>,
 			},
 			{
-				accessorKey: "productName",
-				cell: (info) => {
-					const itemName = `${info.getValue()}`;
-					return <div className="ml-2">{itemName}</div>;
+				accessorKey: "item name",
+				cell: ({ row }) => {
+					return (
+						<div className="ml-2">
+							{row.original.productId?.name}
+						</div>
+					);
 				},
 				header: () => <span className="">Item Name</span>,
 			},
 			{
-				accessorKey: "items",
-				cell: (info) =>
-					info ? (info.getValue() as T_order[])[0].quantity : null,
+				accessorKey: "quantity",
+				cell: (info) => info.getValue(),
 				header: () => <span className="">Quantity</span>,
 			},
 			{
 				accessorKey: "createdAt",
-				cell: (info) => info.getValue(),
+				cell: (info) => formattedDate(info.getValue() as string),
 				header: () => <span className="">Order Date</span>,
 			},
 			{
-				accessorKey: "items",
+				accessorKey: "deliveryStatus",
 				cell: ({ cell }) => {
-					switch (
-						(cell.getValue() as T_order[])[0].deliveryStatus //gets to the item file an
-					) {
+					switch (cell.getValue()) {
 						case "Pending":
 							return (
-								<text className="flex justify-between items-center w-fit">
+								<span className="flex justify-between items-center w-fit">
 									<span className="p-1 rounded-full bg-amber-500 mr-1" />
 									<span className="text-amber-500">
 										Pending
 									</span>
-								</text>
+								</span>
 							);
 						case "Paid":
 							return (
-								<text className="flex justify-between items-center w-fit">
+								<span className="flex justify-between items-center w-fit">
 									<span className="p-1 rounded-full bg-lime-600 mr-1" />
 									<span className="text-lime-600">Paid</span>
-								</text>
+								</span>
 							);
 						case "Cancelled":
 							return (
-								<text className="flex justify-between items-center w-fit">
+								<span className="flex justify-between items-center w-fit">
 									<span className="p-1 rounded-full bg-red-500 mr-1" />
 									<span className="text-red-500">
 										Cancelled
 									</span>
-								</text>
+								</span>
 							);
 						case "Shipped":
 							return (
-								<text className="flex justify-between items-center w-fit">
+								<span className="flex justify-between items-center w-fit">
 									<span className="p-1 rounded-full bg-blue-500 mr-1" />
 									<span className="text-blue-500">
 										Shipped
 									</span>
-								</text>
+								</span>
 							);
 					}
 				},
@@ -161,7 +164,7 @@ export const OrderTable: FC = memo(() => {
 			{
 				accessorKey: "total",
 				cell: ({ cell }) => (
-					<>${(cell.getValue() as number).toLocaleString()}</>
+					<>&#x20A6;{(cell.getValue() as number).toLocaleString()}</>
 				),
 				header: () => <span className="">Price</span>,
 			},
@@ -170,26 +173,24 @@ export const OrderTable: FC = memo(() => {
 				cell: ({ row }) => (
 					<div className="flex justify-start gap-3 items-center">
 						<button
-							onClick={() => {
-								console.log(row.original);
-								dispatch(setViewOrderData(row.original));
+							
+							onClick={async () => {
+								const ordersServices = new Order();
+								ordersServices.getOrdersBySessionId(
+									row.original.sessionId,
+								);
+								const userServices = new User();
+								const buyerInfo =
+									await userServices.getUserById(
+										row.original.vendorId,
+									);
+								dispatch(updateOrderBuyerInfo(buyerInfo));
 								router.push("/orders/details");
 							}}
 							className="hover:scale-90 border-none transition duration-300"
 						>
 							<MdRemoveRedEye size={24} />
 						</button>
-						{/* 	<button
-							className="hover:scale-90 border-none transition duration-300"
-							onClick={() => {
-								const newData = data.filter(
-									(_, idx) => idx !== row.index,
-								);
-								setData(newData);
-							}}
-						>
-							<MdDeleteOutline size={24} />
-						</button> */}
 					</div>
 				),
 				header: () => <span className="">Action</span>,
@@ -210,121 +211,161 @@ export const OrderTable: FC = memo(() => {
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
-		debugTable: true,
+		debugTable: false,
 	});
-	if (!data.length) {
-		return <ResultsFallback />;
-	}
 
+	
 	return (
 		<main className="relative">
 			<div className="my-10 w-full  h-[85vh] pb-2 bg-white overflow-auto rounded-md border shadow-sm border-slate-300">
 				<header className="flex sticky top-0 justify-between items-center border-b border-slate-300 text-afruna-blue bg-white ">
 					<h1 className="p-3 font-bold ">Orders</h1>
 					<div className="flex justify-between items-center p-3 space-x-2">
-						<InputLabel
-							getValue={(v)=>handleSearch(v as string)}
-							placeholder={"Search"}
-							inputClassName="text-sm p-1"
-							inputsuffixIcon={
-								<button>
-									<MdSearch />
-								</button>
-							}
-							type={"text"}
-						/>
-						<SelectPicker
-							triggerClassName="relative top-[5px] flex w-24 justify-between items-center space-x-1 text-[12px] p-[11px] border border-afruna-gray/30 rounded-md"
-							placeholder="Months"
-							getSelected={(val) => console.log(val)}
-							items={months}
-						/>
-						<SelectPicker
-							triggerClassName="relative top-[5px] flex w-24 justify-between items-center space-x-1 text-[12px] p-[11px] border border-afruna-gray/30 rounded-md"
-							placeholder="Select"
-							getSelected={(val) => console.log(val)}
-							items={[
-								"This Month",
-								"3 Days",
-								"1 Week",
-								"2 Months",
-								"6 Months",
-							]}
-						/>
+						<fieldset className="xs:col-span-full lg:col-span-2 overflow-hidden text-[#777777] border border-slate-300 flex justify-between items-center rounded-xl">
+								<input
+									value={searchInput}
+									onChange={(e)=>setSearchInput(e.target.value)}
+									type="search"
+									placeholder="Search"
+									name="search"
+									className="w-full text-base p-3 outline-none focus:outline focus:outline-1 focus:outline-blue focus:bg-white"
+								/>
+								<GoSearch className="text-slate-200 w-16 text-2xl cursor-pointer" />
+							</fieldset>
+							<Select.Root onValueChange={setTimePeriod as (value: string) => void}>
+								<Select.Trigger className="flex items-center gap-2 p-3 border rounded-lg">
+									<Select.Value
+										placeholder={"Select range"}
+									/>
+									<Select.Icon>
+										<ChevronDownIcon />
+									</Select.Icon>
+								</Select.Trigger>
+								<Select.Portal>
+									<Select.Content
+										className="p-2 bg-white gap-2"
+										position="popper"
+									>
+										<Select.Viewport>
+											{dateInterval.map((date) => (
+												<SelectItem
+													key={date}
+													value={date}
+												>
+													{date}
+												</SelectItem>
+											))}
+										</Select.Viewport>
+									</Select.Content>
+								</Select.Portal>
+							</Select.Root>
+							<Select.Root onValueChange={setStatusFilter as (value: string) => void}>
+								<Select.Trigger className="flex items-center gap-2 p-3 border rounded-lg">
+									<Select.Value
+										placeholder={"Status"}
+									/>
+									<Select.Icon>
+										<ChevronDownIcon />
+									</Select.Icon>
+								</Select.Trigger>
+								<Select.Portal>
+									<Select.Content
+										className="p-2 bg-white gap-2"
+										position="popper"
+									>
+										<Select.Viewport>
+											{ordersStatus.map((date) => (
+												<SelectItem
+													key={date}
+													value={date}
+												>
+													{date}
+												</SelectItem>
+											))}
+										</Select.Viewport>
+									</Select.Content>
+								</Select.Portal>
+							</Select.Root>
+						
 					</div>
 				</header>
-				<table className="w-screen lg:w-full px-8 relative">
-					<thead className=" sticky top-16 bg-white">
-						{table.getHeaderGroups().map((headerGroup) => (
-							<tr
-								className="text-left text-afruna-gray text-[12px] font-extralight"
-								key={headerGroup.id}
-							>
-								{headerGroup.headers.map((header) => (
-									<th key={header.id}>
-										{header.index > 1 &&
-										header.id !== "actions" ? (
-											<div className="flex px-1 justify-between items-center w-fit">
-												{flexRender(
-													header.column.columnDef
-														.header,
-													header.getContext(),
-												)}
-												<span className="flex flex-col">
-													<BiChevronUp
-														onClick={header.column.getToggleSortingHandler()}
-														size={24}
-														className="relative top-2 text-slate-400"
-													/>
-													<BiChevronDown
-														onClick={header.column.getToggleSortingHandler()}
-														size={24}
-														className="relative bottom-[7px]"
-													/>
-												</span>
-											</div>
-										) : (
-											<span className="px-2">
-												{flexRender(
-													header.column.columnDef
-														.header,
-													header.getContext(),
-												)}
-											</span>
-										)}
-									</th>
-								))}
-							</tr>
-						))}
-					</thead>
-					<tbody className="">
-						{table.getRowModel().rows.map((row) => {
-							return (
+				{ orders && orders.length > 0?
+					(<table className="w-screen lg:w-full px-8 relative">
+						<thead className=" sticky top-16 bg-white">
+							{table.getHeaderGroups().map((headerGroup) => (
 								<tr
-									className="text-left odd:border-y-[1px] odd:border-slate-300 text-afruna-blue text-[12px]"
-									key={row.original._id}
+									className="text-left text-afruna-gray text-[12px] font-extralight"
+									key={headerGroup.id}
 								>
-									{row.getVisibleCells().map((cell) => {
-										return (
-											<td className="py-2" key={cell.id}>
-												{flexRender(
-													cell.column.columnDef.cell,
-													cell.getContext(),
-												)}
-											</td>
-										);
-									})}
+									{headerGroup.headers.map((header) => (
+										<th key={header.id}>
+											{header.index > 1 &&
+												header.id !== "actions" ? (
+												<div className="flex px-1 justify-between items-center w-fit">
+													{flexRender(
+														header.column.columnDef
+															.header,
+														header.getContext(),
+													)}
+													<span className="flex flex-col">
+														<BiChevronUp
+															onClick={header.column.getToggleSortingHandler()}
+															size={24}
+															className="relative top-2 text-slate-400"
+														/>
+														<BiChevronDown
+															onClick={header.column.getToggleSortingHandler()}
+															size={24}
+															className="relative bottom-[7px]"
+														/>
+													</span>
+												</div>
+											) : (
+												<span className="px-2">
+													{flexRender(
+														header.column.columnDef
+															.header,
+														header.getContext(),
+													)}
+												</span>
+											)}
+										</th>
+									))}
 								</tr>
-							);
-						})}
-					</tbody>
-				</table>
+							))}
+						</thead>
+						<tbody className="">
+							{table.getRowModel().rows.map((row) => {
+								return (
+									<tr
+										className="text-left odd:border-y-[1px] odd:border-slate-300 text-afruna-blue text-[12px]"
+										key={
+											row.original._id ??
+											Math.ceil(
+												Math.random() *
+												row.original.quantity,
+											)
+										}
+									>
+										{row.getVisibleCells().map((cell) => {
+											return (
+												<td className="py-2" key={cell.id}>
+													{flexRender(
+														cell.column.columnDef.cell,
+														cell.getContext(),
+													)}
+												</td>
+											);
+										})}
+									</tr>
+								);
+							})}
+						</tbody>
+					</table>):<ResultsFallback />}
 			</div>
-			<Pagination table={table} />
+			{data && data.length > 0 && <Pagination table={table} />}
 		</main>
 	);
 });
 
-const Pagination = createPaginationWithCustomType<
-	T_order | T_user_order | T_updated_user_order
->();
+const Pagination = createPaginationWithCustomType<T_order>();

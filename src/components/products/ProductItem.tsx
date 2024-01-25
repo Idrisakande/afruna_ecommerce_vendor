@@ -4,6 +4,7 @@ import { MdStar, MdStarHalf } from "react-icons/md";
 import Image from "next/image";
 import { IProductItem } from "@/interfaces/IProductItem";
 import { images } from "@/constants/images";
+import { verifyImageUrl } from "@/utils/verify_image_url";
 
 export const ProductItem: FC<IProductItem> = memo(
 	({
@@ -21,9 +22,10 @@ export const ProductItem: FC<IProductItem> = memo(
 		discount,
 		checkbox,
 		handleSelect,
+		onClick
 	}) => {
 		return published ? (
-			<div className="relative flex flex-col hover:bg-afruna-gray/10 bg-afruna-gray/5 backdrop-blur-sm rounded-md shadow-sm text-[12px] md:text-xs p-3">
+			<div onClick={onClick} className="relative flex flex-col hover:bg-afruna-gray/10 bg-afruna-gray/5 backdrop-blur-sm rounded-md shadow-sm text-[12px] md:text-xs p-3 hover:cursor-pointer">
 				{checkbox && (
 					<input
 						type="checkbox"
@@ -37,11 +39,13 @@ export const ProductItem: FC<IProductItem> = memo(
 					</span>
 				) : null}
 				<header className="flex flex-col items-center space-y-2 p-1">
-					<Image src={item_img} alt={"ProductImage_"} width={100} />
+					<Image src={verifyImageUrl(item_img as string)} alt={"ProductImage_"} width={100} />
 					<div className="flex self-start w-full items-center justify-between">
 						<p>
-							${price}
-							<s className="text-afruna-gray/30">${slashed_price}</s>
+							&#x20A6;{price}
+							<s className="text-afruna-gray/30">
+								&#x20A6;{slashed_price}
+							</s>
 						</p>
 						<span className="space-x-1 flex items-center">
 							{rating}
@@ -90,7 +94,7 @@ export const ProductItem: FC<IProductItem> = memo(
 				) : null}
 				<header className="flex flex-col my-auto items-center space-y-2 p-1">
 					<Image
-						src={item_img ?? "https://picsum.photos/200/300"}
+						src={verifyImageUrl(item_img as string)}
 						alt={"ProductImage_"}
 						width={100}
 						height={100}
@@ -114,8 +118,10 @@ export const ProductItem: FC<IProductItem> = memo(
 					</div>
 				</header>
 				<footer className="flex mt-auto justify-between items-center space-y-2 p-1">
-					<span>${price}</span>
-					<s className="text-afruna-gray/30">${slashed_price}</s>
+					<span>&#x20A6;{price}</span>
+					<s className="text-afruna-gray/30">
+						&#x20A6;{slashed_price}
+					</s>
 				</footer>
 			</div>
 		);

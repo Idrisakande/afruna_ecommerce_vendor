@@ -5,8 +5,9 @@ import { useRouter } from "next/router";
 import { FC, memo, useCallback } from "react";
 
 import withAuthorization from "@/hooks/withAuth10";
+import withAuth from "@/hooks/withAuth";
 
-export default withAuthorization(function Index() {
+export default withAuth(function Index() {
   const router = useRouter();
   const register = useCallback(() => router.push("auth/register"), [router]);
   return (

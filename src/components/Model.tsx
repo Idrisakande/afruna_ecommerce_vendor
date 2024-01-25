@@ -7,12 +7,27 @@ interface ModelProps {
 	onclose: () => void;
 	children?: ReactNode;
 	title: string;
+	rootClassName?: string;
+	EditModel?: boolean;
 }
 
-export const Model: FC<ModelProps> = ({ isOpen, onclose, children, title }) => {
+export const Model: FC<ModelProps> = ({
+	isOpen,
+	onclose,
+	children,
+	title,
+	rootClassName,
+	EditModel
+}) => {
 	return (
 		<Transition.Root show={isOpen} as={Fragment}>
-			<Dialog as={"div"} className="relative z-50" onClose={onclose}>
+			<Dialog
+				as={"div"}
+				className="relative z-30"
+				onClose={() => {
+					EditModel ? "" : onclose();
+				}}
+			>
 				<Transition.Child
 					as={Fragment}
 					enter="ease-out duration-300"
@@ -36,7 +51,9 @@ export const Model: FC<ModelProps> = ({ isOpen, onclose, children, title }) => {
 							leaveFrom="opacity-100 translate-y-0 xs:scale-100"
 							leaveTo="opacity-0 translate-y-4 xs:translate-y-0 xs:scale-95"
 						>
-							<Dialog.Panel className="relative transform overflow-hidden rounded-xl bg-white shadow-xl transition-all">
+							<Dialog.Panel
+								className={`${rootClassName} relative transform overflow-hidden rounded-xl bg-white shadow-xl transition-all`}
+							>
 								<div className="pt-8 px-8 pb-12 flex justify-between items-center">
 									<Dialog.Title
 										as="h2"
@@ -53,7 +70,9 @@ export const Model: FC<ModelProps> = ({ isOpen, onclose, children, title }) => {
 										<RxCross2 className=" text-slate-500 w-6 h-6" />
 									</button>
 								</div>
-								{children}
+								<div className="flex justify-start items-start">
+									{children}
+								</div>
 							</Dialog.Panel>
 						</Transition.Child>
 					</div>

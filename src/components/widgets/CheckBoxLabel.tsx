@@ -17,7 +17,7 @@ export default memo(function ColorSelector({
 		[getselectedChecks, selectedChecks]
 	);
 	return (
-		<div className="w-full">
+		<div className="w-full flex justify-start items-start flex-col">
 			<h3 className="mb-1 font-semibold text-sm">{headerTitle}</h3>
 			<div className="w-full rounded-lg mt-2 flex flex-wrap justify-start space-x-4 items-center">
 				{placeholders.map((placeholder, idx) => (

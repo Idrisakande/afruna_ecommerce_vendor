@@ -67,7 +67,7 @@ export interface IOrederContext {
 export interface IProducts {
 	id: number;
 	productName: string;
-	productImg: StaticImageData;
+	productImg: string|StaticImageData;
 	category: string;
 	stock: number;
 	rating: string;

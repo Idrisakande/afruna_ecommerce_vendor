@@ -16,18 +16,26 @@ import Image from "next/image";
 // InvoiceTable
 import { OrederDetailsData } from "@/constants/data";
 import { IOrederDetails } from "@/interfaces/tables.interface";
+import { RootState } from "@/types/store.type";
+import { useSelector } from "react-redux";
+import { T_orderBySessionId } from "@/types/user.type";
+import { formattedDate } from "@/utils/formatted_date";
+import { verifyImageUrl } from "@/utils/verify_image_url";
 interface InvoiceTableProps {}
 
 export const InvoiceTable: FC<InvoiceTableProps> = ({}) => {
 	const [rowSelection, setRowSelection] = useState({});
+	const { viewOrder, orderBuyerInfo, orderBySessionId } = useSelector(
+		(state: RootState) => state.user,
+	);
 	// const [globalFilter, setGlobalFilter] = useState("");
-	const [data, setData] = useState([...OrederDetailsData]);
+	const [data, setData] = useState(orderBySessionId);
 	const [sorting, setSorting] = useState<SortingState>([]);
 
-	const columns = useMemo<ColumnDef<IOrederDetails>[]>(
+	const columns = useMemo<ColumnDef<T_orderBySessionId>[]>(
 		() => [
 			{
-				accessorKey: "id",
+				accessorKey: "customId",
 				cell: (info) => {
 					const id = `#${info.getValue()}`;
 					return <p className="pl-24">{id}</p>;
@@ -38,11 +46,12 @@ export const InvoiceTable: FC<InvoiceTableProps> = ({}) => {
 			},
 			{
 				accessorKey: "img",
-				cell: ({ cell }) => (
+				cell: ({ row }) => (
 					<Image
-						src={cell.getValue() as unknown as string}
+						src={verifyImageUrl(row.original.productId?.images[0])}
 						width={45}
 						height={45}
+						priority
 						alt="order-image"
 						className="rounded"
 					/>
@@ -53,7 +62,7 @@ export const InvoiceTable: FC<InvoiceTableProps> = ({}) => {
 			},
 			{
 				accessorKey: "itemName",
-				cell: (cell) => cell.getValue(),
+				cell: ({ row }) => row.original.productId?.name,
 				header: () => (
 					<span className="text-sm text-[#7C7C7C]">item Name</span>
 				),
@@ -68,24 +77,24 @@ export const InvoiceTable: FC<InvoiceTableProps> = ({}) => {
 				),
 			},
 			{
-				accessorKey: "orderDate",
-				cell: (info) => info.getValue(),
+				accessorKey: "createdAt",
+				cell: (info) => formattedDate(info.getValue() as string),
 				header: () => (
 					<span className="text-sm text-[#7C7C7C]">Order Date</span>
 				),
 			},
 			{
-				accessorKey: "amount",
+				accessorKey: "total",
 				cell: (info) => {
-					const amount = `#${info.getValue()}`;
-					return <p className="pr-16">{amount}</p>;
+					const amount = `${info.getValue()}`;
+					return <p className="pr-16">&#x20A6;{amount}</p>;
 				},
 				header: () => (
 					<span className="text-sm text-[#7C7C7C]">Amount</span>
 				),
 			},
 		],
-		[]
+		[],
 	);
 
 	const table = useReactTable({
@@ -122,7 +131,7 @@ export const InvoiceTable: FC<InvoiceTableProps> = ({}) => {
 									{header &&
 										flexRender(
 											header.column.columnDef.header,
-											header.getContext()
+											header.getContext(),
 										)}
 								</th>
 							))}
@@ -144,7 +153,7 @@ export const InvoiceTable: FC<InvoiceTableProps> = ({}) => {
 										>
 											{flexRender(
 												cell.column.columnDef.cell,
-												cell.getContext()
+												cell.getContext(),
 											)}
 										</td>
 									);
@@ -171,29 +180,29 @@ export const InvoiceTable: FC<InvoiceTableProps> = ({}) => {
 						</h3>
 					</div>
 					<div className="flex flex-col gap-5 min-w-[50%] justify-start">
-						<span className="text-sm text-[#777687] font-semibold">
-							$2892.15
-						</span>
-						<span className="text-sm text-[#777687] font-semibold">
-							$235.15
-						</span>
-						<span className="text-sm text-[#777687] font-semibold">
-							$28.15
-						</span>
-						<span className="text-sm text-[#777687] font-semibold">
-							$2.15
-						</span>
+						{orderBySessionId.map((order, idx) => (
+							<span
+								key={order._id}
+								className="text-sm text-[#777687] font-semibold"
+							>
+								&#x20A6;{order.total}
+							</span>
+						))}
 					</div>
 				</div>
 				<div className="max-w-[23rem] mt-6 pt-8 w-full border-t border-slate-300 gap-10 flex justify-between items-center">
 					<div className="flex flex-col min-w-[50%] gap-5 justify-start">
 						<h3 className="text-sm text-[#777687] font-semibold">
-							Total (USD):
+							Total (NGN):
 						</h3>
 					</div>
 					<div className="flex flex-col gap-5 min-w-[50%] justify-start">
 						<span className="text-sm text-[#777687] font-semibold">
-							$2892.15
+							&#x20A6;
+							{orderBySessionId.reduce(
+								(acc, val) => acc + val.total,
+								0,
+							)}
 						</span>
 					</div>
 				</div>

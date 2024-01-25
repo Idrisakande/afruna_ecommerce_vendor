@@ -1,5 +1,6 @@
 import { conversations } from "@/constants/data";
 import { images } from "@/constants/images";
+import { verifyImageUrl } from "@/utils/verify_image_url";
 import Image, { StaticImageData } from "next/image";
 import { FC } from "react";
 
@@ -21,7 +22,7 @@ export const CurrentUsersConversations: FC<CurrentUsersConversationsProps> = ({
       <Image
       height={40}
       width={40}
-      src={img??images.afruna_logo}
+      src={verifyImageUrl(img as string)}
       alt="img"
       priority
       className={`w-8 h-8 rounded-full ${isOwn && "order-2"}`}

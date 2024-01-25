@@ -9,7 +9,7 @@ export function DashboardHeader({
 	rightComponent: ReactNode;
 }) {
 	return (
-		<nav className={"bg-gradient-afruna p-2 flex items-center"}>
+		<nav className={"print:hidden bg-gradient-afruna p-2 flex items-center"}>
 			<div className="flex justify-between items-center max-w-[90%] mx-auto w-full">
 				<Link className={""} href={"/"}>
 					<Image src={svgs.logo} width={200} alt="Logo" />

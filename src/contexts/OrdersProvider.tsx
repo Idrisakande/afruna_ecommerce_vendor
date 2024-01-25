@@ -2,7 +2,8 @@ import Breadcrumbs from "@/components/widgets/Breadcrumbs";
 import { orderData } from "@/constants/data";
 import { IOrder, IOrederContext } from "@/interfaces/tables.interface";
 import { Main } from "@/layouts/Main";
-import { FC, ReactNode, createContext, useCallback, useState } from "react";
+import { RootState } from "@/types/store.type";
+import { FC, ReactNode, createContext, useCallback, useMemo, useState } from "react";
 
 interface OrdersProviderProps {
 	children: ReactNode;
@@ -17,6 +18,7 @@ export const OrdersContext = createContext<IOrderContext | null>(null);
 
 export const OrdersProvider: FC<OrdersProviderProps> = ({ children }) => {
 	const [selectedFilter, setSelectedFilter] = useState("All Orders");
+	
 	const handleActiveFilter = useCallback(
 		(item: string) => setSelectedFilter(item),
 		[],

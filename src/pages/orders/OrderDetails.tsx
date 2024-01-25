@@ -16,32 +16,36 @@ import { T_updated_user_order } from "@/types/user.type";
 
 const OrderDetails: FC = () => {
 	const { query } = useRouter();
-	const {viewOrder} = useSelector((state:RootState)=> state.user)
+	const { viewOrder, orderBuyerInfo, orderBySessionId } = useSelector(
+		(state: RootState) => state.user,
+	);
 	const [updateStatusModelOpen, setUpdateStatusModelOpen] = useState(false);
-	const buyer_address =  useMemo(()=> {
-		if (viewOrder) {
-			const info = viewOrder as T_updated_user_order; //meas of escaping ts error
-			return info.items[0].deliveryAddress ;
-		}
-	},[viewOrder])
-	
+	// const buyer_address =  useMemo(()=> {
+	// 	if (viewOrder) {
+	// 		const info = viewOrder as T_updated_user_order; //meas of escaping ts error
+	// 		return info.items[0].deliveryAddress ;
+	// 	}
+	// },[viewOrder])
+
 	return (
 		<Main breadcrumbs={<Breadcrumbs />}>
 			<main className="m-7 pb-20">
 				<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:max-w-[96%] sm:mx-auto">
-					<h2 className="text-xl font-semibold">Order ID: #{viewOrder?._id}</h2>
+					<h2 className="text-xl font-semibold">
+						Order ID:{orderBySessionId[0].customId}
+					</h2>
 					<div className="flex justify-start sm:justify-end items-center">
-					<button
-              onClick={() => setUpdateStatusModelOpen(true)}
-              className="px-8 py-3 text-white rounded font-semibold tracking-tight bg-gradient-y-deepblue
+						<button
+							onClick={() => setUpdateStatusModelOpen(true)}
+							className="px-8 py-3 text-white rounded font-semibold tracking-tight bg-gradient-y-deepblue
 "
-            >
-              Order Status
-            </button>
-            <UpdateStatus
-              isOpen={updateStatusModelOpen}
-              onClose={() => setUpdateStatusModelOpen(false)}
-            />
+						>
+							Order Status
+						</button>
+						<UpdateStatus
+							isOpen={updateStatusModelOpen}
+							onClose={() => setUpdateStatusModelOpen(false)}
+						/>
 						{/* <Link
 							href={"/orders/invoice"}
 							className="px-6 py-2 text-xs text-white bg-gradient-y-deepblue flex gap-1 justify-center items-center rounded"
@@ -52,22 +56,22 @@ const OrderDetails: FC = () => {
 					</div>
 				</div>
 				<div className="flex flex-col sm:flex-row lg:ml-3 gap-6 mt-8 justify-start sm:items-center">
-					<div className="py-4 px-6 text-xs bg-gradient-to-b from-green-500/40 to-green-100] rounded-md h-fit space-y-2 w-full max-w-[16rem]">
+					<div className="py-4 px-6 text-xs bg-gradient-green rounded-md h-[9rem] w-full max-w-[16rem]">
 						<h2 className="text-lg mb-2 font-semibold tracking-tight ">
 							Buyer Info
 						</h2>
 						<p className="text-[0.85rem] font-semibold mb-1 tracking-tight ">
-							Leo Paula Jaboati dexk
+							{orderBuyerInfo?.firstName} {orderBuyerInfo?.lastName}
 						</p>
-						<p className="tracking-tight mb-1">LeoPj@menu.comcom</p>
-						<span className="tracking-tight ">+234074653864</span>
+						{/* 	<p className="tracking-tight mb-1">LeoPj@menu.comcom</p>
+						<span className="tracking-tight ">+234074653864</span> */}
 					</div>
 					<div className="py-4 px-6 text-xs bg-gradient-to-b from-blue-500/40 to-blue-100] rounded-md h-fit space-y-2 w-full max-w-[16rem]">
 						<h2 className="text-lg mb-2 font-semibold tracking-tight ">
 							Shipping Address
 						</h2>
 						<p className="text-[0.85rem] font-semibold mb-1 tracking-tight max-w-[12.115rem] capitalize">
-							{buyer_address?.postCode} {buyer_address?.address} {buyer_address?.city}, {buyer_address?.state} {buyer_address?.country}.
+							{/* {buyer_address?.postCode} {buyer_address?.address} {buyer_address?.city}, {buyer_address?.state} {buyer_address?.country}. */}
 						</p>
 						{/* <span className="tracking-tight ">+234074653864</span> */}
 					</div>
@@ -85,7 +89,7 @@ const OrderDetails: FC = () => {
 					<div className="w-full max-w-[65%]">
 						<OrderDetailsTable />
 					</div>
-				{/* 	<div className="w-full max-w-[34%]">
+					{/* <div className="w-full max-w-[34%]">
 						<ScrollArea.Root className="ScrollAreaRoot w-full h-[72vh] bg-white overflow-auto rounded-xl border shadow-sm border-slate-300">
 							<ScrollArea.Viewport className="ScrollAreaViewport w-full h-full pb-6">
 								<div className="border-b pt-4 pb-3 px-6 border-slate-300 flex justify-start items-center text-lg font-semibold">
@@ -129,7 +133,7 @@ const OrderDetails: FC = () => {
 											Total Amount:
 										</h3>
 										<h3 className="text-sm text-[#777687] min-w-[50%] font-semibold">
-											$5756.95
+											&#x20A6;{orderBySessionId.reduce((acc,val)=> acc + val.total,0)}
 										</h3>
 									</div>
 								</div>

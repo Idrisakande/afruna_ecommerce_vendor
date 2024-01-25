@@ -14,6 +14,7 @@ import {
 import { handleAuthErrors } from "@/utils/auth.util";
 import { T_User } from "@/types/user.type";
 import { setUserBio } from "@/redux/features/user.slice";
+import { updateConvo, updateMessages } from "@/redux/features/chat.slice";
 
 class Auth10 {
 	private store = store.store;
@@ -43,6 +44,7 @@ class Auth10 {
 				});
 				return;
 			}
+			Cookies.set("token", data.data.token)
 			dispatch(setAuth10(true));
 			dispatch(setToken(data.data.token));
 			dispatch(setUserBio(user as T_User));
@@ -62,7 +64,10 @@ class Auth10 {
 		}
 	}
 	async handleLogout() {
+		// reset
 		this.store.dispatch(setAuth10(false));
+		this.store.dispatch(updateConvo([]));
+		this.store.dispatch(updateMessages([]));
 		this.router && this.router.replace("/auth/login");
 	}
 	async handleSignup(user_data: T_register_data) {
@@ -92,7 +97,7 @@ class Auth10 {
 	}
 	async googlesignin() {
 		try {
-			const { data } = await axios.get("/api/oAuthUrls");
+			const { data } = await axios.get("/api/oAuthUrls?url=localhost:3000");
 			const {
 				data: { googleLoginUrl },
 			} = data;

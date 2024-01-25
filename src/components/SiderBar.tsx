@@ -19,7 +19,7 @@ export function SiderBar() {
 	const { route } = useRouter();
 	const currentRoute = route === "/" ? "/" : route;
 	return (
-		<aside className="pt-4 w-24 md:w-48 bg-white h-full">
+		<aside className="print:hidden pt-4 w-24 md:w-48 bg-white h-full">
 			<div className="bg-gradient-sidebar h-full snap-both flex flex-col justify-between rounded-r-lg overflow-y-auto overflow-x-hidden">
 				{[
 					{

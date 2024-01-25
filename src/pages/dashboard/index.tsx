@@ -20,8 +20,7 @@ import { T_DashboardStats } from "@/types/user.type";
 import PageLoarder from "@/components/widgets/PageLoarder";
 import User from "@/services/user.service";
 import Products from "@/services/products.service";
-import Chat from "@/services/chat.service";
-
+import withAuth from "@/hooks/withAuth";
 const Index = () => {
 	const [isloading, setIsloading] = useState(true);
 	const [dashboardStats, setDashboardStats] = useState<T_DashboardStats>({
@@ -31,13 +30,6 @@ const Index = () => {
 		totalOrders: 0,
 	});
 	const router = useRouter();
-
-	//refreshes chats every 10 mins
-	/* useEffect(()=> {
-		const chatServices =  new Chat();
-		const timer = setInterval(chatServices.getConversations, 10e3 * 60);
-		return () => clearInterval(timer);
-	},[]) */
 	useEffect(() => {
 		const userService = new User();
 		userService.getReviews();
@@ -51,7 +43,6 @@ const Index = () => {
 			.then((result) => setDashboardStats(result))
 			.then(() => setIsloading(false));
 	}, []);
-	if (isloading) return <PageLoarder />;
 	return (
 		<Main
 			breadcrumbs={<Breadcrumbs />}
@@ -83,4 +74,4 @@ const Index = () => {
 		</Main>
 	);
 };
-export default withAuth10(Index);
+export default withAuth(Index);

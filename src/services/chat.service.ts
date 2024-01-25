@@ -30,8 +30,9 @@ class Chat {
 			});
 			// Reverse the order of chat messages to show the last one at the top
 			const messages: T_msg[] = data.data.slice().reverse();
-
 			this.store.dispatch(updateMessages(messages));
+			this.getConversations();
+			return messages;
 		} catch (error) {
 			handleAuthErrors(error as AxiosError<T_error_response>);
 		}
@@ -41,9 +42,7 @@ class Chat {
 			const { data } = await axios.post("/api/messages/", payload, {
 				headers: { Authorization: `Bearer ${Cookies.get("token")}` },
 			});
-			const id = data.data.convo._id;
-			console.log(id);
-			
+			const id = data.data.message.conversation;
 			this.getMessage(id);
 		} catch (error) {
 			handleAuthErrors(error as AxiosError<T_error_response>);
