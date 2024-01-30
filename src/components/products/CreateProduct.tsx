@@ -114,33 +114,6 @@ export const CreateProduct: FC<{}> = memo(({}) => {
 		[categories, category]
 	  );
 
-	/* const renderAttributes = () => {
-		if (category && category.options && category.options.length > 0) {
-			return (
-				<div className="grid lg:grid-cols-2 gap-2">
-					{category.options.map((name, index) => {
-						return (
-							<InputData
-								headerTitle={name}
-								key={index + name}
-								placeholder={name}
-								getMetadata={(values) =>
-									handleInputChange(values, name)
-								}
-							/>
-						);
-					})}
-				</div>
-			);
-		} else {
-			return category ? (
-				<p>No options available for the selected category.</p>
-			) : (
-				<p>no category selected</p>
-			);
-		}
-	}; */
-
 	const updateFiles = useCallback((incommingFiles: ExtFile[]) => {
 		if (incommingFiles.length <= 10) {
 			setFiles(
@@ -551,8 +524,6 @@ export const CreateProduct: FC<{}> = memo(({}) => {
 							placeholder="Select brand"
 						/>
 					</div>
-					{/* {isAttributeModalOpen && renderAttributes()} */}
-					{/* set attributes */}
 					{categories && category && productVariants.length > 0
 						? productVariants.map((variant, index) => (
 								<div key={index} className="gap-2">

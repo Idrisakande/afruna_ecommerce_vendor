@@ -1,12 +1,14 @@
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
-import { ComponentType, FC } from "react";
+import { ComponentType, FC, useEffect } from "react";
 import {
 	TOriginalComponentProps,
 	TResultComponentProps,
 } from "@/types/auth.type";
 import { RootState } from "@/types/store.type";
 import { toast } from "react-toastify";
+import Cookies from "js-cookie";
+import { verifyToken } from "@/utils/decode_jwt";
 // import {isAuthenticated} from "@/lib/is_authenticated";
 
 const withAuth = <P extends TOriginalComponentProps>(
@@ -19,21 +21,29 @@ const withAuth = <P extends TOriginalComponentProps>(
 		const router = useRouter();
 		const { pathname } = router;
 
-		/**
-		 * @Description: Redirect to login page when not logged in and
-		 *              path is among protected routes.
-		 *  @Type: Path redirect.
-		 * */
-		if (!isAuthenticated && isProtectedRoute(pathname)) {
-			router.replace("auth/login").finally(() => {
-				toast.error("Kindly login");
-			});
-			return;
-		}
-		// if (!isAuthenticated() && isProtectedRoute(pathname)) {
-		// 	router.replace("/auth/login");
-		// 	return;
-		// }
+		useEffect(() => {
+			const token = Cookies.get("token");
+
+			if (isProtectedRoute(pathname)) {
+				if (!token) {
+					toast.warn("Unauthorized Attempted!");
+					// Redirect to login page if token doesn't exist
+					router.push("/auth");
+				} else {
+					// Verify token validity
+					const tokenValid = verifyToken(token);
+					if (!tokenValid) {
+						toast.warn("Session expired!");
+						// Redirect to login page if token is invalid
+						router.push("/auth/login");
+					}
+					if (tokenValid && !isAuthenticated) {
+						toast.warn("Login required!");
+						router.push("/auth/login");
+					}
+				}
+			}
+		}, []);
 
 		// Render the wrapped component if the user is logged in
 		return <WrappedComponent {...(props as P)} />;
@@ -57,9 +67,7 @@ const protectedRoutes = [
 const isProtectedRoute = (pathname: string) => {
 	return protectedRoutes.includes(pathname);
 };
-const UN_PROTECTED_PATH = [
-	"/"
-];
+const UN_PROTECTED_PATH = ["/"];
 const isPublicRoute = (pathname: string) => {
 	return UN_PROTECTED_PATH.includes(pathname);
 };

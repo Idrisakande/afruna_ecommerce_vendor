@@ -14,7 +14,6 @@ import { RootState } from "@/types/store.type";
 import Chat from "@/services/chat.service";
 import { T_convo, T_msg } from "@/types/user.type";
 import { getChatTimeDiff } from "@/utils/chat_time_diff";
-import withAuth10 from "@/hooks/withAuth10";
 import User from "@/services/user.service";
 import useSearchConvo from "@/hooks/useSearchConvo";
 import * as Avatar from "@radix-ui/react-avatar";

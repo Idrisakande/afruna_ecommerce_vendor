@@ -10,7 +10,6 @@ import { ManageProducts } from "@/components/products/ManageProducts";
 import { CreateProduct } from "@/components/products/CreateProduct";
 import { IProductContext } from "@/interfaces/IProductContext";
 import { ProductReviews } from "@/components/products/ProductReviews";
-import withAuth10 from "@/hooks/withAuth10";
 import withAuth from "@/hooks/withAuth";
 
 const TABS = [

@@ -18,7 +18,6 @@ import { ReportStats } from "@/components/ReportStats";
 import Reports from "@/services/reports.service";
 import { useSelector } from "react-redux";
 import { RootState } from "@/types/store.type";
-import withAuth10 from "@/hooks/withAuth10";
 import withAuth from "@/hooks/withAuth";
 
 const Index: FC<{}> = () => {

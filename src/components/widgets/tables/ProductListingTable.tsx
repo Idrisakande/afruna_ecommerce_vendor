@@ -18,6 +18,7 @@ import { RootState } from "@/types/store.type";
 import { IProduct } from "@/interfaces/IProductItem";
 import Products from "@/services/products.service";
 import { formattedDate } from "@/utils/formatted_date";
+import { nameCutter } from "@/utils/name_cutter.util";
 
 type T_data = IProduct & { categoryName: string };
 const ProductListingTable: FC = () => {
@@ -55,10 +56,11 @@ const ProductListingTable: FC = () => {
 			},
 			{
 				accessorKey: "name",
-				cell: (info) => {
-					const itemName = `${info.getValue()}`;
-					return <div className="ml-2">{itemName}</div>;
-				},
+				cell: (info) => (
+					<div className="ml-2">
+						{nameCutter(info.getValue() as string, 20)}
+					</div>
+				),
 				header: () => <span className="">Item Name</span>,
 			},
 			{
@@ -128,7 +130,7 @@ const ProductListingTable: FC = () => {
 				cell: ({ row }) => (
 					<div className="flex justify-start gap-3 items-center">
 						<Link
-							href={"/products/"+row.original._id}
+							href={"/products/" + row.original._id}
 							className="hover:scale-90 border-none transition duration-300"
 						>
 							<MdRemoveRedEye size={24} />

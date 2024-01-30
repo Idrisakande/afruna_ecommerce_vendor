@@ -2,14 +2,16 @@
 const nextConfig = {
 	reactStrictMode: true,
 	env: {
-		BASE_URL: "https://afruna-backend-cmsxg.ondigitalocean.app/api/v1",
+		BASE_URL: "https://afruna-api-ba54q.ondigitalocean.app/api/v1",
 	},
 	async rewrites() {
 		return [
 			{
 				source: "/api/:path*",
+				// destination:
+				// 	"https://afruna-backend-cmsxg.ondigitalocean.app/api/v1/:path*",
 				destination:
-					"https://afruna-backend-cmsxg.ondigitalocean.app/api/v1/:path*",
+					"https://afruna-api-ba54q.ondigitalocean.app/api/v1/:path*",
 			},
 		];
 	},
@@ -17,25 +19,7 @@ const nextConfig = {
 		remotePatterns: [
 			{
 				protocol: "https",
-				hostname: "picsum.photos",
-				port: "",
-				pathname: "/**",
-			},
-			{
-				protocol: "http",
-				hostname: "nyc3.digitaloceanspaces.com",
-				port: "",
-				pathname: "/**",
-			},
-			{
-				protocol: "https",
-				hostname: "afruna-bucket.nyc3.digitaloceanspaces.com",
-				port: "",
-				pathname: "/**",
-			},
-			{
-				protocol: "https",
-				hostname: "nyc3.digitaloceanspaces.com",
+				hostname: "afruna-space.nyc3.digitaloceanspaces.com",
 				port: "",
 				pathname: "/**",
 			},

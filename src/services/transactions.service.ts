@@ -25,6 +25,11 @@ export default class Transaction {
 
 	constructor() {
 		this.store = store.store;
+		this.getBanks();
+		this.getTransactions();
+		this.getWalletDetails();
+		console.log("__initialize__transactions__");
+		
 	}
 
 	async getWalletDetails() {
@@ -37,6 +42,8 @@ export default class Transaction {
 					},
 				},
 			);
+			console.log("wallet details", data.data);
+			
 			this.store.dispatch(setWallet(data.data));
 			sessionStorage.setItem(
 				"account",
@@ -47,7 +54,7 @@ export default class Transaction {
 		}
 	}
 
-	async getTransactions(page: number) {
+	async getTransactions(page: number = 1) {
 		try {
 			const { data } = await axios.get<TSuccessResponse<ITransaction[]>>(
 				`/api/transactions?page${page}`,
@@ -58,7 +65,6 @@ export default class Transaction {
 				},
 			);
 			this.store.dispatch(setTransactions(data.data));
-			toast.success("Fetch successful", { autoClose: 1000 });
 		} catch (error) {
 			handleAuthErrors(error as AxiosError<TErrorResponse>);
 		}
@@ -76,7 +82,6 @@ export default class Transaction {
 			);
 			this.store.dispatch(setSingleTransaction(data.data));
 			this.store.dispatch(setTotalPages(data.totalPages));
-			toast.success("Fetch Succesful", { autoClose: 1000 });
 		} catch (error) {
 			handleAuthErrors(error as AxiosError<TErrorResponse>);
 		}

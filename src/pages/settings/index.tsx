@@ -20,7 +20,6 @@ import get_countryUtil from "@/utils/get_country.util";
 import User from "@/services/user.service";
 import { ExtFile, FileInputButton } from "@files-ui/react";
 import { toast } from "react-toastify";
-import withAuth10 from "@/hooks/withAuth10";
 import { verifyImageUrl } from "@/utils/verify_image_url";
 import withAuth from "@/hooks/withAuth";
 export default withAuth(function Index() {

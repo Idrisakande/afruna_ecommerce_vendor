@@ -18,7 +18,6 @@ import Auth10 from "@/services/auth.service";
 import { T_login_data } from "@/types/auth.type";
 import { useSelector } from "react-redux";
 import { RootState } from "@/types/store.type";
-import withAuth10 from "@/hooks/withAuth10";
 import withAuth from "@/hooks/withAuth";
 
 const schema = Joi.object({

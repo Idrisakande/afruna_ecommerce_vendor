@@ -12,7 +12,6 @@ import { ProductListView } from "@/components/ProductListView";
 import { CreateBtn } from "@/components/widgets/CreateBtn";
 import { ReviewsSlide } from "@/components/ReviewsSlide";
 
-import withAuth10 from "@/hooks/withAuth10";
 import Order from "@/services/order.service";
 import { AppContext } from "@/contexts/AppProvider";
 import { T_app_provider } from "@/types/t";
