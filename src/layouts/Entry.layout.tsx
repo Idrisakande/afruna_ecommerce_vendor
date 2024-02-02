@@ -50,13 +50,13 @@ export default function EntryLayout({ children }: IEntryLayout) {
           <div className="hidden md:flex items-center space-x-4">
             <Picker
               items={["Help?", "Supports?", "Contact us"]}
-              getSelected={(value) => console.log(value)}
+              getSelected={(value) => {}}
               prefixHeaderIconComponent={<MdHelp />}
               isprefixHeaderIcon
             />
             <Picker
               items={["FR", "EN", "CN"]}
-              getSelected={(value) => console.log(value)}
+              getSelected={(value) => {}}
               prefixHeaderIconComponent={<BiWorld />}
               isprefixHeaderIcon
               headerPlaceholder="Lang"

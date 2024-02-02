@@ -28,7 +28,7 @@ const withAuth = <P extends TOriginalComponentProps>(
 				if (!token) {
 					toast.warn("Unauthorized Attempted!");
 					// Redirect to login page if token doesn't exist
-					router.push("/auth");
+					router.push("/auth/login");
 				} else {
 					// Verify token validity
 					const tokenValid = verifyToken(token);
@@ -37,7 +37,7 @@ const withAuth = <P extends TOriginalComponentProps>(
 						// Redirect to login page if token is invalid
 						router.push("/auth/login");
 					}
-					if (tokenValid && !isAuthenticated) {
+					if (!isAuthenticated) {
 						toast.warn("Login required!");
 						router.push("/auth/login");
 					}

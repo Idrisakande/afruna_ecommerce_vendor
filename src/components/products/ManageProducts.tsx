@@ -62,7 +62,6 @@ export const ManageProducts: FC<{}> = memo(({}) => {
 		},
 		[manageItems],
 	);
-	console.log(manageItems);
 
 	return (
 		<>

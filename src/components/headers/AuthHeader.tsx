@@ -17,7 +17,13 @@ export const AuthHeader = memo(() => (
 				items={["FAQs", "Contant Us"]}
 				placeholder={"Help"}
 				triggerLeftIcon={<MdHelp className="text-xl" />}
-				getSelected={(value) => console.log(value)}
+				getSelected={(value) => {
+					if (value === "FAQs"){
+
+					}else {
+						
+					}
+				}}
 				triggerClassName={
 					"gap-3 p-1 flex justify-between items-center text-sm text-afruna-blue"
 				}

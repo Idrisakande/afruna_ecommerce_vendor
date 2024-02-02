@@ -45,7 +45,7 @@ export const Main: FC<MainProps> = ({
 							items={["FAQs", "Contant Us"]}
 							placeholder={"Get help"}
 							triggerLeftIcon={<MdHelp className="text-lg" />}
-							getSelected={(value) => console.log(value)}
+							getSelected={(value) => {}}
 							contentClassName="z-20"
 							triggerClassName="flex text-xs space-x-1 items-center text-afruna-blue"
 						/>

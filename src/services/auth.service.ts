@@ -44,12 +44,12 @@ class Auth10 {
 				});
 				return;
 			}
-			Cookies.set("token", data.data.token)
+			Cookies.set("token", data.data.token);
 			dispatch(setAuth10(true));
 			dispatch(setToken(data.data.token));
 			dispatch(setUserBio(user as T_User));
 			this.router && this.router.replace("/dashboard");
-			toast.success("Login Successful", {
+			toast.success("Login Successful. Welcome!", {
 				position: "top-center",
 				autoClose: 5000,
 				hideProgressBar: true,
@@ -60,6 +60,9 @@ class Auth10 {
 				theme: "colored",
 			});
 		} catch (error) {
+			if (error){
+
+			}
 			handleAuthErrors(error as AxiosError<T_error_response>);
 		}
 	}
@@ -78,7 +81,7 @@ class Auth10 {
 			} = data;
 
 			this.store.dispatch(setAuth10(true));
-			Cookies.set("token", data.data.token)
+			Cookies.set("token", data.data.token);
 			this.store.dispatch(setUserBio(user));
 			toast.success("Registeration Successful", {
 				position: "top-center",
@@ -90,14 +93,16 @@ class Auth10 {
 				progress: undefined,
 				theme: "colored",
 			});
-			this.router && this.router.replace("/dashboard");
+			this.router && this.router.replace("/auth/login");
 		} catch (error) {
 			handleAuthErrors(error as AxiosError<T_error_response>);
 		}
 	}
 	async googlesignin() {
 		try {
-			const { data } = await axios.get("/api/oAuthUrls?url=localhost:3000");
+			const { data } = await axios.get(
+				"/api/oauthurls?url=localhost:3000",
+			);
 			const {
 				data: { googleLoginUrl },
 			} = data;

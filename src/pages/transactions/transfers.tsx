@@ -90,39 +90,39 @@ export default function Transfer() {
 				<div className="col-span-6 flex flex-col bg-white rounded-2xl border p-4">
 					<InputLabel
 						type="text"
-						getValue={(val) => console.log(val)}
+						getValue={(val) => {}}
 						headerTitle="Seller's Name"
 						placeholder="Hammer Head"
 					/>
 					<InputLabel
 						type="text"
-						getValue={(val) => console.log(val)}
+						getValue={(val) => {}}
 						headerTitle="Seller's ID"
 						placeholder="#dzkd33c"
 					/>
 					<div className="grid grid-cols-2 gap-8">
 						<InputLabel
 							type="text"
-							getValue={(val) => console.log(val)}
+							getValue={(val) => {}}
 							headerTitle="Bank Name"
 							placeholder="POS"
 						/>
 						<InputLabelNumber
-							getValue={(val) => console.log(val)}
+							getValue={(val) => {}}
 							headerTitle="Account Number"
 							max={10}
 							placeholder="9095783044"
 						/>
 					</div>
 					<InputLabelNumber
-						getValue={(val) => console.log(val)}
+						getValue={(val) => {}}
 						headerTitle="Phone Number"
 						max={14}
 						placeholder="+2349095783044"
 					/>
 					<div className="grid grid-cols-2">
 						<InputLabelNumber
-							getValue={(val) => console.log(val)}
+							getValue={(val) => {}}
 							headerTitle="Enter Amount"
 							max={14}
 							placeholder="5000"

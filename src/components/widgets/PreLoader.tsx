@@ -6,7 +6,7 @@ export default function () {
 		<>
 			<div id="preloader">
                 <div id="loader" />
-                <Image src={images.afruna_logo} alt="logo" id="heartbeat_preload" />
+                <Image width={100} height={100} className="w-24 h-24" src={images.afruna_logo} alt="logo" id="heartbeat_preload" />
 			</div>
 				
 		</>

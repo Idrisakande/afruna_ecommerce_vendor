@@ -93,7 +93,6 @@ export default withAuth(function Index() {
 	const handlePasswordChange = useCallback(
 		(data: T_cp) => {
 			const userServices = new User();
-			console.log(data);
 			if (!data.oldPassword.length) {
 				toast.warn("Old password required!");
 				return;

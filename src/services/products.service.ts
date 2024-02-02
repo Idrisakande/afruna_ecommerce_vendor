@@ -1,17 +1,20 @@
 import axios, { AxiosError } from "axios";
 
 import { IProduct } from "@/interfaces/IProductItem";
-import { IProducts } from "@/interfaces/tables.interface";
 import store from "@/redux/store";
 import { T_app_provider } from "@/types/t";
 import { handleAuthErrors } from "@/utils/auth.util";
 import Cookies from "js-cookie";
 import { updateCategories } from "@/redux/features/categories.slice";
-import { updateProdouctsWithReviews, updateProducts } from "@/redux/features/products.slice";
+import {
+	updateProdouctsWithReviews,
+	updateProducts,
+} from "@/redux/features/products.slice";
 import { T_error_response } from "@/types/auth.type";
 import { toast } from "react-toastify";
 import { productsWithReviews } from "@/utils/products_with_reviews";
 import { T_review } from "@/types/user.type";
+import { T_product_reviews } from "@/components/products/ProductReviews";
 
 class Products {
 	protected store = store.store;
@@ -58,19 +61,17 @@ class Products {
 		const { setIsloading } = opt;
 		setIsloading && setIsloading(true);
 		try {
-			const { data } = await axios.put("/api/products/" + id,payload, {
+			const { data } = await axios.put("/api/products/" + id, payload, {
 				headers: {
 					Authorization: `Bearer ${Cookies.get("token")}`,
 				},
 			});
-			
+
 			toast.info("Update successfully!");
 			this.getProducts();
 			return data.data;
 		} catch (error) {
 			handleAuthErrors(error as AxiosError<T_error_response>);
-			
-		
 		} finally {
 			setIsloading && setIsloading(true);
 		}
@@ -87,10 +88,9 @@ class Products {
 						new Date(a.createdAt as string).getDate() -
 						new Date(b.createdAt as string).getDate(),
 				);
-				
+
 				this.store.dispatch(updateProducts(sortedProducts));
 			} else {
-				console.log(products);
 				this.store.dispatch(updateProducts(products));
 			}
 		} catch (error) {
@@ -100,8 +100,10 @@ class Products {
 	getProductsWithReviews() {
 		const products = this.store.getState().products.products;
 		const reviews = this.store.getState().user.reviews as T_review[];
-		const PWR = productsWithReviews(products, reviews);
-		this.store.dispatch(updateProdouctsWithReviews(PWR));
+		const PWR = productsWithReviews<T_product_reviews>(products, reviews);
+		this.store.dispatch(
+			updateProdouctsWithReviews(PWR as unknown as T_product_reviews[]),
+		);
 		return PWR;
 	}
 	private async getCategories() {

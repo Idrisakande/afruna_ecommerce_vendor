@@ -1,10 +1,10 @@
-import { ITransaction, IWallet } from "@/interfaces/ITransaction";
+import { IBank, ITransaction, IWallet } from "@/interfaces/ITransaction";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     transactions: [] as ITransaction[],
     transaction: {} as ITransaction,
-    banks: [] as any[],
+    banks: [] as IBank[],
     wallet: {} as IWallet
 }
 
@@ -18,7 +18,7 @@ const transaction_slice = createSlice({
         setSingleTransaction: (state, action: PayloadAction<ITransaction>) => {
             state.transaction = action.payload
         },
-        setBanks: (state, action: PayloadAction<any[]>) => {
+        setBanks: (state, action: PayloadAction<IBank[]>) => {
             state.banks = action.payload
         },
         setWallet: (state, action: PayloadAction<IWallet>) => {

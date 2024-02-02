@@ -22,7 +22,7 @@ export const AddCategory: FC<AddCategoryProps> = ({ isOpen, onClose }) => {
 	} = useForm<IAddCategoryInput>();
 
 	const onSubmit: SubmitHandler<IAddCategoryInput> = (data) => {
-		console.log(data);
+		
 	};
 
 	const [files, setFiles] = useState<ExtFile[]>([]);
@@ -146,7 +146,7 @@ export const AddCategory: FC<AddCategoryProps> = ({ isOpen, onClose }) => {
 								headerTitle="Category Title"
 								placeholder="Select the title"
 								key={"Items"}
-								getSelected={(val) => console.log(val)}
+								getSelected={(_) => {}}
 							/>
 							<ItemPicker
 								items={[
@@ -159,7 +159,7 @@ export const AddCategory: FC<AddCategoryProps> = ({ isOpen, onClose }) => {
 								headerTitle="Slug"
 								placeholder="Select the slug"
 								key={"Items"}
-								getSelected={(val) => console.log(val)}
+								getSelected={(_) => {}}
 							/>
 							<fieldset className="w-full flex flex-col gap-2">
 								<label>Description</label>

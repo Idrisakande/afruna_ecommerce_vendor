@@ -376,7 +376,8 @@ export default function Register() {
 							Login
 						</button>
 					</div>
-					<button
+					{/* 
+						<button
 						onClick={handleGoogleLogin}
 						type="button"
 						className="p-2 text-slate-700 justify-center items-center w-full rounded-md my-2 flex border-[1px] border-slate-300"
@@ -388,6 +389,7 @@ export default function Register() {
 						/>
 						<span className="ml-2">Log in with Google</span>
 					</button>
+						*/}
 				</section>
 			</form>
 		</AuthLayout>

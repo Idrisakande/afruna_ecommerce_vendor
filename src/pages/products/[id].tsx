@@ -76,8 +76,6 @@ export default function () {
 	}, [productsWithReviews, query.id]);
 
 	const prod = productWithReview !== undefined ? productWithReview : product;
-	console.log(prod);
-
 	return (
 		<ProductProvider>
 			<div className="relative p-3 text-[12px] pb-28 md:pb-44">

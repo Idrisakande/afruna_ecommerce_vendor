@@ -35,7 +35,6 @@ import { getNonEmptyInputValues } from "@/utils/get_non_empty_input_values";
 
 export const CreateProduct: FC<{}> = memo(({}) => {
 	const { bio_data } = useSelector((state: RootState) => state.user);
-	console.log(bio_data);
 
 	const router = useRouter();
 	const { tab } = useContext(productcontext) as IProductContext;
@@ -305,8 +304,7 @@ export const CreateProduct: FC<{}> = memo(({}) => {
 			(accum, value) => accum + parseInt(value.quantity as string),
 			0,
 		);
-		console.log(totalQauantity);
-
+	
 		setQuantity(totalQauantity);
 	}, [productVariants]);
 	if (opt.isLoading) {

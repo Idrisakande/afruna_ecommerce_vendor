@@ -19,8 +19,7 @@ export const PopupModal: FC<PopupModalProps> = ({
 }) => {
 
 	const deleteproducts = useCallback(async () => {
-		console.log(products);
-		
+
 		const productsService = new Products();
 		if (products) {
 		

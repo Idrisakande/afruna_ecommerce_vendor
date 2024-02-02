@@ -1,58 +1,49 @@
-"use client"
+"use client";
 import "react-calendar/dist/Calendar.css";
 import Image from "next/image";
 import { Main } from "@/layouts/Main";
 import { images } from "@/constants/images";
 import TransactionHistory from "@/components/widgets/tables/TransactionHistory";
 import Breadcrumbs from "@/components/widgets/Breadcrumbs";
-import { useRouter } from "next/router";
 import { Content } from "@/components/products/Content";
 import { Header } from "@/components/products/Header";
-import { FC, ReactElement, ReactNode, useEffect, useState } from "react";
+import { FC, ReactElement, ReactNode, useCallback, useState } from "react";
 import classNames from "classnames";
 import { RxChevronRight } from "react-icons/rx";
 import { HiX } from "react-icons/hi";
 import { useSelector } from "react-redux";
 import { RootState } from "@/types/store.type";
-import Transactions from "@/services/transactions.service";
 import withAuth from "@/hooks/withAuth";
-import Transaction from "@/services/transactions.service";
 import { useSearchParams } from "next/navigation";
-import { toast } from "react-toastify";
-import { IConfirmankDetails, ISetBankDetails } from "@/interfaces/ITransaction";
-import * as Dialog from "@radix-ui/react-dialog";
-import * as Select from "@radix-ui/react-select";
-import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
-import { SelectItem } from "@/components/widgets/SelectItem";
-import NumberInput from "@/components/widgets/Input/NumberInput";
-import ItemLabelPicker from "@/components/widgets/ItemLabelPicker";
+import WalletSetup from "@/components/WalletSetup";
+import { WalletWithdrawal } from "@/components/WalletWithdrawal";
 
 const Index = () => {
-	const router = useRouter();
 	const [showAFCModel, setShowAFCModel] = useState(false);
 	const [showPendingModel, setShowPendingModel] = useState(false);
 
-	const { banks, transactions, wallet } = useSelector(
+	const { transactions, wallet } = useSelector(
 		(state: RootState) => state.transaction,
 	);
-	const userWallet = useSelector(
-		(state: RootState) => state.transaction.wallet,
-	);
-	const [accountDetails, setAccountDetails] = useState({
-		bankID: "",
-		bankName: "",
-	});
-
-	console.log("wallet",wallet);
-	
 
 	const searchParams = useSearchParams();
 	const page = searchParams.get("page") ?? "1";
-	const [open, setOpen] = useState(false);
+	const [accountsConfig, setAccountsConfig] = useState({
+		new_account: false,
+		open_wallet: false,
+	});
 
-	useEffect(() => {
-		const transationApis = new Transaction();
-	}, []);
+	const handleWithdrawal = useCallback(() => {
+		if (wallet.accounts.length < 1 || wallet.accounts === undefined) {
+			setAccountsConfig((acc) => ({ ...acc, new_account: true }));
+		} else {
+			setAccountsConfig((acc) => ({
+				...acc,
+				new_account: false,
+				open_wallet: true,
+			}));
+		}
+	}, [wallet.accounts]);
 
 	return (
 		<Main breadcrumbs={<Breadcrumbs />}>
@@ -70,12 +61,12 @@ const Index = () => {
 						middelComponent={
 							<MiddleComponent
 								title={"Available Balance"}
-								value={userWallet.balance ?? 0}
+								value={wallet.balance ?? 0}
 							/>
 						}
 						rightComponent={
 							<button
-								onClick={() => setOpen(true)}
+								onClick={handleWithdrawal}
 								className="md:w-24 text-center rounded-sm bg-gradient-whitishblue p-2 text-white text-[12px]"
 							>
 								Withdraw
@@ -118,81 +109,28 @@ const Index = () => {
 						}
 					/>
 				</div>
-				<Dialog.Root modal open={open}>
-					<Dialog.Portal>
-						<Dialog.Overlay className="DialogOverlay" />
-						<Dialog.Content className="bg-white left-1/2 top-[40%] absolute h-[45vh] overflow-y-auto -translate-x-[50%] -translate-y-[40%] p-3 rounded-md w-1/2 z-30 transition-all shadow-lg">
-							<div className="grid my-3 gap-1 md:grid-cols-2 w-full grid-cols-auto">
-								<div className="col-span-full md:col-span-1 space-y-3">
-									<Select.Root>
-										<Select.Trigger>
-											<Select.Value />
-											<Select.Icon />
-										</Select.Trigger>
-
-										<Select.Portal>
-											<Select.Content>
-												<Select.ScrollUpButton />
-												<Select.Viewport>
-													{banks.map((bank) => (
-														<Select.Separator
-															key={bank.id}
-														/>
-													))}
-												</Select.Viewport>
-												<Select.ScrollDownButton />
-												<Select.Arrow />
-											</Select.Content>
-										</Select.Portal>
-									</Select.Root>
-
-									<NumberInput
-										className="p-2 outline-none focus-within:border-afruna-blue/70 border border-afruna-base/70 rounded-md appearance-none w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-										type="number"
-										placeholder="Account Number"
-										maxLength={10}
-									/>
-									<NumberInput
-										className="p-2 outline-none focus-within:border-afruna-blue/70 border border-afruna-base/70 rounded-md appearance-none w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-										type="number"
-										placeholder="Amount"
-									/>
-								</div>
-								<div className="col-span-full md:col-span-1 space-y-3">
-									{/* other */}
-								</div>
-							</div>
-
-							<div className="flex justify-end items-end gap-3">
-								<Dialog.Close asChild>
-									<button
-										onClick={() => setOpen(false)}
-										className="border border-red-400 text-afruna-blue/90 hover:text-afruna-blue rounded-md p-3 place-self-end text-xs text-center"
-										aria-label="Close"
-									>
-										Cancel
-									</button>
-								</Dialog.Close>
-								<Dialog.Close asChild>
-									<button
-										onClick={() => setOpen(false)}
-										className="border border-green-400 text-afruna-blue/90 hover:text-afruna-blue rounded-md p-3 place-self-end text-xs text-center"
-										aria-label="Close"
-									>
-										Confirm
-									</button>
-								</Dialog.Close>
-							</div>
-						</Dialog.Content>
-					</Dialog.Portal>
-				</Dialog.Root>
+				{/* wallet details*/}
+				{accountsConfig.new_account ? (
+					<WalletSetup defaultOpen={true} />
+				) : null}
+				<WalletWithdrawal
+					onClose={() => {
+						setAccountsConfig((acc) => ({
+							...acc,
+							new_account: false,
+							open_wallet: false,
+						}));
+					}}
+					open={accountsConfig.open_wallet}
+				/>
+				<WalletSetup titleText="Add account" />
 				<Content>
 					<Header
 						key={"transaction history"}
 						headerTitle={"Transaction history"}
 					/>
 					{transactions.length ? (
-						<TransactionHistory />
+						<TransactionHistory transactions={transactions} />
 					) : (
 						<div className="flex flex-col justify-center items-center h-1/2">
 							<Image

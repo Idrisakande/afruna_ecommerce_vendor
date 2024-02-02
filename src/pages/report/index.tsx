@@ -27,8 +27,6 @@ const Index: FC<{}> = () => {
 	}, []);
 	
 	const {reports} = useSelector((state: RootState)=>state.user)
-	console.log(reports);
-	
 	return (
 		<Main breadcrumbs={<Breadcrumbs />}>
 			<ReportStats />

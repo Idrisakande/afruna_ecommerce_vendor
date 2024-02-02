@@ -12,17 +12,20 @@ import { MdDeleteOutline, MdPrint } from "react-icons/md";
 
 import { ITransactionHistory } from "@/interfaces/tables.interface";
 import { transactionHistory_data } from "@/constants/data";
+import { ITransaction } from "@/interfaces/ITransaction";
 
-interface TransactionHistoryType {}
+interface TransactionHistoryProps {
+	transactions: ITransaction[]
+}
 
-const TransactionHistory: FC<TransactionHistoryType> = () => {
-	const [data, setData] = useState(() => [...transactionHistory_data]);
+const TransactionHistory: FC<TransactionHistoryProps> = ({transactions}) => {
+	const [data, setData] = useState(() => [...transactions]);
 
 	const [sorting, setSorting] = useState<SortingState>([]);
-	const columns = useMemo<ColumnDef<ITransactionHistory>[]>(
+	const columns = useMemo<ColumnDef<ITransaction>[]>(
 		() => [
 			{
-				accessorKey: "id",
+				accessorKey: "customId",
 				cell: (info) => <>#{info.getValue()}</>,
 				header: () => <span>Transaction ID</span>,
 			},

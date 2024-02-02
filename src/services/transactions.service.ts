@@ -14,7 +14,7 @@ import {
 	setWallet,
 } from "@/redux/features/app/transaction_slice";
 import { toast } from "react-toastify";
-import { handleAuthErrors } from "../utils/auth.util";
+import { handleAuthErrors, handleTransactionErrors } from "../utils/auth.util";
 import { setTotalPages } from "@/redux/features/app/utils_slice";
 import { T_store } from "@/types/store.type";
 import store from "@/redux/store";
@@ -28,8 +28,6 @@ export default class Transaction {
 		this.getBanks();
 		this.getTransactions();
 		this.getWalletDetails();
-		console.log("__initialize__transactions__");
-		
 	}
 
 	async getWalletDetails() {
@@ -42,15 +40,14 @@ export default class Transaction {
 					},
 				},
 			);
-			console.log("wallet details", data.data);
-			
+
 			this.store.dispatch(setWallet(data.data));
 			sessionStorage.setItem(
 				"account",
 				JSON.stringify(data.data.accounts[0]),
 			);
 		} catch (error) {
-			handleAuthErrors(error as AxiosError<TErrorResponse>);
+			handleTransactionErrors(error as AxiosError<TErrorResponse>);
 		}
 	}
 
@@ -66,7 +63,7 @@ export default class Transaction {
 			);
 			this.store.dispatch(setTransactions(data.data));
 		} catch (error) {
-			handleAuthErrors(error as AxiosError<TErrorResponse>);
+			handleTransactionErrors(error as AxiosError<TErrorResponse>);
 		}
 	}
 
@@ -83,7 +80,7 @@ export default class Transaction {
 			this.store.dispatch(setSingleTransaction(data.data));
 			this.store.dispatch(setTotalPages(data.totalPages));
 		} catch (error) {
-			handleAuthErrors(error as AxiosError<TErrorResponse>);
+			handleTransactionErrors(error as AxiosError<TErrorResponse>);
 		}
 	}
 
@@ -100,7 +97,7 @@ export default class Transaction {
 			this.store.dispatch(setBanks(data.data));
 			sessionStorage.setItem("banks", JSON.stringify(data.data));
 		} catch (error) {
-			handleAuthErrors(error as AxiosError<TErrorResponse>);
+			handleTransactionErrors(error as AxiosError<TErrorResponse>);
 		}
 	}
 
@@ -113,18 +110,10 @@ export default class Transaction {
 					Authorization: `Bearer ${Cookies.get("token")}`,
 				},
 			});
+
 			return data;
-		} catch (error: any) {
-			if (
-				error.response.data.error.error ===
-				"Could not resolve account name. Check parameters or try again."
-			) {
-				toast.error(
-					"Could not resolve account name. Check parameters or try again.",
-					{ autoClose: 1000 },
-				);
-			}
-			handleAuthErrors(error as AxiosError<TErrorResponse>);
+		} catch (error) {
+			return error;
 		}
 	}
 
@@ -141,11 +130,11 @@ export default class Transaction {
 			);
 			return data;
 		} catch (error) {
-			handleAuthErrors(error as AxiosError<TErrorResponse>);
+			handleTransactionErrors(error as AxiosError<TErrorResponse>);
 		}
 	}
 
-	async withdraw(payload: any) {
+	async withdraw(payload: { accountId: string; amount: number }) {
 		try {
 			const { data } = await axios.post<TSuccessResponse<any>>(
 				"/api/wallets/withdraw",
@@ -158,7 +147,7 @@ export default class Transaction {
 			);
 			return data;
 		} catch (error) {
-			handleAuthErrors(error as AxiosError<TErrorResponse>);
+			return error;
 		}
 	}
 }

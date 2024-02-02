@@ -20,8 +20,6 @@ export const ReviewsSlide = () => {
 	const { reviews, recent_reviewers } = useSelector(
 		(state: RootState) => state.user,
 	);
-	console.log(reviews);
-	
 
 	if (!reviews?.length)
 	return <ResultsFallback/>	

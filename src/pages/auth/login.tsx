@@ -72,10 +72,10 @@ function Login() {
 		[],
 	);
 
-	const handleGoogleLogin = useCallback(async () => {
-		const authService = new Auth10();
-		authService.googlesignin();
-	}, []);
+	// const handleGoogleLogin = useCallback(async () => {
+	// 	const authService = new Auth10();
+	// 	authService.googlesignin();
+	// }, []);
 
 	return (
 		<AuthLayout>
@@ -176,18 +176,21 @@ function Login() {
 						<span className="p-3">or</span>
 						<Hr.Root style={{ margin: "15px 0" }} />
 					</div> */}
-				<button
-					onClick={handleGoogleLogin}
-					type="button"
-					className="p-2 text-slate-700 justify-center items-center w-full rounded-md my-2 flex border-[1px] border-slate-300"
-				>
-					<Image
-						src={images.google_icon}
-						width={30}
-						alt="google_icon"
-					/>
-					<span className="ml-2">Log in with Google</span>
-				</button>
+				{/* 
+						<button
+						onClick={handleGoogleLogin}
+						type="button"
+						className="p-2 text-slate-700 justify-center items-center w-full rounded-md my-2 flex border-[1px] border-slate-300"
+					>
+						<Image
+							src={images.google_icon}
+							width={30}
+							alt="google_icon"
+						/>
+						<span className="ml-2">Log in with Google</span>
+					</button>
+						*/}
+
 				<div className="my-3 text-center">
 					<p>Don&apos;t have an account already?</p>
 					<button

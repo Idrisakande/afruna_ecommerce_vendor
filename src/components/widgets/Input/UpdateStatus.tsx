@@ -19,7 +19,7 @@ export const UpdateStatus: FC<UpdateStatusProps> = ({ isOpen, onClose }) => {
   } = useForm<IUpdateStatusInput>();
 
   const onSubmit: SubmitHandler<IUpdateStatusInput> = (data) => {
-    console.log(data);
+    
   };
 
   return (
@@ -41,10 +41,10 @@ contentClassName="z-50"
           headerTitle="Status"
           placeholder="Select the status"
           key={"Items"}
-          getSelected={(val) => console.log(val)}
+          getSelected={(val) => {}}
         />
         <InputLabel
-          getValue={(val) => console.log(val)}
+          getValue={(val) => {}}
           headerTitle="Date"
           placeholder="Enter the date"
           type="date"

@@ -1,7 +1,7 @@
 import { Fab } from "react-tiny-fab";
 import "react-tiny-fab/dist/styles.css";
 import { useRouter } from "next/router";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Main } from "@/layouts/Main";
 import { UsersList } from "@/components/UsersList";
 import { CurrentUserHeader } from "@/components/CurrentUserHeader";
@@ -17,9 +17,7 @@ import { getChatTimeDiff } from "@/utils/chat_time_diff";
 import User from "@/services/user.service";
 import useSearchConvo from "@/hooks/useSearchConvo";
 import * as Avatar from "@radix-ui/react-avatar";
-import { verifyImageUrl } from "@/utils/verify_image_url";
 import withAuth from "@/hooks/withAuth";
-import { images } from "@/constants/images";
 import { updateMessages } from "@/redux/features/chat.slice";
 export default withAuth(function Index() {
 	const router = useRouter();
@@ -38,26 +36,10 @@ export default withAuth(function Index() {
 			const _ = new Chat();
 			const messages = await _.getMessage(id);
 			dispatch(updateMessages(messages as T_msg[]));
-			console.log("msg");
-			console.log(messages);
-			
 		},
 		[dispatch],
 	);
 	const { searchResult, setSearchInput } = useSearchConvo({ data: convo });
-
-	// const moreUsers = useMemo(
-	// 	() =>
-	// 		users &&
-	// 		users.filter(
-	// 			(user) => user?._id !== activeChat[0]?.from._id,
-	// 		).filter((user)=> user?._id !== bio_data?._id),
-	// 		// usersWithReviews &&
-	// 		// usersWithReviews.filter(
-	// 		// 	(user) => user._id !== activeChat[0]?.from._id,
-	// 		// ),
-	// 	[activeChat, usersWithReviews],
-	// );
 
 	return (
 		<Main breadcrumbs={<Breadcrumbs />}>
@@ -268,7 +250,8 @@ export default withAuth(function Index() {
 																);
 														}}
 														key={user?._id}
-														className="flex items-center place-items-center gap-2 hover:bg-gray-300/90 w-full rounded-lg"
+														className="flex 
+														items-center place-items-center gap-3 hover:bg-gray-300/90 w-full rounded-lg"
 													>
 														<Avatar.Root>
 															<Avatar.Image

@@ -113,7 +113,6 @@ class Order {
 				},
 			});
 			const orders: T_order[] = data.data.filter(order => order.productId !== null);
-console.log(orders);
 
 			this.store.dispatch(updateOrder(orders));
 		} catch (error) {
